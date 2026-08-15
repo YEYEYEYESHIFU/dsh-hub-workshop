@@ -15,5 +15,151 @@
     ],
     "failClosed": true
   },
-  "records": []
+  "records": [
+    {
+      "schema": "omdsh-workshop-intake/v1",
+      "id": "dsh-lsp-actions@0.2.0",
+      "submission": {
+        "repository": "https://github.com/PerryLink/dsh-lsp-actions",
+        "ref": "0ac0a6300968d34418f366532f545cf3bbd4a16e",
+        "path": null,
+        "manifest": {
+          "schema": "omdsh-workshop-submission/v2",
+          "operation": "create-project",
+          "project": {
+            "id": "dsh-lsp-actions",
+            "displayName": "dsh-lsp-actions",
+            "summary": "LSP action surface for DeepSeek Harness: diagnostics, formatting, completion, code actions, symbols, signature help, inlay hints, and rename tools over real language servers.",
+            "kind": "toolkit",
+            "category": "developer-tools",
+            "tags": [
+              "lsp",
+              "language-server",
+              "diagnostics",
+              "formatting",
+              "completion",
+              "refactoring"
+            ],
+            "repository": "https://github.com/PerryLink/dsh-lsp-actions",
+            "path": null,
+            "author": {
+              "name": "PerryLink",
+              "url": "https://github.com/PerryLink"
+            },
+            "license": "Apache-2.0"
+          },
+          "release": {
+            "version": "0.2.0",
+            "ref": "0ac0a6300968d34418f366532f545cf3bbd4a16e",
+            "updatedAt": "2026-08-15T09:05:00Z",
+            "channel": "stable",
+            "compatibility": "@deepseek-ai/dsh 0.1.0-rc.6 (official baseline; peerDependencies >=0.1.0-rc.6)",
+            "changelog": "https://github.com/PerryLink/dsh-lsp-actions/blob/0ac0a6300968d34418f366532f545cf3bbd4a16e/CHANGELOG.md",
+            "capabilities": {
+              "requiresFabric": false,
+              "deepHook": false,
+              "restartRequired": true
+            },
+            "profileBundle": {
+              "packageName": "dsh-lsp-actions",
+              "spec": "0.2.0"
+            },
+            "updateFrom": null
+          },
+          "management": {
+            "method": "profile-bundle",
+            "protocol": "harness-profile",
+            "label": "Profile bundle (cordis.patch.yml)",
+            "instructions": "Install the npm package and add one server entry per language server in the profile's cordis.patch.yml; the eight tools register on the next host start. See the repository README for the configuration reference.",
+            "source": null
+          },
+          "declarations": {
+            "permissions": "Reads workspace source files through ctx.fs; lsp_format and lsp_rename write only through fs/write-intent and the per-call sandbox policy; spawns configured language servers through ctx.subprocess; no network access, no credential handling, no install scripts.",
+            "testing": "241 unit/integration tests plus a real typescript-language-server e2e suite; coverage gates (lines/statements/functions >= 90%, branches >= 85%); GitHub Actions matrix on Node 22/24 x ubuntu/windows/macos green at the pinned commit.",
+            "trustedPublisherRequested": false,
+            "installScriptsMustRemainDisabled": true
+          },
+          "packageManifest": {
+            "schema": "omdsh-workshop-package/v1",
+            "type": "plugin",
+            "integration": {
+              "protocol": "harness-profile",
+              "artifact": "cordis.patch.yml"
+            },
+            "install": {
+              "mode": "transactional",
+              "adapter": "profile-bundle",
+              "failurePolicy": "generation-rollback",
+              "touchesCurrentBeforeActivation": false
+            },
+            "lifecycle": {
+              "activation": "restart-host",
+              "dispose": "supported"
+            },
+            "permissions": [
+              "fs:read",
+              "fs:write",
+              "subprocess:spawn",
+              "network:none"
+            ],
+            "compatibility": {
+              "dshVersions": [
+                "0.1.0-rc.6"
+              ]
+            },
+            "capability": {
+              "id": "lsp_diagnostics",
+              "kind": "tool",
+              "invocation": "lsp_diagnostics with file_path pointing at a TypeScript source in a workspace with typescript-language-server configured",
+              "expected": "a diagnostics result with severity, range, message, and source server reported by the real language server"
+            },
+            "evidence": {
+              "install": null,
+              "failureIsolation": null,
+              "hotReload": null,
+              "remove": null
+            }
+          }
+        }
+      },
+      "classification": {
+        "management": "transactional"
+      },
+      "baseline": {
+        "package": "@deepseek-ai/dsh",
+        "version": "0.1.0-rc.6",
+        "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+      },
+      "review": {
+        "state": "pending-review",
+        "notes": "Automatically prepared from #22; public fixed-source preflight passed. Human review is still required."
+      },
+      "verification": {
+        "state": "untested"
+      },
+      "tests": {
+        "static": {
+          "required": true,
+          "status": "passed",
+          "evidence": "submission manifest validation; public repository and fixed commit resolved; pinned path(s): /cordis.patch.yml, /package.json"
+        },
+        "supplyChain": {
+          "required": true,
+          "status": "pending"
+        },
+        "officialBaseline": {
+          "required": true,
+          "status": "pending"
+        },
+        "lifecycle": {
+          "required": true,
+          "status": "pending"
+        }
+      },
+      "registry": {
+        "state": "ineligible",
+        "reason": "current-baseline-verification-required"
+      }
+    }
+  ]
 }

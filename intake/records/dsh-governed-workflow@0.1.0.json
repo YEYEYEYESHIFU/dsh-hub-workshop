@@ -1,0 +1,147 @@
+{
+  "schema": "omdsh-workshop-intake/v1",
+  "id": "dsh-governed-workflow@0.1.0",
+  "submission": {
+    "repository": "https://github.com/zcx369658780/governed-workflow-for-dsh",
+    "ref": "609f399957cedc166328da8a9b7c4f063bc53c94",
+    "path": null,
+    "manifest": {
+      "schema": "omdsh-workshop-submission/v2",
+      "operation": "create-project",
+      "project": {
+        "id": "dsh-governed-workflow",
+        "displayName": "Governed Workflow for DSH",
+        "summary": "Policy-enforced, evidence-first governed Builder workflow for DeepSeek Harness agents.",
+        "kind": "extension",
+        "category": "workflow",
+        "tags": [
+          "deepseek-harness",
+          "governance",
+          "workflow",
+          "agent-safety"
+        ],
+        "repository": "https://github.com/zcx369658780/governed-workflow-for-dsh",
+        "path": null,
+        "author": {
+          "name": "zcx369658780",
+          "url": "https://github.com/zcx369658780"
+        },
+        "license": "MIT"
+      },
+      "release": {
+        "version": "0.1.0",
+        "ref": "609f399957cedc166328da8a9b7c4f063bc53c94",
+        "updatedAt": "2026-08-15T10:39:43Z",
+        "channel": "beta",
+        "compatibility": "@deepseek-ai/dsh@0.1.0-rc.6 only; future DSH versions are not claimed.",
+        "changelog": "Initial OMDSH submission for the V0.9 Developer Technical Preview: governed GitHub task authority, explicit lifecycle tools, RUNNING-only mutation guard, governed-builder Skill, evidence recording, tracked prebuilt lib for scripts-disabled Profile Bundle intake, and author-facing release-truth convergence.",
+        "capabilities": {
+          "requiresFabric": false,
+          "deepHook": false,
+          "restartRequired": true
+        },
+        "profileBundle": {
+          "packageName": "dsh-governed-workflow",
+          "spec": "github:zcx369658780/governed-workflow-for-dsh#609f399957cedc166328da8a9b7c4f063bc53c94"
+        },
+        "updateFrom": null
+      },
+      "management": {
+        "method": "profile-bundle",
+        "protocol": "harness-profile",
+        "label": "DeepSeek Harness Profile Bundle",
+        "instructions": "Use the DSH Profile Bundle mechanism with the exact pinned package spec declared in release.profileBundle.spec. Activation requires a profile restart.",
+        "source": null
+      },
+      "declarations": {
+        "permissions": "Registers DSH model-facing lifecycle tools, a governed-builder Skill, a ToolRuntime mutation guard, and appends Session governance evidence. The default bundle performs no network request; the opt-in public GitHub Issue authority provider may perform one fixed-host unauthenticated GitHub.com read. No credential lookup, subprocess execution, or native-code loading is part of the declared plugin runtime behavior.",
+        "testing": "Author-side evidence: repository CI at OMDSH-1 acceptance covered 167 tests across 12 files plus TypeScript typecheck, canonical build, and fail-closed tracked-lib drift checking. Scripts-disabled Profile Bundle install, dump-config, normal boot, real governance_status invocation, remove, and reinstall were also recorded in docs/OMDSH_REVIEW.md. These are author-side facts, not OMDSH certification.",
+        "trustedPublisherRequested": false,
+        "installScriptsMustRemainDisabled": true
+      },
+      "packageManifest": {
+        "schema": "omdsh-workshop-package/v1",
+        "type": "plugin",
+        "integration": {
+          "protocol": "harness-profile",
+          "artifact": "cordis.patch.yml"
+        },
+        "install": {
+          "mode": "transactional",
+          "adapter": "profile-bundle",
+          "failurePolicy": "generation-rollback",
+          "touchesCurrentBeforeActivation": false
+        },
+        "lifecycle": {
+          "activation": "restart-profile",
+          "dispose": "unknown"
+        },
+        "permissions": [
+          "harness:tool",
+          "harness:skill",
+          "harness:guard",
+          "session:append",
+          "network:read",
+          "credentials:none",
+          "subprocess:none",
+          "native-code:none"
+        ],
+        "compatibility": {
+          "dshVersions": [
+            "0.1.0-rc.6"
+          ]
+        },
+        "capability": {
+          "id": "governance-status",
+          "kind": "tool",
+          "invocation": "invoke the model-facing tool named governance_status with empty arguments through the DSH ToolRuntime",
+          "expected": "a bounded read-only object with fields state (lifecycle state), authorityAccepted (boolean), taskId (string|null), and a last-transition summary"
+        },
+        "evidence": {
+          "install": "docs/OMDSH_REVIEW.md",
+          "failureIsolation": null,
+          "hotReload": null,
+          "remove": "docs/OMDSH_REVIEW.md"
+        }
+      }
+    }
+  },
+  "classification": {
+    "management": "transactional"
+  },
+  "baseline": {
+    "package": "@deepseek-ai/dsh",
+    "version": "0.1.0-rc.6",
+    "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+  },
+  "review": {
+    "state": "pending-review",
+    "notes": "Automatically prepared from #23; public fixed-source preflight passed. Human review is still required."
+  },
+  "verification": {
+    "state": "untested"
+  },
+  "tests": {
+    "static": {
+      "required": true,
+      "status": "passed",
+      "evidence": "submission manifest validation; public repository and fixed commit resolved; pinned path(s): /cordis.patch.yml, /docs/OMDSH_REVIEW.md, /package.json"
+    },
+    "supplyChain": {
+      "required": true,
+      "status": "pending"
+    },
+    "officialBaseline": {
+      "required": true,
+      "status": "pending"
+    },
+    "lifecycle": {
+      "required": true,
+      "status": "pending"
+    }
+  },
+  "registry": {
+    "state": "ineligible",
+    "reason": "current-baseline-verification-required"
+  }
+}

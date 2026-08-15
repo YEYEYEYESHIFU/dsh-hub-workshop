@@ -15,5 +15,155 @@
     ],
     "failClosed": true
   },
-  "records": []
+  "records": [
+    {
+      "schema": "omdsh-workshop-intake/v1",
+      "id": "dsh-sgme@0.1.1",
+      "submission": {
+        "repository": "https://github.com/freehul/sgme",
+        "ref": "5be3c726d24714da69f9565a5eb8590796d5214b",
+        "path": null,
+        "manifest": {
+          "schema": "omdsh-workshop-submission/v2",
+          "operation": "create-project",
+          "project": {
+            "id": "dsh-sgme",
+            "displayName": "dsh-sgme",
+            "summary": "SGME memory engine bridge for DeepSeek Harness — multi-agent shared long-term memory with LLM distillation, scenario injection and proactive care signals, via HTTP.",
+            "kind": "extension",
+            "category": "memory",
+            "tags": [
+              "deepseek-harness",
+              "memory",
+              "agent-memory",
+              "persistent-memory",
+              "multi-agent",
+              "llm-memory",
+              "cordis",
+              "plugin"
+            ],
+            "repository": "https://github.com/freehul/sgme",
+            "path": null,
+            "author": {
+              "name": "freehul",
+              "url": "https://github.com/freehul"
+            },
+            "license": "MIT"
+          },
+          "release": {
+            "version": "0.1.1",
+            "ref": "5be3c726d24714da69f9565a5eb8590796d5214b",
+            "updatedAt": "2026-08-15T22:05:40Z",
+            "channel": "stable",
+            "compatibility": "@deepseek-ai/dsh@0.1.0-rc.6 (official public baseline); Node ^22.19 || >=24",
+            "changelog": "Initial OMDSH submission: dsh-sgme 0.1.1 — automatic per-turn session capture (L0 append + async refine trigger), memory_search / wiki_search tools, proactive care signal tools (signal_pull/claim/ack), first-step persona injection.",
+            "capabilities": {
+              "requiresFabric": false,
+              "deepHook": false,
+              "restartRequired": true
+            },
+            "profileBundle": {
+              "packageName": "dsh-sgme",
+              "spec": "github:freehul/sgme#5be3c726d24714da69f9565a5eb8590796d5214b"
+            },
+            "updateFrom": null
+          },
+          "management": {
+            "method": "profile-bundle",
+            "protocol": "harness-profile",
+            "label": "DeepSeek Harness Profile Bundle (github:freehul/sgme git install wrapper)",
+            "instructions": "Install via the DSH Profile Bundle mechanism with the exact pinned spec github:freehul/sgme#<commit>; the repo-root package.json is the git install wrapper whose dsh.bundle.patch points to adapters/dsh/sgme-bridge/cordis.patch.yml. Activation requires a profile restart.",
+            "source": null
+          },
+          "declarations": {
+            "permissions": "HTTP(S) client to the SGME Gateway (:9910/:9913) for inject/search/append/refine-trigger and care-signal pull/claim/ack; no subprocess, no shell, no Python, no native code; credentials injected via environment variables (SGME_AGENT_KEY/SGME_ADMIN_KEY), never written into the repo; no install scripts.",
+            "testing": "sgme-bridge suite: 65 vitest tests across 6 files (commands, sgme-client, tools, skeleton, session-sync) plus tsc typecheck clean (2026-08-16, verified during submission); runtime zero-Python by design (Node built-in fetch); failure isolation: every SGME call failure is logged and returns empty, never blocks the DSH main loop.",
+            "trustedPublisherRequested": false,
+            "installScriptsMustRemainDisabled": true
+          },
+          "packageManifest": {
+            "schema": "omdsh-workshop-package/v1",
+            "type": "plugin",
+            "integration": {
+              "protocol": "harness-profile",
+              "artifact": "adapters/dsh/sgme-bridge/cordis.patch.yml"
+            },
+            "install": {
+              "mode": "transactional",
+              "adapter": "profile-bundle",
+              "failurePolicy": "generation-rollback",
+              "touchesCurrentBeforeActivation": false
+            },
+            "lifecycle": {
+              "activation": "restart-profile",
+              "dispose": "supported"
+            },
+            "permissions": [
+              "harness:tool",
+              "harness:command",
+              "network:read",
+              "subprocess:none",
+              "shell:none",
+              "credentials:none"
+            ],
+            "compatibility": {
+              "dshVersions": [
+                "0.1.0-rc.6"
+              ]
+            },
+            "capability": {
+              "id": "memory_search",
+              "kind": "tool",
+              "invocation": "invoke the model-facing tool memory_search with a natural-language query through the DSH ToolRuntime",
+              "expected": "a bounded structured result of tagged memory entries matching the query, or an empty list when none match"
+            },
+            "evidence": {
+              "install": null,
+              "failureIsolation": null,
+              "hotReload": null,
+              "remove": null
+            }
+          }
+        }
+      },
+      "classification": {
+        "management": "transactional"
+      },
+      "baseline": {
+        "package": "@deepseek-ai/dsh",
+        "version": "0.1.0-rc.6",
+        "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+      },
+      "review": {
+        "state": "pending-review",
+        "notes": "Automatically prepared from #24; public fixed-source preflight passed. Human review is still required."
+      },
+      "verification": {
+        "state": "untested"
+      },
+      "tests": {
+        "static": {
+          "required": true,
+          "status": "passed",
+          "evidence": "submission manifest validation; public repository and fixed commit resolved; pinned path(s): /adapters/dsh/sgme-bridge/cordis.patch.yml, /package.json"
+        },
+        "supplyChain": {
+          "required": true,
+          "status": "pending"
+        },
+        "officialBaseline": {
+          "required": true,
+          "status": "pending"
+        },
+        "lifecycle": {
+          "required": true,
+          "status": "pending"
+        }
+      },
+      "registry": {
+        "state": "ineligible",
+        "reason": "current-baseline-verification-required"
+      }
+    }
+  ]
 }

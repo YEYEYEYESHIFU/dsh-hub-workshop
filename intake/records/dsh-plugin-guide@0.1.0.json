@@ -1,0 +1,141 @@
+{
+  "schema": "omdsh-workshop-intake/v1",
+  "id": "dsh-plugin-guide@0.1.0",
+  "submission": {
+    "repository": "https://github.com/PerryLink/dsh-plugin-guide",
+    "ref": "9447366f63a02229031af1e0bed2afedeff44860",
+    "path": null,
+    "manifest": {
+      "schema": "omdsh-workshop-submission/v2",
+      "operation": "create-project",
+      "project": {
+        "id": "dsh-plugin-guide",
+        "displayName": "dsh-plugin-guide",
+        "summary": "Plugin-development knowledge base registered as an on-demand agent skill: official constraints, task workflows, API references, and community pitfalls.",
+        "kind": "skill",
+        "category": "developer-tools",
+        "tags": [
+          "dsh-plugin",
+          "skill",
+          "knowledge-base",
+          "plugin-development",
+          "documentation"
+        ],
+        "repository": "https://github.com/PerryLink/dsh-plugin-guide",
+        "path": null,
+        "author": {
+          "name": "PerryLink",
+          "url": "https://github.com/PerryLink"
+        },
+        "license": "Apache-2.0"
+      },
+      "release": {
+        "version": "0.1.0",
+        "ref": "9447366f63a02229031af1e0bed2afedeff44860",
+        "updatedAt": "2026-08-15T12:00:00Z",
+        "channel": "beta",
+        "compatibility": "@deepseek-ai/dsh 0.1.0-rc.6 (optional peerDependency pin)",
+        "changelog": "Initial bundle release: registers the dsh-plugin-guide knowledge base as an on-demand agent skill; 5-language README with git/tarball install instructions.",
+        "capabilities": {
+          "requiresFabric": false,
+          "deepHook": false,
+          "restartRequired": true
+        },
+        "profileBundle": {
+          "packageName": "dsh-plugin-guide",
+          "spec": "git+https://github.com/PerryLink/dsh-plugin-guide.git#9447366f63a02229031af1e0bed2afedeff44860"
+        },
+        "updateFrom": null
+      },
+      "management": {
+        "method": "profile-bundle",
+        "protocol": "harness-profile",
+        "label": "Installable bundle (dsh plugin add)",
+        "instructions": "Install from git with `dsh plugin --profile <profile> add github:PerryLink/dsh-plugin-guide#9447366f63a02229031af1e0bed2afedeff44860`, or pack a tarball (`pnpm pack`) and add it. The bundle layer registers the dsh-plugin-guide agent skill at boot; the skill resolves ./guide and ./references relative to the package directory.",
+        "source": null
+      },
+      "declarations": {
+        "permissions": "Read-only at runtime: reads its bundled SKILL.md at apply time and registers one runtime skill via ctx.skills.register; no writes, no network, no subprocess, no native code, no install scripts.",
+        "testing": "Local evidence on Windows (no macOS sandbox-exec, no DEEPSEEK_API_KEY): dsh plugin --profile dspg-test add . -> profile bundles list includes dsh-plugin-guide; dsh --profile dspg-test --dump-config shows the layer; a minimal Cordis mount against the installed @deepseek-ai/dsh-skill registry lists the skill and skills.get('dsh-plugin-guide') returns the full definition (description/content/directory resourceBase); full boot created a session without FAILED diagnostics. Model dialogue and the hub sandboxed lifecycle suite were not executed on this machine.",
+        "trustedPublisherRequested": false,
+        "installScriptsMustRemainDisabled": true
+      },
+      "packageManifest": {
+        "schema": "omdsh-workshop-package/v1",
+        "type": "plugin",
+        "integration": {
+          "protocol": "harness-profile",
+          "artifact": "cordis.patch.yml"
+        },
+        "install": {
+          "mode": "transactional",
+          "adapter": "profile-bundle",
+          "failurePolicy": "generation-rollback",
+          "touchesCurrentBeforeActivation": false
+        },
+        "lifecycle": {
+          "activation": "restart-profile",
+          "dispose": "supported"
+        },
+        "permissions": [
+          "filesystem:read"
+        ],
+        "compatibility": {
+          "dshVersions": [
+            "0.1.0-rc.6"
+          ]
+        },
+        "capability": {
+          "id": "dsh-plugin-guide",
+          "kind": "service",
+          "invocation": "ctx.skills.get('dsh-plugin-guide') resolves a complete SkillDefinition",
+          "expected": "session skill catalog lists dsh-plugin-guide and the loaded body carries the SKILL.md workflow with a directory resourceBase"
+        },
+        "evidence": {
+          "install": null,
+          "failureIsolation": null,
+          "hotReload": null,
+          "remove": null
+        }
+      }
+    }
+  },
+  "classification": {
+    "management": "transactional"
+  },
+  "baseline": {
+    "package": "@deepseek-ai/dsh",
+    "version": "0.1.0-rc.6",
+    "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+  },
+  "review": {
+    "state": "pending-review",
+    "notes": "Automatically prepared from #20; public fixed-source preflight passed. Human review is still required."
+  },
+  "verification": {
+    "state": "untested"
+  },
+  "tests": {
+    "static": {
+      "required": true,
+      "status": "passed",
+      "evidence": "submission manifest validation; public repository and fixed commit resolved; pinned path(s): /cordis.patch.yml, /package.json"
+    },
+    "supplyChain": {
+      "required": true,
+      "status": "pending"
+    },
+    "officialBaseline": {
+      "required": true,
+      "status": "pending"
+    },
+    "lifecycle": {
+      "required": true,
+      "status": "pending"
+    }
+  },
+  "registry": {
+    "state": "ineligible",
+    "reason": "current-baseline-verification-required"
+  }
+}

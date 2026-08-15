@@ -15,5 +15,151 @@
     ],
     "failClosed": true
   },
-  "records": []
+  "records": [
+    {
+      "schema": "omdsh-workshop-intake/v1",
+      "id": "dsh-checkpoint-rewind@0.4.0",
+      "submission": {
+        "repository": "https://github.com/PerryLink/dsh-checkpoint-rewind",
+        "ref": "4650e117afd282aecc0647d5232116c2947a1aab",
+        "path": null,
+        "manifest": {
+          "schema": "omdsh-workshop-submission/v2",
+          "operation": "create-project",
+          "project": {
+            "id": "dsh-checkpoint-rewind",
+            "displayName": "dsh-checkpoint-rewind",
+            "summary": "Claude Code /rewind for DeepSeek Harness: git-first workspace snapshots before every mutating tool, turn-boundary session forks, and a one-shot /rewind command that restores files and forks the session back to a checkpoint.",
+            "kind": "extension",
+            "category": "safety",
+            "tags": [
+              "rewind",
+              "checkpoint",
+              "workspace-safety",
+              "session-fork"
+            ],
+            "repository": "https://github.com/PerryLink/dsh-checkpoint-rewind",
+            "path": null,
+            "author": {
+              "name": "PerryLink",
+              "url": "https://github.com/PerryLink"
+            },
+            "license": "Apache-2.0"
+          },
+          "release": {
+            "version": "0.4.0",
+            "ref": "4650e117afd282aecc0647d5232116c2947a1aab",
+            "updatedAt": "2026-08-15T08:06:13Z",
+            "channel": "stable",
+            "compatibility": "DeepSeek Harness 0.1.0-rc.6 (npm @deepseek-ai/dsh); Node ^22.19 || >=24",
+            "changelog": "0.4.0: /rewind preview read-only impact preview, excludeGlobs glob semantics, path/argument safety hardening at the persistence boundary, npm publish workflow. Full history in CHANGELOG.md.",
+            "capabilities": {
+              "requiresFabric": false,
+              "deepHook": false,
+              "restartRequired": true
+            },
+            "profileBundle": {
+              "packageName": "dsh-checkpoint-rewind",
+              "spec": "0.4.0"
+            },
+            "updateFrom": null
+          },
+          "management": {
+            "method": "profile-bundle",
+            "protocol": "harness-profile",
+            "label": "dsh plugin add dsh-checkpoint-rewind",
+            "instructions": "Install with `dsh plugin --profile <name> add dsh-checkpoint-rewind` (npm) or `pnpm dsh web --patch ./cordis.patch.yml`, then restart the profile; /rewind becomes active in the Web UI.",
+            "source": null
+          },
+          "declarations": {
+            "permissions": "Reads workspace files for snapshot capture; writes workspace files only on an approved /rewind restore (overwrite of captured files, never deletion, never through symbolic links). Writes snapshot storage only under snapshotDir. Runs only whitelisted side-effect-free git primitives. No network, no credentials.",
+            "testing": "160 unit tests (node --test) plus assembled-headless integration (copy and real-git flows); CI green on Windows/Linux x Node 22/24; npm package published as 0.4.0. Load-level verified against dsh 0.1.0-rc.6 (dsh plugin add, dump-config layer, inject activation; stripped headless profile lacks the storageDomain service).",
+            "trustedPublisherRequested": false,
+            "installScriptsMustRemainDisabled": true
+          },
+          "packageManifest": {
+            "schema": "omdsh-workshop-package/v1",
+            "type": "plugin",
+            "integration": {
+              "protocol": "harness-profile",
+              "artifact": "cordis.patch.yml"
+            },
+            "install": {
+              "mode": "transactional",
+              "adapter": "profile-bundle",
+              "failurePolicy": "generation-rollback",
+              "touchesCurrentBeforeActivation": false
+            },
+            "lifecycle": {
+              "activation": "restart-profile",
+              "dispose": "supported"
+            },
+            "permissions": [
+              "workspace:read",
+              "workspace:write",
+              "git:read",
+              "snapshot-storage:write",
+              "session-log:read",
+              "network:none"
+            ],
+            "compatibility": {
+              "dshVersions": [
+                "0.1.0-rc.6"
+              ]
+            },
+            "capability": {
+              "id": "rewind",
+              "kind": "command",
+              "invocation": "/rewind",
+              "expected": "the /rewind command is registered on the commands service: it lists checkpoints, restores workspace files after user confirmation, and forks the session at the checkpoint's turn boundary"
+            },
+            "evidence": {
+              "install": null,
+              "failureIsolation": null,
+              "hotReload": null,
+              "remove": null
+            }
+          }
+        }
+      },
+      "classification": {
+        "management": "transactional"
+      },
+      "baseline": {
+        "package": "@deepseek-ai/dsh",
+        "version": "0.1.0-rc.6",
+        "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+      },
+      "review": {
+        "state": "pending-review",
+        "notes": "Automatically prepared from #12; public fixed-source preflight passed. Human review is still required."
+      },
+      "verification": {
+        "state": "untested"
+      },
+      "tests": {
+        "static": {
+          "required": true,
+          "status": "passed",
+          "evidence": "submission manifest validation; public repository and fixed commit resolved; pinned path(s): /cordis.patch.yml, /package.json"
+        },
+        "supplyChain": {
+          "required": true,
+          "status": "pending"
+        },
+        "officialBaseline": {
+          "required": true,
+          "status": "pending"
+        },
+        "lifecycle": {
+          "required": true,
+          "status": "pending"
+        }
+      },
+      "registry": {
+        "state": "ineligible",
+        "reason": "current-baseline-verification-required"
+      }
+    }
+  ]
 }

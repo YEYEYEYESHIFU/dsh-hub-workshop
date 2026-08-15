@@ -15,5 +15,152 @@
     ],
     "failClosed": true
   },
-  "records": []
+  "records": [
+    {
+      "schema": "omdsh-workshop-intake/v1",
+      "id": "dsh-memento@0.3.1",
+      "submission": {
+        "repository": "https://github.com/PerryLink/dsh-memento",
+        "ref": "9d65b142c571034487bc30e4e9c0cae774828d73",
+        "path": null,
+        "manifest": {
+          "schema": "omdsh-workshop-submission/v2",
+          "operation": "create-project",
+          "project": {
+            "id": "dsh-memento",
+            "displayName": "dsh-memento",
+            "summary": "Bounded, layered, approval-gated, auditable cross-session memory for DeepSeek Harness: a typed ctx.memory service seam with a zero-dependency SQLite provider, a memory tool, and frozen snapshot injection.",
+            "kind": "extension",
+            "category": "memory",
+            "tags": [
+              "memory",
+              "approval",
+              "audit"
+            ],
+            "repository": "https://github.com/PerryLink/dsh-memento",
+            "path": null,
+            "author": {
+              "name": "PerryLink",
+              "url": "https://github.com/PerryLink"
+            },
+            "license": "Apache-2.0"
+          },
+          "release": {
+            "version": "0.3.1",
+            "ref": "9d65b142c571034487bc30e4e9c0cae774828d73",
+            "updatedAt": "2026-08-15T08:00:00Z",
+            "channel": "stable",
+            "compatibility": "DeepSeek Harness 0.1.0-rc.6 (official public baseline); Node ^22.19 || >=24",
+            "changelog": "https://github.com/PerryLink/dsh-memento/blob/main/CHANGELOG.md",
+            "capabilities": {
+              "requiresFabric": false,
+              "deepHook": false,
+              "restartRequired": true
+            },
+            "profileBundle": {
+              "packageName": "dsh-memento",
+              "spec": "0.3.1"
+            },
+            "updateFrom": null
+          },
+          "management": {
+            "method": "profile-bundle",
+            "protocol": "harness-profile",
+            "label": "Profile bundle (cordis.patch.yml insert, row id memento)",
+            "instructions": "dsh plugin --profile <name> add dsh-memento",
+            "source": null
+          },
+          "declarations": {
+            "permissions": "network:none; subprocess:none; shell:none; python:none; credentials:none; filesystem read/write scoped to the local memory database (default <DSH_HOME or ~/.dsh>/dsh-memento/memory.db) plus a user-triggered /memory import file read; harness:tool (memory, memory_recall); no install scripts.",
+            "testing": "115 node:test cases; tsc checkJs clean; coverage gate lib>=90% index.mjs>=85% all>=90%; five-language README gate; CI matrix green (3 OS x Node 22.19/24, 2026-08-15); real headless load with a real model turn on @deepseek-ai/dsh@0.1.0-rc.6 (2026-08-15, scratch profile memento-selfcheck, exit 0).",
+            "trustedPublisherRequested": false,
+            "installScriptsMustRemainDisabled": true
+          },
+          "packageManifest": {
+            "schema": "omdsh-workshop-package/v1",
+            "type": "plugin",
+            "integration": {
+              "protocol": "harness-profile",
+              "artifact": "package.json"
+            },
+            "install": {
+              "mode": "transactional",
+              "adapter": "profile-bundle",
+              "failurePolicy": "generation-rollback",
+              "touchesCurrentBeforeActivation": false
+            },
+            "lifecycle": {
+              "activation": "restart-profile",
+              "dispose": "supported"
+            },
+            "permissions": [
+              "harness:tool",
+              "filesystem:read",
+              "filesystem:write",
+              "network:none",
+              "subprocess:none",
+              "shell:none",
+              "python:none",
+              "credentials:none"
+            ],
+            "compatibility": {
+              "dshVersions": [
+                "0.1.0-rc.6"
+              ]
+            },
+            "capability": {
+              "id": "memory",
+              "kind": "tool",
+              "invocation": "memory action=query text=preferences",
+              "expected": "structured result listing entries matching the query in the local memory store"
+            },
+            "evidence": {
+              "install": "docs/OMDSH_REVIEW.md",
+              "failureIsolation": null,
+              "hotReload": null,
+              "remove": null
+            }
+          }
+        }
+      },
+      "classification": {
+        "management": "transactional"
+      },
+      "baseline": {
+        "package": "@deepseek-ai/dsh",
+        "version": "0.1.0-rc.6",
+        "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+      },
+      "review": {
+        "state": "pending-review",
+        "notes": "Automatically prepared from #11; public fixed-source preflight passed. Human review is still required."
+      },
+      "verification": {
+        "state": "untested"
+      },
+      "tests": {
+        "static": {
+          "required": true,
+          "status": "passed",
+          "evidence": "submission manifest validation; public repository and fixed commit resolved; pinned path(s): /docs/OMDSH_REVIEW.md, /package.json"
+        },
+        "supplyChain": {
+          "required": true,
+          "status": "pending"
+        },
+        "officialBaseline": {
+          "required": true,
+          "status": "pending"
+        },
+        "lifecycle": {
+          "required": true,
+          "status": "pending"
+        }
+      },
+      "registry": {
+        "state": "ineligible",
+        "reason": "current-baseline-verification-required"
+      }
+    }
+  ]
 }

@@ -1,0 +1,144 @@
+{
+  "schema": "omdsh-workshop-intake/v1",
+  "id": "dsh-output-styles@0.3.2",
+  "submission": {
+    "repository": "https://github.com/PerryLink/dsh-output-styles",
+    "ref": "5e50095f19a5d624033050b19c2f80117e1049d5",
+    "path": null,
+    "manifest": {
+      "schema": "omdsh-workshop-submission/v2",
+      "operation": "create-project",
+      "project": {
+        "id": "dsh-output-styles",
+        "displayName": "dsh-output-styles",
+        "summary": "Runtime-switchable model output styles with Claude Code outputStyles parity: a /style command, per-session persistence, and a web picker.",
+        "kind": "extension",
+        "category": "developer-tools",
+        "tags": [
+          "output-styles",
+          "claude-code",
+          "system-prompt",
+          "session"
+        ],
+        "repository": "https://github.com/PerryLink/dsh-output-styles",
+        "path": null,
+        "author": {
+          "name": "PerryLink",
+          "url": "https://github.com/PerryLink"
+        },
+        "license": "Apache-2.0"
+      },
+      "release": {
+        "version": "0.3.2",
+        "ref": "5e50095f19a5d624033050b19c2f80117e1049d5",
+        "updatedAt": "2026-08-15T08:10:00Z",
+        "channel": "stable",
+        "compatibility": "@deepseek-ai/dsh 0.1.0-rc.6 (real bundle install via dsh plugin add and profile boot verified on Windows, 2026-08-15)",
+        "changelog": "Fix bundle install on rc.6 (storage row config); add dsh.client and dshWorkshop manifests. Full list in CHANGELOG.md.",
+        "capabilities": {
+          "requiresFabric": false,
+          "deepHook": false,
+          "restartRequired": false
+        },
+        "profileBundle": {
+          "packageName": "dsh-output-styles",
+          "spec": "0.3.2"
+        },
+        "updateFrom": null
+      },
+      "management": {
+        "method": "profile-bundle",
+        "protocol": "harness-profile",
+        "label": "dsh plugin --profile <name> add dsh-output-styles",
+        "instructions": "Install from npm with `dsh plugin --profile <name> add dsh-output-styles`; the bundle patch composes the storage rows plus the plugin row. Web profiles can add the picker client row `- id: output-styles-client / name: dsh-output-styles/client`.",
+        "source": null
+      },
+      "declarations": {
+        "permissions": "fs:read (style library files), fs:watch (style directories), storage:read/storage:write (output_style selection domain), settings:read (output-style namespace); no network access.",
+        "testing": "93 vitest unit/integration tests plus GitHub Actions CI (typecheck, tests, self-contained check, build on Node 22 and 24); real rc.6 bundle install and profile boot verified on Windows 2026-08-15.",
+        "trustedPublisherRequested": false,
+        "installScriptsMustRemainDisabled": true
+      },
+      "packageManifest": {
+        "schema": "omdsh-workshop-package/v1",
+        "type": "plugin",
+        "integration": {
+          "protocol": "harness-profile",
+          "artifact": "cordis.patch.yml"
+        },
+        "install": {
+          "mode": "transactional",
+          "adapter": "profile-bundle",
+          "failurePolicy": "generation-rollback",
+          "touchesCurrentBeforeActivation": false
+        },
+        "lifecycle": {
+          "activation": "hot-reload",
+          "dispose": "supported"
+        },
+        "permissions": [
+          "fs:read",
+          "fs:watch",
+          "storage:read",
+          "storage:write",
+          "settings:read"
+        ],
+        "compatibility": {
+          "dshVersions": [
+            "0.1.0-rc.6"
+          ]
+        },
+        "capability": {
+          "id": "style-command",
+          "kind": "command",
+          "invocation": "/style concise",
+          "expected": "the command replies 'switched to concise' and the next assembled system prompt contains the concise style body"
+        },
+        "evidence": {
+          "install": null,
+          "failureIsolation": null,
+          "hotReload": null,
+          "remove": null
+        }
+      }
+    }
+  },
+  "classification": {
+    "management": "transactional"
+  },
+  "baseline": {
+    "package": "@deepseek-ai/dsh",
+    "version": "0.1.0-rc.6",
+    "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+  },
+  "review": {
+    "state": "pending-review",
+    "notes": "Automatically prepared from #15; public fixed-source preflight passed. Human review is still required."
+  },
+  "verification": {
+    "state": "untested"
+  },
+  "tests": {
+    "static": {
+      "required": true,
+      "status": "passed",
+      "evidence": "submission manifest validation; public repository and fixed commit resolved; pinned path(s): /cordis.patch.yml, /package.json"
+    },
+    "supplyChain": {
+      "required": true,
+      "status": "pending"
+    },
+    "officialBaseline": {
+      "required": true,
+      "status": "pending"
+    },
+    "lifecycle": {
+      "required": true,
+      "status": "pending"
+    }
+  },
+  "registry": {
+    "state": "ineligible",
+    "reason": "current-baseline-verification-required"
+  }
+}

@@ -2,6 +2,11 @@
 
 import { readFile, readdir, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
+import {
+  COMMUNITY_PLUGIN_CREATED_AT_CUTOFF,
+  OFFICIAL_REPOSITORY_OWNERS,
+  isRetiredRepositoryOwner,
+} from './topic-admission-policy.mjs'
 
 const ROOT = resolve(import.meta.dirname, '..')
 const inputDirectory = process.argv[2]
@@ -25,11 +30,12 @@ for (const repository of pages.flatMap((page) => page.items)) {
     repositoriesByName.set(repository.full_name.toLocaleLowerCase('en-US'), repository)
   }
 }
-const repositories = [...repositoriesByName.values()]
+const discoveredRepositories = [...repositoriesByName.values()]
   .sort((left, right) => String(right.pushed_at || right.updated_at).localeCompare(String(left.pushed_at || left.updated_at)))
-if (repositories.length !== expected) {
-  throw new Error(`Topic snapshot is incomplete: received ${repositories.length} unique repositories, expected ${expected}`)
+if (discoveredRepositories.length !== expected) {
+  throw new Error(`Topic snapshot is incomplete: received ${discoveredRepositories.length} unique repositories, expected ${expected}`)
 }
+const repositories = discoveredRepositories.filter((repository) => !isRetiredRepositoryOwner(repository))
 
 const RETIRED_TOPIC = ['dsh', 'external'].join('-')
 const publicTopics = (repository) => (repository.topics || []).filter((topic) => topic !== RETIRED_TOPIC)
@@ -45,6 +51,15 @@ const snapshot = {
   source: 'https://github.com/search?q=topic%3Adsh-plugin&type=repositories',
   observedRepositoryCount: repositories.length,
   status: 'discovery-only',
+  collection: {
+    method: 'captured-github-search-pages',
+    pluginCreationPolicy: {
+      communityCreatedAtCutoff: COMMUNITY_PLUGIN_CREATED_AT_CUTOFF,
+      officialOwnerExemptions: OFFICIAL_REPOSITORY_OWNERS,
+    },
+    retiredOwnerExclusionsApplied: true,
+    excludedRepositoryCount: discoveredRepositories.length - repositories.length,
+  },
   repositories: repositories.map((repository) => ({
     owner: repository.owner.login,
     name: repository.name,
@@ -52,6 +67,7 @@ const snapshot = {
     description: sanitizePublicText(repository.description || ''),
     language: repository.language,
     topics: publicTopics(repository),
+    createdAt: repository.created_at,
     commitUpdatedAt: repository.pushed_at || repository.updated_at,
     metadataUpdatedAt: repository.updated_at,
     stars: repository.stargazers_count,
@@ -71,4 +87,4 @@ await Promise.all([
   writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`),
 ])
 
-console.log(`refreshed public Topic snapshot: ${repositories.length} repositories across ${pages.length} captured page(s)`)
+console.log(`refreshed public Topic snapshot: ${repositories.length} repositories across ${pages.length} captured page(s) (${discoveredRepositories.length - repositories.length} retired-owner sources excluded)`)

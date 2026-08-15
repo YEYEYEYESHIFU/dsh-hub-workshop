@@ -2,11 +2,17 @@
 
 import { readFile, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
+import {
+  COMMUNITY_PLUGIN_CREATED_AT_CUTOFF,
+  OFFICIAL_REPOSITORY_OWNERS,
+  isRetiredRepositoryOwner,
+} from './topic-admission-policy.mjs'
 
 const ROOT = resolve(import.meta.dirname, '..')
 const TOPIC = 'dsh-plugin'
 const USER_AGENT = 'omdsh-workshop-topic-refresh/2.0'
-const REQUEST_INTERVAL_MS = 6_500
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN?.trim() || ''
+const REQUEST_INTERVAL_MS = GITHUB_TOKEN ? 2_200 : 6_500
 const decoder = new TextDecoder()
 let lastRequestAt = 0
 
@@ -27,6 +33,7 @@ async function search(query, page) {
       accept: 'application/vnd.github+json',
       'user-agent': USER_AGENT,
       'x-github-api-version': '2022-11-28',
+      ...(GITHUB_TOKEN ? { authorization: `Bearer ${GITHUB_TOKEN}` } : {}),
     },
   })
   if (!response.ok) {
@@ -49,7 +56,10 @@ const today = utcDate(0)
 const partitions = [
   `topic:${TOPIC} created:<${yesterday}`,
   `topic:${TOPIC} created:${yesterday}`,
-  `topic:${TOPIC} created:>=${today}`,
+  `topic:${TOPIC} created:${today}T00:00:00Z..${today}T05:59:59Z`,
+  `topic:${TOPIC} created:${today}T06:00:00Z..${today}T11:59:59Z`,
+  `topic:${TOPIC} created:${today}T12:00:00Z..${today}T17:59:59Z`,
+  `topic:${TOPIC} created:>=${today}T18:00:00Z`,
 ]
 const repositoriesByName = new Map()
 let observed = 0
@@ -81,8 +91,9 @@ const sanitizePublicText = (value = '') => String(value)
   .replaceAll(/\bNDA\b/gi, 'previous restricted program')
   .replaceAll('内测', '社区阶段')
 const generatedAt = new Date().toISOString()
-const repositories = [...repositoriesByName.values()]
+const discoveredRepositories = [...repositoriesByName.values()]
   .sort((left, right) => String(right.pushed_at || right.updated_at).localeCompare(String(left.pushed_at || left.updated_at)))
+const repositories = discoveredRepositories.filter((repository) => !isRetiredRepositoryOwner(repository))
 const snapshot = {
   schema: 'dsh-topic-discovery/v1',
   generatedAt,
@@ -91,9 +102,15 @@ const snapshot = {
   observedRepositoryCount: repositories.length,
   status: 'discovery-only',
   collection: {
-    method: 'anonymous-partitioned-github-search',
+    method: `${GITHUB_TOKEN ? 'authenticated' : 'anonymous'}-partitioned-github-search`,
     partitions,
     searchCapHandled: true,
+    pluginCreationPolicy: {
+      communityCreatedAtCutoff: COMMUNITY_PLUGIN_CREATED_AT_CUTOFF,
+      officialOwnerExemptions: OFFICIAL_REPOSITORY_OWNERS,
+    },
+    retiredOwnerExclusionsApplied: true,
+    excludedRepositoryCount: discoveredRepositories.length - repositories.length,
   },
   repositories: repositories.map((repository) => ({
     owner: repository.owner.login,
@@ -102,6 +119,7 @@ const snapshot = {
     description: sanitizePublicText(repository.description || ''),
     language: repository.language,
     topics: publicTopics(repository),
+    createdAt: repository.created_at,
     commitUpdatedAt: repository.pushed_at || repository.updated_at,
     metadataUpdatedAt: repository.updated_at,
     stars: repository.stargazers_count,
@@ -121,4 +139,4 @@ await Promise.all([
   writeFile(resolve(ROOT, 'topic-repositories.json'), `${JSON.stringify(snapshot, null, 2)}\n`),
   writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`),
 ])
-console.log(`refreshed public Topic snapshot: ${repositories.length} repositories across ${partitions.length} non-overlapping partitions`)
+console.log(`refreshed public Topic snapshot: ${repositories.length} repositories across ${partitions.length} non-overlapping partitions (${discoveredRepositories.length - repositories.length} retired-owner sources excluded)`)

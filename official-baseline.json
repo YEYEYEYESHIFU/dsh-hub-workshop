@@ -12,6 +12,38 @@
   "contracts": {
     "profileBundle": {
       "status": "available",
+      "templates": {
+        "base": {
+          "bundles": [
+            "@deepseek-ai/dsh-base"
+          ],
+          "exactPackages": [
+            {
+              "package": "@deepseek-ai/dsh-base",
+              "version": "0.1.0-rc.6",
+              "integrity": "sha512-SR0V0Lq4Bm2ir7k2OaiINZZWFSDt1n4dS8J6IlIabYhoIF46baEQY2awZ9/InOWCe+dIpQob0/3y3yZOHqjnpw=="
+            }
+          ]
+        },
+        "web": {
+          "bundles": [
+            "@deepseek-ai/dsh-base",
+            "@deepseek-ai/dsh-web-app"
+          ],
+          "exactPackages": [
+            {
+              "package": "@deepseek-ai/dsh-base",
+              "version": "0.1.0-rc.6",
+              "integrity": "sha512-SR0V0Lq4Bm2ir7k2OaiINZZWFSDt1n4dS8J6IlIabYhoIF46baEQY2awZ9/InOWCe+dIpQob0/3y3yZOHqjnpw=="
+            },
+            {
+              "package": "@deepseek-ai/dsh-web-app",
+              "version": "0.1.0-rc.6",
+              "integrity": "sha512-GKvfD1oHbdNN4Mbb77nCydfv2ZRxGVnKcKIGUfXGvs5cNC3cfPYPP/Ok9b/Kbk9zFYMuz+lLikka+HK3zyUcAQ=="
+            }
+          ]
+        }
+      },
       "evidence": [
         "dsh plugin --profile <name> add/remove <package>",
         "package.json#dsh.bundle.patch",

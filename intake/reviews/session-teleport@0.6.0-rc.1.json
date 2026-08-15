@@ -1,0 +1,136 @@
+{
+  "schema": "omdsh-workshop-real-project-review/v1",
+  "id": "session-teleport",
+  "releaseId": "session-teleport@0.6.0-rc.1",
+  "source": {
+    "repository": "https://github.com/omdsh-dev/session-teleport",
+    "ref": "d76e0d98b09ad1d08f2592ffd47161acb907bfc4",
+    "path": null,
+    "packagePath": "package.json",
+    "publiclyReachable": true,
+    "observedDefaultHead": "d76e0d98b09ad1d08f2592ffd47161acb907bfc4",
+    "tree": "e897db2766bc298df712d3f45b91965eeb04c06a"
+  },
+  "catalog": {
+    "version": "0.6.0-rc.1",
+    "license": "BSD-3-Clause",
+    "kind": "extension",
+    "legacyManagement": "profile-bundle"
+  },
+  "package": {
+    "name": "@mattheliu/session-teleport",
+    "version": "0.6.0-rc.1",
+    "license": "BSD-3-Clause",
+    "private": true,
+    "workshopManifest": "absent",
+    "legacySignals": [
+      "dsh.bundle.patch:./cordis.patch.yml"
+    ],
+    "lifecycleScripts": []
+  },
+  "sequence": [
+    {
+      "stage": "fixed-source",
+      "state": "passed",
+      "reason": "Anonymous public Git fetch resolved the exact commit and tree e897db2766bc298df712d3f45b91965eeb04c06a."
+    },
+    {
+      "stage": "type-plan",
+      "state": "blocked",
+      "reason": "A valid author-declared package.json#dshWorkshop and matching release facts are required."
+    },
+    {
+      "stage": "trust-review",
+      "state": "completed",
+      "reason": "Assisted static review recorded 3 finding(s) without executing source code."
+    },
+    {
+      "stage": "adapter",
+      "state": "blocked",
+      "reason": "Source execution requires a separate explicit human trust decision after a valid type plan."
+    },
+    {
+      "stage": "evidence",
+      "state": "saved",
+      "reason": "Pre-admission review evidence is stored at intake/reviews/session-teleport@0.6.0-rc.1.json."
+    },
+    {
+      "stage": "human-review",
+      "state": "pending",
+      "reason": "Independent maintainer review has not been recorded."
+    },
+    {
+      "stage": "admission",
+      "state": "not-created",
+      "reason": "Admission is a separate explicit change after approved review and passing Harness evidence."
+    }
+  ],
+  "typePlan": {
+    "state": "blocked",
+    "declaredProtocol": null,
+    "declaredAdapter": null,
+    "observedLegacyProtocol": "harness-profile",
+    "observedLegacyAdapter": "profile-bundle",
+    "migrationOptions": [],
+    "reason": "package.json#dshWorkshop is absent"
+  },
+  "trustReview": {
+    "state": "needs-fix",
+    "method": "assisted-static-public-source-review",
+    "sourceExecutionAuthorized": false,
+    "checks": {
+      "publicCommit": "passed",
+      "packageJson": "passed",
+      "workshopManifest": "failed",
+      "catalogVersion": "passed",
+      "license": "passed",
+      "artifact": "passed",
+      "credentials": "passed",
+      "symlinkContainment": "passed",
+      "nativeCode": "passed",
+      "lifecycleScripts": "passed",
+      "processExecutionIntent": "review-required",
+      "rc6Baseline": "failed"
+    },
+    "findings": [
+      {
+        "severity": "blocker",
+        "code": "workshop-manifest-absent",
+        "evidence": "package.json#dshWorkshop is absent"
+      },
+      {
+        "severity": "blocker",
+        "code": "legacy-runtime-pins",
+        "evidence": "Fixed package still declares @deepseek-ai/cordis@4.0.1-rc.4, @deepseek-ai/dsh-session-persistence-jsonl@0.0.1-rc.5, @deepseek-ai/dsh-session-persistence@0.0.1-rc.5, @deepseek-ai/dsh-session@0.0.1-rc.5; this is not RC.6 evidence."
+      },
+      {
+        "severity": "review",
+        "code": "process-execution-intent",
+        "evidence": "10 tracked file(s) contain process-execution intent and require manual inspection."
+      }
+    ]
+  },
+  "adapter": {
+    "state": "blocked",
+    "name": "profile-bundle",
+    "reason": "Typed Harness plan is blocked; project code was not executed.",
+    "report": null
+  },
+  "humanReview": {
+    "state": "pending",
+    "reviewer": null,
+    "reason": "The generated assisted review cannot approve its own independent human gate."
+  },
+  "admission": {
+    "state": "not-created",
+    "reason": "No approved human review or passing RC.6 Harness report exists for this fixed release."
+  },
+  "claims": {
+    "rc6Verified": false,
+    "seamlessInstall": "unknown",
+    "failureIsolation": "unknown",
+    "hotReload": "unknown"
+  },
+  "reviewedAt": "2026-08-14T07:27:57.043Z",
+  "reviewer": "codex-assisted-pre-admission-review"
+}

@@ -30,7 +30,7 @@
 4. 直接生成一份严格符合以下契约的 JSON，不要添加契约外字段：
    - schema：`https://hub.omdsh.dev/submission.schema.json`
    - `schema` 固定为 `omdsh-workshop-submission/v2`
-   - `packageManifest` 必须与固定 commit 中的 `package.json#dshWorkshop` 完全一致，分别声明安装模式、失败处置、是否在启用前触碰 current、热重载/重启、dispose、结构化权限和证据路径
+   - `packageManifest` 必须与固定 commit 中的 `package.json#dshWorkshop` 完全一致，分别声明安装模式、失败处置、是否在启用前触碰 current、热重载/重启、dispose、结构化权限和证据路径；Profile、Repository Plugin、Cordis 与 MCP 还必须声明一个具体 `capability`（ID、类型、调用方式、预期观察），不能用 loaded/started 代替功能验证
    - `operation` 只能是 `create-project` 或 `add-release`
    - `project.path` 无子路径时为 `null`，有子路径时以 `/` 开头
    - `release.ref` 为完整 40 位 commit；`updatedAt` 为可验证的 ISO 8601 时间

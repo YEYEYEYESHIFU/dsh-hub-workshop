@@ -1,0 +1,137 @@
+{
+  "schema": "omdsh-workshop-intake/v1",
+  "id": "almanac-mcp@0.1.0-rc.2",
+  "submission": {
+    "repository": "https://github.com/omdsh-dev/toybox",
+    "ref": "86e98729b92db0b9fe901c39e32bca74cf8c0f54",
+    "path": "/plugins/almanac-mcp/.dsh-plugin",
+    "manifest": {
+      "schema": "omdsh-workshop-submission/v2",
+      "operation": "add-release",
+      "project": {
+        "id": "almanac-mcp",
+        "displayName": "老黄历 MCP",
+        "summary": "查询今日宜忌、冲煞、幸运方向，支持可复现抽签与每日一诗。",
+        "kind": "mcp",
+        "category": "fun",
+        "tags": [
+          "黄历",
+          "抽签",
+          "零依赖"
+        ],
+        "repository": "https://github.com/omdsh-dev/toybox",
+        "path": "/plugins/almanac-mcp/.dsh-plugin",
+        "author": {
+          "name": "mattheliu",
+          "url": "https://github.com/mattheliu"
+        },
+        "license": "MIT"
+      },
+      "release": {
+        "version": "0.1.0-rc.2",
+        "ref": "86e98729b92db0b9fe901c39e32bca74cf8c0f54",
+        "updatedAt": "2026-08-13T13:18:30Z",
+        "channel": "beta",
+        "compatibility": "Exact @deepseek-ai/dsh@0.1.0-rc.6 Harness evaluation.",
+        "changelog": "Migrated to the current typed Workshop contract and fixed public source.",
+        "capabilities": {
+          "requiresFabric": false,
+          "deepHook": false,
+          "restartRequired": true
+        },
+        "profileBundle": null,
+        "updateFrom": null
+      },
+      "management": {
+        "method": "guided",
+        "protocol": "mcp",
+        "label": "Isolated MCP review",
+        "instructions": "Review the fixed MCP server in an isolated process after explicit trust approval.",
+        "source": null
+      },
+      "declarations": {
+        "permissions": "none",
+        "testing": "Run the typed adapter against this exact source and preserve the complete report.",
+        "trustedPublisherRequested": false,
+        "installScriptsMustRemainDisabled": true
+      },
+      "packageManifest": {
+        "schema": "omdsh-workshop-package/v1",
+        "type": "plugin",
+        "integration": {
+          "protocol": "mcp",
+          "artifact": "server.json",
+          "mcp": {
+            "protocolVersions": [
+              "2026-07-28"
+            ],
+            "serverManifest": "server.json",
+            "registrySchema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json"
+          }
+        },
+        "install": {
+          "mode": "isolated-trial",
+          "adapter": "mcp-server",
+          "failurePolicy": "discard-process",
+          "touchesCurrentBeforeActivation": false
+        },
+        "lifecycle": {
+          "activation": "restart-plugin",
+          "dispose": "supported"
+        },
+        "permissions": [],
+        "capability": {
+          "id": "yi_ji",
+          "kind": "tool",
+          "invocation": "yi_ji({date: '2030-01-15'})",
+          "expected": "📅 2030年1月15日（星期二）\n🧮 干支：庚戌年 · 庚午日\n🌿 五行属金\n✅ 宜：谈判签约、清算对账、断舍离、复盘总结、跨部门沟通、代码评审\n❌ 忌：借贷担保、感情用事、意气用事、拍脑袋定方案、在评审里纠结命名\n⚡ 冲煞：冲鼠（午）\n🧭 幸运方向：东"
+        },
+        "evidence": {
+          "install": null,
+          "failureIsolation": null,
+          "hotReload": null,
+          "remove": null
+        }
+      }
+    }
+  },
+  "classification": {
+    "management": "guided"
+  },
+  "baseline": {
+    "package": "@deepseek-ai/dsh",
+    "version": "0.1.0-rc.6",
+    "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+  },
+  "review": {
+    "state": "pending-review"
+  },
+  "verification": {
+    "state": "untested"
+  },
+  "tests": {
+    "static": {
+      "required": true,
+      "status": "passed",
+      "evidence": "submission manifest validation"
+    },
+    "supplyChain": {
+      "required": true,
+      "status": "pending"
+    },
+    "officialBaseline": {
+      "required": false,
+      "status": "not-applicable",
+      "evidence": "guided entries expose no executable install intent"
+    },
+    "lifecycle": {
+      "required": false,
+      "status": "not-applicable",
+      "evidence": "guided entries have no Workshop-owned lifecycle"
+    }
+  },
+  "registry": {
+    "state": "ineligible",
+    "reason": "guided-catalog-only"
+  }
+}

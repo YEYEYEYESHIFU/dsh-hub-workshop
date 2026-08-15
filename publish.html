@@ -168,11 +168,28 @@
               <label><span data-i18n="publish.packageName">包名</span><input name="packageName" placeholder="@owner/session-notes"></label>
               <label><span data-i18n="publish.spec">不可变 spec</span><input name="spec" placeholder="git+https://github.com/owner/repo.git#40-char-commit"></label>
             </div>
+            <div id="update-source-fields" class="form-grid update-source-fields" hidden>
+              <div class="form-wide update-source-heading"><strong data-i18n="publish.updateSourceTitle">升级测试起点</strong><small data-i18n="publish.updateSourceHelp">固定一个已公开的上一版本；Harness 会在隔离 candidate 中先装上一版，再升级到本次 Release。不能用本次版本重复安装冒充升级。</small></div>
+              <label><span data-i18n="publish.previousVersion">上一版本</span><input name="previousVersion" placeholder="0.9.0"></label>
+              <label><span data-i18n="publish.previousRef">上一版本完整 commit SHA</span><input name="previousRef" pattern="[0-9a-f]{40}" minlength="40" maxlength="40" placeholder="0123456789abcdef0123456789abcdef01234567"></label>
+            </div>
             <div class="form-section-body declaration-fields">
               <div class="permission-grid">
                 <label><span data-i18n="publish.permissions">权限说明</span><textarea name="permissions" required rows="3" placeholder="无额外权限；或说明文件、网络、Shell、凭据访问" data-i18n-placeholder="publish.permissionsPlaceholder"></textarea><small data-i18n="publish.permissionsHelp">没有额外权限也请明确填写“无”。</small></label>
                 <label><span data-i18n="publish.testing">测试与已知限制</span><textarea name="testing" required rows="3" placeholder="已运行的测试；未覆盖的环境或已知限制" data-i18n-placeholder="publish.testingPlaceholder"></textarea><small data-i18n="publish.testingHelp">只写实际验证过的内容，不需要包装。</small></label>
                 <label><span data-i18n="publish.permissionScopes">结构化权限</span><input name="permissionScopes" placeholder="filesystem:read, network:outbound"><small data-i18n="publish.permissionScopesHelp">英文逗号分隔；没有额外权限可留空，文字说明仍须填写。</small></label>
+              </div>
+              <div id="capability-fields" class="capability-declaration" hidden>
+                <div class="capability-declaration-heading">
+                  <div><strong data-i18n="publish.capabilityTitle">实际能力断言</strong><small data-i18n="publish.capabilityHelp">声明 Harness 必须注册、调用并观察的一个具体能力；这只是测试目标，不是“已验证”。</small></div>
+                  <span data-i18n="publish.capabilityRequired">可执行类型必填</span>
+                </div>
+                <div class="form-grid">
+                  <label><span data-i18n="publish.capabilityId">能力 ID</span><input name="capabilityId" pattern="[a-z0-9][a-z0-9.-]*" placeholder="session-teleport-ready"><small data-i18n="publish.capabilityIdHelp">稳定、可观测的英文标识；不能只写 loaded 或 started。</small></label>
+                  <label><span data-i18n="publish.capabilityKind">能力类型</span><select name="capabilityKind" data-generated="service"><option value="tool" data-i18n="publish.capabilityKind.tool">工具</option><option value="command" data-i18n="publish.capabilityKind.command">命令</option><option value="service" selected data-i18n="publish.capabilityKind.service">服务</option><option value="ui" data-i18n="publish.capabilityKind.ui">界面</option><option value="event" data-i18n="publish.capabilityKind.event">事件</option><option value="provider" data-i18n="publish.capabilityKind.provider">Provider</option><option value="other" data-i18n="publish.capabilityKind.other">其他</option></select></label>
+                  <label class="form-wide"><span data-i18n="publish.capabilityInvocation">调用方式</span><textarea name="capabilityInvocation" rows="2" maxlength="1000" placeholder="调用命令、工具或服务端点，并写明最小输入" data-i18n-placeholder="publish.capabilityInvocationPlaceholder"></textarea></label>
+                  <label class="form-wide"><span data-i18n="publish.capabilityExpected">预期观察</span><textarea name="capabilityExpected" rows="2" maxlength="1000" placeholder="可重复判断的响应、状态、事件或 UI 结果" data-i18n-placeholder="publish.capabilityExpectedPlaceholder"></textarea><small data-i18n="publish.capabilityExpectedHelp">adapter 必须回报同一个断言及实际观察值；字段不一致会直接失败。</small></label>
+                </div>
               </div>
             </div>
             <details id="management-details" class="form-disclosure">
@@ -283,6 +300,6 @@
         </div>
       </section>
     </main>
-    <footer class="site-footer doc-footer"><a class="footer-brand" href="./">DSH Hub Workshop</a><p data-i18n="publish.footer">Author Studio 自动准备待审核记录；人工批准、测试验证与 Registry 授权仍彼此独立。</p><div class="footer-links"><a href="contributing.html" data-i18n="nav.contribute">收录指南</a><a href="registry.html" data-i18n="nav.registry">协议</a></div></footer>
+    <footer class="site-footer doc-footer"><div class="footer-summary"><a class="footer-brand" href="./">DSH Hub Workshop</a><p data-i18n="publish.footer">Author Studio 自动准备待审核记录；人工批准、测试验证与 Registry 授权仍彼此独立。</p></div><nav class="footer-group" aria-label="站点资源"><strong class="footer-heading">站点资源</strong><div class="footer-links"><a href="contributing.html" data-i18n="nav.contribute">收录指南</a><a href="registry.html" data-i18n="nav.registry">协议</a></div></nav><nav class="footer-group footer-ecosystem" aria-label="生态外链"><strong class="footer-heading">生态外链</strong><a class="footer-external-link" href="https://dshfind.com/" target="_blank" rel="noopener noreferrer"><span><b>dshfind</b><small>DSH 学习与分享社区</small></span><span aria-hidden="true">↗</span></a></nav></footer>
   </body>
 </html>

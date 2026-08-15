@@ -7,6 +7,7 @@
   "scripts": {
     "topic:audit": "node scripts/audit-topic-plugins.mjs",
     "topic:fetch": "node scripts/fetch-topic-snapshot.mjs",
+    "topic:sanitize": "node scripts/enforce-topic-source-boundary.mjs",
     "topic:apply": "node scripts/apply-topic-plugin-audit.mjs",
     "topic:snapshot": "node scripts/refresh-topic-snapshot.mjs",
     "feeds:build": "node scripts/build-install-feeds.mjs",
@@ -18,16 +19,28 @@
     "intake:prepare": "node scripts/intake.mjs prepare",
     "intake:evidence": "node scripts/intake.mjs evidence",
     "intake:issue": "node scripts/prepare-issue-intake.mjs",
+    "intake:review-real": "node scripts/review-real-projects.mjs",
+    "intake:review-check": "node scripts/check-real-project-reviews.mjs",
+    "alignment:check": "node scripts/check-rc6-alignment.mjs",
+    "harness:plan": "node scripts/harness.mjs plan",
+    "harness:evidence": "node scripts/harness.mjs evidence",
+    "harness:profile": "node scripts/run-harness-fixture.mjs profile",
+    "harness:mcp": "node scripts/run-harness-fixture.mjs mcp",
+    "harness:skill": "node scripts/run-harness-fixture.mjs skill",
+    "harness:verify": "node scripts/run-harness-fixture.mjs all",
     "baseline:verify": "node scripts/verify-official-baseline.mjs",
     "build": "npm run intake:build && npm run feeds:build && npm run inventory:build && npm run api:build && node scripts/build-public-site.mjs",
-    "check": "npm run intake:check && npm run build && node --check worker/public.js && node scripts/check-public-site.mjs",
+    "check": "npm run intake:check && npm run intake:review-check && npm run alignment:check && npm run build && node --check worker/public.js && node scripts/check-public-site.mjs",
     "test": "node --test",
     "validate": "npm run check && npm test",
     "deploy:dry-run": "npm run build && wrangler deploy -c wrangler.public.jsonc --dry-run --outdir dist",
     "deploy": "npm run validate && wrangler deploy -c wrangler.public.jsonc"
   },
   "devDependencies": {
-    "wrangler": "4.122.0"
+    "@modelcontextprotocol/client": "2.0.0",
+    "@modelcontextprotocol/server": "2.0.0",
+    "wrangler": "4.122.0",
+    "yaml": "2.9.0"
   },
   "engines": {
     "node": ">=22"

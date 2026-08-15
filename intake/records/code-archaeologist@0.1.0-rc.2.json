@@ -1,0 +1,126 @@
+{
+  "schema": "omdsh-workshop-intake/v1",
+  "id": "code-archaeologist@0.1.0-rc.2",
+  "submission": {
+    "repository": "https://github.com/omdsh-dev/toybox",
+    "ref": "86e98729b92db0b9fe901c39e32bca74cf8c0f54",
+    "path": "/plugins/code-archaeologist/.dsh-plugin",
+    "manifest": {
+      "schema": "omdsh-workshop-submission/v2",
+      "operation": "add-release",
+      "project": {
+        "id": "code-archaeologist",
+        "displayName": "代码考古学家",
+        "summary": "用地层、文物和证据链方法解剖遗留代码，给出保护性迁移建议。",
+        "kind": "skill",
+        "category": "fun",
+        "tags": [
+          "legacy-code",
+          "架构",
+          "证据链"
+        ],
+        "repository": "https://github.com/omdsh-dev/toybox",
+        "path": "/plugins/code-archaeologist/.dsh-plugin",
+        "author": {
+          "name": "mattheliu",
+          "url": "https://github.com/mattheliu"
+        },
+        "license": "MIT"
+      },
+      "release": {
+        "version": "0.1.0-rc.2",
+        "ref": "86e98729b92db0b9fe901c39e32bca74cf8c0f54",
+        "updatedAt": "2026-08-13T13:18:30Z",
+        "channel": "beta",
+        "compatibility": "Exact @deepseek-ai/dsh@0.1.0-rc.6 Harness evaluation.",
+        "changelog": "Migrated to the current typed Workshop contract and fixed public source.",
+        "capabilities": {
+          "requiresFabric": false,
+          "deepHook": false,
+          "restartRequired": false
+        },
+        "profileBundle": null,
+        "updateFrom": null
+      },
+      "management": {
+        "method": "guided",
+        "protocol": "skill",
+        "label": "Static Skill review",
+        "instructions": "Inspect the fixed Skill bundle statically without executing its instructions.",
+        "source": null
+      },
+      "declarations": {
+        "permissions": "filesystem:read",
+        "testing": "Run the typed adapter against this exact source and preserve the complete report.",
+        "trustedPublisherRequested": false,
+        "installScriptsMustRemainDisabled": true
+      },
+      "packageManifest": {
+        "schema": "omdsh-workshop-package/v1",
+        "type": "plugin",
+        "integration": {
+          "protocol": "skill",
+          "artifact": "skills/code-archaeologist/SKILL.md"
+        },
+        "install": {
+          "mode": "guided",
+          "adapter": "skill",
+          "failurePolicy": "manual",
+          "touchesCurrentBeforeActivation": false
+        },
+        "lifecycle": {
+          "activation": "immediate",
+          "dispose": "unsupported"
+        },
+        "permissions": [
+          "filesystem:read"
+        ],
+        "evidence": {
+          "install": null,
+          "failureIsolation": null,
+          "hotReload": null,
+          "remove": null
+        }
+      }
+    }
+  },
+  "classification": {
+    "management": "guided"
+  },
+  "baseline": {
+    "package": "@deepseek-ai/dsh",
+    "version": "0.1.0-rc.6",
+    "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+  },
+  "review": {
+    "state": "pending-review"
+  },
+  "verification": {
+    "state": "untested"
+  },
+  "tests": {
+    "static": {
+      "required": true,
+      "status": "passed",
+      "evidence": "submission manifest validation"
+    },
+    "supplyChain": {
+      "required": true,
+      "status": "pending"
+    },
+    "officialBaseline": {
+      "required": false,
+      "status": "not-applicable",
+      "evidence": "guided entries expose no executable install intent"
+    },
+    "lifecycle": {
+      "required": false,
+      "status": "not-applicable",
+      "evidence": "guided entries have no Workshop-owned lifecycle"
+    }
+  },
+  "registry": {
+    "state": "ineligible",
+    "reason": "guided-catalog-only"
+  }
+}

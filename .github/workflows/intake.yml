@@ -8,11 +8,15 @@ on:
       - 'intake/**'
       - 'intake-queue.json'
       - 'intake*.schema.json'
+      - 'harness-*.schema.json'
+      - 'package-manifest.schema.json'
       - 'official-baseline.json'
       - 'submission.schema.json'
       - 'scripts/intake*.mjs'
+      - 'scripts/*harness*.mjs'
       - 'scripts/check-intake.mjs'
       - 'tests/intake.test.mjs'
+      - 'tests/typed-harness.test.mjs'
   workflow_dispatch:
   schedule:
     - cron: '23 3 * * 1'
@@ -34,7 +38,7 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts
       - run: npm run intake:check
-      - run: node --test tests/intake.test.mjs
+      - run: node --test tests/intake.test.mjs tests/typed-harness.test.mjs
 
   official-baseline:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
@@ -77,12 +81,17 @@ jobs:
           INTAKE_BRANCH: ${{ steps.prepare.outputs.branch }}
           INTAKE_RECORD_ID: ${{ steps.prepare.outputs.record_id }}
           INTAKE_RECORD_PATH: ${{ steps.prepare.outputs.record_path }}
+          HARNESS_PLAN_PATH: ${{ steps.prepare.outputs.plan_path }}
           ISSUE_NUMBER: ${{ steps.prepare.outputs.issue_number }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "$INTAKE_BRANCH"
           git add "$INTAKE_RECORD_PATH" intake-queue.json
+          if [ -n "$HARNESS_PLAN_PATH" ]
+          then
+            git add "$HARNESS_PLAN_PATH"
+          fi
           git commit -m "Queue $INTAKE_RECORD_ID from #$ISSUE_NUMBER"
           git push origin "$INTAKE_BRANCH"
       - name: Open the review PR

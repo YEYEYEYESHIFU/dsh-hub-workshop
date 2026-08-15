@@ -47,7 +47,7 @@ test('retired login and private session endpoints remain unavailable', async () 
 })
 
 test('public feeds, project directory, and repository mappings require no session', async () => {
-  for (const path of ['/catalog.json', '/registry-v1.json', '/recipes-v1.json', '/agent-ecosystem-v1.json', '/api/v1/ecosystem.json', '/api/v1/market.json', '/api/v1/plugin-types.json', '/api/v1/plugins.json', '/ecosystem-repositories.json', '/public-discovery.json', '/topic-repositories.json', '/topic-plugin-audit.json', '/official-baseline.json', '/intake-queue.json', '/intake.schema.json', '/intake-evidence.schema.json', '/market-layers.json', '/market-layers.schema.json', '/verification-inventory.json', '/projects.html']) {
+  for (const path of ['/catalog.json', '/registry-v1.json', '/recipes-v1.json', '/agent-ecosystem-v1.json', '/api/v1/ecosystem.json', '/api/v1/market.json', '/api/v1/plugin-types.json', '/api/v1/plugins.json', '/ecosystem-repositories.json', '/public-discovery.json', '/topic-repositories.json', '/topic-plugin-audit.json', '/official-baseline.json', '/intake-queue.json', '/intake.schema.json', '/intake-evidence.schema.json', '/harness-plan.schema.json', '/harness-report.schema.json', '/market-layers.json', '/market-layers.schema.json', '/verification-inventory.json', '/projects.html']) {
     const response = await publicWorker.fetch(new Request(`https://hub.omdsh.dev${path}`), env())
     assert.equal(response.status, 200, path)
     assert.equal(await response.text(), `asset:${path}`, path)

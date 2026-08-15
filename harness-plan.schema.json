@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hub.omdsh.dev/harness-plan.schema.json",
+  "title": "OMDSH Workshop typed test Harness plan",
+  "type": "object",
+  "required": ["schema", "id", "projectId", "releaseId", "source", "updateFrom", "baseline", "profileBase", "classification", "capability", "policy", "claims", "blockedReasons", "steps"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "omdsh-workshop-harness-plan/v1" },
+    "id": { "type": "string", "minLength": 3 },
+    "projectId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "releaseId": { "type": "string", "minLength": 3 },
+    "source": { "$ref": "#/$defs/source" },
+    "updateFrom": {
+      "oneOf": [
+        { "$ref": "#/$defs/updateFrom" },
+        { "type": "null" }
+      ]
+    },
+    "baseline": { "$ref": "#/$defs/baseline" },
+    "profileBase": {
+      "oneOf": [
+        { "$ref": "#/$defs/profileBase" },
+        { "type": "null" }
+      ]
+    },
+    "classification": {
+      "type": "object",
+      "required": ["management", "installMode", "adapter", "protocol", "failurePolicy", "activation"],
+      "additionalProperties": false,
+      "properties": {
+        "management": { "enum": ["transactional", "managed", "guided"] },
+        "installMode": { "enum": ["transactional", "isolated-trial", "guided"] },
+        "adapter": { "enum": ["profile-bundle", "repository-plugin", "mcp-server", "skill", "third-party"] },
+        "protocol": { "enum": ["harness-profile", "harness-repository", "harness-cordis", "mcp", "skill", "third-party"] },
+        "failurePolicy": { "enum": ["generation-rollback", "discard-candidate", "discard-process", "manual"] },
+        "activation": { "enum": ["immediate", "hot-reload", "restart-plugin", "restart-profile", "restart-host"] }
+      }
+    },
+    "capability": {
+      "oneOf": [
+        { "$ref": "#/$defs/capability" },
+        { "type": "null" }
+      ]
+    },
+    "policy": {
+      "type": "object",
+      "required": ["sourceExecution", "workspace", "network", "installScripts", "currentProfile", "cleanup"],
+      "additionalProperties": false,
+      "properties": {
+        "sourceExecution": { "const": "disabled-until-explicitly-trusted" },
+        "workspace": { "const": "ephemeral" },
+        "network": { "const": "deny-by-default" },
+        "installScripts": { "const": "disabled" },
+        "currentProfile": { "const": "read-only-until-controlled-activation" },
+        "cleanup": { "const": "mandatory" }
+      }
+    },
+    "claims": {
+      "type": "object",
+      "required": ["seamlessInstall", "failureIsolation", "hotReload", "protocolCompatibility", "registryReadiness"],
+      "additionalProperties": false,
+      "properties": {
+        "seamlessInstall": { "$ref": "#/$defs/plannedClaim" },
+        "failureIsolation": { "$ref": "#/$defs/plannedClaim" },
+        "hotReload": { "$ref": "#/$defs/plannedClaim" },
+        "protocolCompatibility": { "$ref": "#/$defs/plannedClaim" },
+        "registryReadiness": { "$ref": "#/$defs/plannedClaim" }
+      }
+    },
+    "blockedReasons": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/step" }
+    }
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "required": ["repository", "ref", "path"],
+      "additionalProperties": false,
+      "properties": {
+        "repository": { "type": "string", "pattern": "^https://github\\.com/" },
+        "ref": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "path": { "type": ["string", "null"] }
+      }
+    },
+    "baseline": {
+      "type": "object",
+      "required": ["package", "version", "integrity"],
+      "additionalProperties": false,
+      "properties": {
+        "package": { "const": "@deepseek-ai/dsh" },
+        "version": { "type": "string", "minLength": 1 },
+        "integrity": { "type": "string", "pattern": "^sha512-" }
+      }
+    },
+    "profileBase": {
+      "type": "object",
+      "required": ["template", "bundles", "exactPackages"],
+      "additionalProperties": false,
+      "properties": {
+        "template": { "enum": ["base", "web"] },
+        "bundles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "exactPackages": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["package", "version", "integrity"],
+            "additionalProperties": false,
+            "properties": {
+              "package": { "type": "string", "minLength": 1 },
+              "version": { "type": "string", "minLength": 1 },
+              "integrity": { "type": "string", "pattern": "^sha512-" }
+            }
+          }
+        }
+      }
+    },
+    "updateFrom": {
+      "type": "object",
+      "required": ["repository", "ref", "path", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "repository": { "type": "string", "pattern": "^https://github\\.com/" },
+        "ref": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "path": { "type": ["string", "null"] },
+        "version": { "type": "string", "minLength": 1 }
+      }
+    },
+    "plannedClaim": {
+      "type": "object",
+      "required": ["state", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "state": { "enum": ["candidate", "not-claimed", "not-declared", "catalog-only", "blocked"] },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "capability": {
+      "type": "object",
+      "required": ["id", "kind", "invocation", "expected"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$" },
+        "kind": { "enum": ["tool", "command", "service", "ui", "event", "provider", "other"] },
+        "invocation": { "type": "string", "minLength": 1 },
+        "expected": { "type": "string", "minLength": 1 }
+      }
+    },
+    "step": {
+      "type": "object",
+      "required": ["id", "phase", "executor", "required", "scope", "expectedFacts"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9.-]*$" },
+        "phase": { "enum": ["static", "supply-chain", "sandbox", "install", "ready", "functional", "failure", "lifecycle", "update", "disable", "remove", "recovery"] },
+        "executor": { "enum": ["static", "profile", "repository", "mcp", "cordis", "skill", "third-party"] },
+        "required": { "type": "boolean" },
+        "scope": { "enum": ["source-only", "ephemeral-workspace", "candidate-profile", "isolated-process", "current-profile-controlled"] },
+        "expectedFacts": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": { "type": ["boolean", "string", "number"] }
+        }
+      }
+    }
+  }
+}

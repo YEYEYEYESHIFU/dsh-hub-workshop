@@ -1,0 +1,30 @@
+{
+  "name": "@omdsh/harness-skill-probe",
+  "version": "1.0.0",
+  "private": true,
+  "dshWorkshop": {
+    "schema": "omdsh-workshop-package/v1",
+    "type": "plugin",
+    "integration": {
+      "protocol": "skill",
+      "artifact": "harness-skill/SKILL.md"
+    },
+    "install": {
+      "mode": "guided",
+      "adapter": "skill",
+      "failurePolicy": "manual",
+      "touchesCurrentBeforeActivation": false
+    },
+    "lifecycle": {
+      "activation": "immediate",
+      "dispose": "unknown"
+    },
+    "permissions": ["filesystem:read"],
+    "evidence": {
+      "install": null,
+      "failureIsolation": null,
+      "hotReload": null,
+      "remove": null
+    }
+  }
+}

@@ -20,8 +20,8 @@ test('verification inventory covers every Catalog project and grants no false RC
   assert.equal(inventory.summary.verification['current-baseline-passed'] || 0, 0)
   assert.equal(inventory.summary.registry.admitted || 0, 0)
   assert.equal(inventory.summary.management.transactional, 2)
-  assert.equal(inventory.summary.management.managed, 9)
-  assert.equal(inventory.summary.management.guided, catalog.packages.length - admissions.blocked.length)
+  assert.equal(inventory.summary.management.managed || 0, 0)
+  assert.equal(inventory.summary.management.guided, catalog.packages.length - 2)
 })
 
 test('known blocked projects preserve their requested mode and exact blocker', async () => {

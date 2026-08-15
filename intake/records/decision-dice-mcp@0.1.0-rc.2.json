@@ -1,0 +1,137 @@
+{
+  "schema": "omdsh-workshop-intake/v1",
+  "id": "decision-dice-mcp@0.1.0-rc.2",
+  "submission": {
+    "repository": "https://github.com/omdsh-dev/toybox",
+    "ref": "86e98729b92db0b9fe901c39e32bca74cf8c0f54",
+    "path": "/plugins/decision-dice-mcp/.dsh-plugin",
+    "manifest": {
+      "schema": "omdsh-workshop-submission/v2",
+      "operation": "add-release",
+      "project": {
+        "id": "decision-dice-mcp",
+        "displayName": "决策骰子 MCP",
+        "summary": "提供抛硬币、掷骰和命运抉择工具，为选择困难保留可复现结果。",
+        "kind": "mcp",
+        "category": "fun",
+        "tags": [
+          "决策",
+          "随机",
+          "seed"
+        ],
+        "repository": "https://github.com/omdsh-dev/toybox",
+        "path": "/plugins/decision-dice-mcp/.dsh-plugin",
+        "author": {
+          "name": "mattheliu",
+          "url": "https://github.com/mattheliu"
+        },
+        "license": "MIT"
+      },
+      "release": {
+        "version": "0.1.0-rc.2",
+        "ref": "86e98729b92db0b9fe901c39e32bca74cf8c0f54",
+        "updatedAt": "2026-08-13T13:18:30Z",
+        "channel": "beta",
+        "compatibility": "Exact @deepseek-ai/dsh@0.1.0-rc.6 Harness evaluation.",
+        "changelog": "Migrated to the current typed Workshop contract and fixed public source.",
+        "capabilities": {
+          "requiresFabric": false,
+          "deepHook": false,
+          "restartRequired": true
+        },
+        "profileBundle": null,
+        "updateFrom": null
+      },
+      "management": {
+        "method": "guided",
+        "protocol": "mcp",
+        "label": "Isolated MCP review",
+        "instructions": "Review the fixed MCP server in an isolated process after explicit trust approval.",
+        "source": null
+      },
+      "declarations": {
+        "permissions": "none",
+        "testing": "Run the typed adapter against this exact source and preserve the complete report.",
+        "trustedPublisherRequested": false,
+        "installScriptsMustRemainDisabled": true
+      },
+      "packageManifest": {
+        "schema": "omdsh-workshop-package/v1",
+        "type": "plugin",
+        "integration": {
+          "protocol": "mcp",
+          "artifact": "server.json",
+          "mcp": {
+            "protocolVersions": [
+              "2026-07-28"
+            ],
+            "serverManifest": "server.json",
+            "registrySchema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json"
+          }
+        },
+        "install": {
+          "mode": "isolated-trial",
+          "adapter": "mcp-server",
+          "failurePolicy": "discard-process",
+          "touchesCurrentBeforeActivation": false
+        },
+        "lifecycle": {
+          "activation": "restart-plugin",
+          "dispose": "supported"
+        },
+        "permissions": [],
+        "capability": {
+          "id": "flip",
+          "kind": "tool",
+          "invocation": "flip({seed: 'verify'})",
+          "expected": "🪙 硬币腾空而起……\n🎯 结果：**反面**\n（seed=\"verify\"，可复现）"
+        },
+        "evidence": {
+          "install": null,
+          "failureIsolation": null,
+          "hotReload": null,
+          "remove": null
+        }
+      }
+    }
+  },
+  "classification": {
+    "management": "guided"
+  },
+  "baseline": {
+    "package": "@deepseek-ai/dsh",
+    "version": "0.1.0-rc.6",
+    "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+  },
+  "review": {
+    "state": "pending-review"
+  },
+  "verification": {
+    "state": "untested"
+  },
+  "tests": {
+    "static": {
+      "required": true,
+      "status": "passed",
+      "evidence": "submission manifest validation"
+    },
+    "supplyChain": {
+      "required": true,
+      "status": "pending"
+    },
+    "officialBaseline": {
+      "required": false,
+      "status": "not-applicable",
+      "evidence": "guided entries expose no executable install intent"
+    },
+    "lifecycle": {
+      "required": false,
+      "status": "not-applicable",
+      "evidence": "guided entries have no Workshop-owned lifecycle"
+    }
+  },
+  "registry": {
+    "state": "ineligible",
+    "reason": "guided-catalog-only"
+  }
+}

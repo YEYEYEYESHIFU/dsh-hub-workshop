@@ -22,6 +22,12 @@ function profileManifest() {
     },
     lifecycle: { activation: 'restart-profile', dispose: 'supported' },
     permissions: ['filesystem:read'],
+    capability: {
+      id: 'profile-route-ready',
+      kind: 'service',
+      invocation: 'boot the candidate Profile and request the declared route',
+      expected: 'the declared route returns a deterministic response',
+    },
     evidence: {
       install: 'docs/verification/install.md',
       failureIsolation: 'docs/verification/failure.md',
@@ -63,6 +69,12 @@ test('aligns MCP declarations with the current official protocol and server mani
     install: { mode: 'isolated-trial', adapter: 'mcp-server', failurePolicy: 'discard-process', touchesCurrentBeforeActivation: false },
     lifecycle: { activation: 'restart-plugin', dispose: 'supported' },
     permissions: ['network:outbound'],
+    capability: {
+      id: 'weather-current',
+      kind: 'tool',
+      invocation: 'tools/call weather-current with a fixed city',
+      expected: 'a structured current-weather response',
+    },
     evidence: { install: null, failureIsolation: null, hotReload: null, remove: null },
   }
   assert.deepEqual(validateWorkshopManifest(declaration), [])
@@ -77,6 +89,28 @@ test('aligns MCP declarations with the current official protocol and server mani
   }), [])
 })
 
+test('accepts underscore capability ids exposed by MCP tools/list', () => {
+  const declaration = {
+    schema: 'omdsh-workshop-package/v1',
+    type: 'plugin',
+    integration: {
+      protocol: 'mcp',
+      artifact: 'server.json',
+      mcp: {
+        protocolVersions: [MCP_PROTOCOL_CURRENT],
+        serverManifest: 'server.json',
+        registrySchema: MCP_REGISTRY_SCHEMA,
+      },
+    },
+    install: { mode: 'isolated-trial', adapter: 'mcp-server', failurePolicy: 'discard-process', touchesCurrentBeforeActivation: false },
+    lifecycle: { activation: 'restart-plugin', dispose: 'supported' },
+    permissions: [],
+    capability: { id: 'color_search', kind: 'tool', invocation: 'tools/call color_search', expected: 'a deterministic color response' },
+    evidence: { install: null, failureIsolation: null, hotReload: null, remove: null },
+  }
+  assert.deepEqual(validateWorkshopManifest(declaration), [])
+})
+
 test('rejects an npm MCP ownership mismatch', () => {
   const errors = validateOfficialMcpManifest({
     packageJson: { mcpName: 'io.github.owner/other' },
@@ -89,10 +123,31 @@ test('rejects an npm MCP ownership mismatch', () => {
   assert.match(errors.join('\n'), /mcpName/)
 })
 
+test('requires a capability target for executable protocols and forbids one for static-only guidance', () => {
+  const executable = profileManifest()
+  delete executable.capability
+  assert.match(validateWorkshopManifest(executable).join('\n'), /requires a named capability target/)
+
+  const staticOnly = profileManifest()
+  staticOnly.integration = { protocol: 'skill', artifact: 'SKILL.md' }
+  staticOnly.install = { mode: 'guided', adapter: 'skill', failurePolicy: 'manual', touchesCurrentBeforeActivation: false }
+  assert.match(validateWorkshopManifest(staticOnly).join('\n'), /cannot declare a runtime capability target/)
+})
+
 test('keeps author capability declarations separate from current-baseline verification', () => {
   const profile = capabilityProfile({ declaration: profileManifest() })
   assert.equal(profile.install.seamless.state, 'declared')
   assert.equal(profile.install.failureIsolation.state, 'declared')
   assert.equal(profile.lifecycle.hotReload.state, 'unsupported')
   assert.equal(profile.admission.state, 'manifest-ready-for-tests')
+})
+
+test('legacy evidence exposes its detected DSH adapter without granting installation authority', () => {
+  const profile = capabilityProfile({
+    manifestSource: 'resolved bundle patch:cordis.patch.yml',
+    integrationProtocol: 'harness-profile',
+  })
+  assert.equal(profile.install.mode, 'guided')
+  assert.equal(profile.install.adapter, 'profile-bundle')
+  assert.equal(profile.admission.state, 'needs-package-manifest')
 })

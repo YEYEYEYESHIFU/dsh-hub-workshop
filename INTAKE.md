@@ -48,7 +48,19 @@ Topic and keyword matches only create discovery candidates. A repository with no
 
 Author declarations display only as Declared. Missing evidence paths, absent evidence files, environment mismatches, or non-reproducible results cannot become Verified. A disposable MCP process proves isolation only; it never grants DSH Profile or Registry installation authority.
 
-Records use `intake.schema.json`, runtime evidence uses `intake-evidence.schema.json`, the public queue is `intake-queue.json`, and `official-baseline.json` records current upstream facts. CI validates all four fail-closed.
+Records use `intake.schema.json`, typed plans use `harness-plan.schema.json`, execution reports use `harness-report.schema.json`, runtime evidence uses `intake-evidence.schema.json`, the public queue is `intake-queue.json`, and `official-baseline.json` records current upstream facts. New v2 submissions require Harness-produced v2 evidence; CI validates every boundary fail-closed.
+
+### One real project at a time
+
+Legacy Catalog candidates do not inherit historical verification in bulk. `npm run intake:review-real` processes them sequentially: it anonymously fixes the public Git commit, attempts a typed-plan preflight, and records an assisted static trust review in one file per project under `intake/reviews/`. A missing `package.json#dshWorkshop`, release mismatch, legacy Runtime pin, or unavailable Repository Plugin contract stops the case before any adapter runs. The command never executes project code, substitutes for independent human review, or writes an admission.
+
+```bash
+npm run intake:review-real
+npm run intake:review-real -- --id 7d7d
+npm run intake:review-check
+```
+
+The enforced order is: public commit → typed plan → human trust gate → matching adapter → report/evidence → independent human review → separate admission. A failed prerequisite always preserves `RC.6 verified=false`.
 
 `verification-inventory.json` accounts for every Catalog project across public handling, review, current-baseline verification, and Registry state. Unknown projects receive guided public handling and are never presented as tested merely because they appear in Catalog.
 
@@ -57,12 +69,22 @@ Records use `intake.schema.json`, runtime evidence uses `intake-evidence.schema.
 ```bash
 npm run intake:validate -- /path/to/submission.json
 npm run intake:prepare -- /path/to/submission.json
+npm run harness:plan -- /path/to/submission.json
+npm run harness:evidence -- intake/records/project@version.json harness-report.json environment.json
 npm run intake:issue -- /path/to/github-event.json
 npm run intake:build
 npm run intake:evidence -- intake/records/project@version.json intake/evidence/project@version.json
 npm run intake:check
 npm run baseline:verify
+npm run harness:skill
+npm run harness:mcp
+npm run harness:profile
+npm run harness:verify
 npm run validate
 ```
 
-Author Studio carries the complete manifest into a GitHub Issue. After the Issue is created, the `intake` workflow checks the public repository, full commit, and declared path read-only. A successful preflight lets `github-actions[bot]` write a `pending-review` record on an isolated branch, rebuild the queue, and open a review PR. Automation does not clone the submitted repository, execute its scripts, approve the submission, or write Registry state. Human boundary review, evidence under `intake/evidence/`, and a separately reviewed admission change remain mandatory. Runtime evidence also records a structured `capability` assertion; executable modes cannot pass with load-only evidence.
+The four `harness:*` adapter commands above use maintainer-owned repository fixtures only; their output is never admission evidence for a community project. A real submission still needs a pinned public commit, an explicit trust decision, and its own adapter run. The adapter independently checks Git `origin`, HEAD, the submitted subpath, and a clean worktree instead of trusting a caller-supplied commit string. The Profile command uses the network only to install exact `@deepseek-ai/dsh@0.1.0-rc.6`; RC.6, pnpm, and plugin execution then run in an ephemeral workspace with network and install scripts disabled. MCP verifies `server/discover → tools/list → tools/call` and contains the crashing tool in its child process. Skill inspection parses frontmatter, references, paths, file types, and command text without executing the Skill.
+
+The current isolated executor requires macOS `sandbox-exec`. Every sandbox first proves that workspace writes succeed, writes outside the workspace fail, and network sockets cannot be created. A failed assertion fails the report closed. Other platforms need an equivalent enforced executor and must never fall back to unsandboxed source execution.
+
+Author Studio carries the complete manifest into a GitHub Issue. After the Issue is created, the `intake` workflow checks the public repository, full commit, and declared path read-only. A successful preflight lets `github-actions[bot]` write a `pending-review` record on an isolated branch, rebuild the queue, and open a review PR. Automation does not clone the submitted repository, execute its scripts, approve the submission, or write Registry state. Human boundary review, evidence under `intake/evidence/`, and a separately reviewed admission change remain mandatory. Profile, Repository Plugin, Cordis, and MCP declarations name a structured `capability`; Skill and static third-party guidance cannot claim a runtime target. The Harness plan fixes that assertion, and the adapter must return the same ID, kind, invocation, and expected observation plus the actual observed value. Executable modes cannot pass with load-only evidence. Transactional and future managed execution must additionally pass failure isolation; a declared hot reload requires dispose and reactivate evidence.

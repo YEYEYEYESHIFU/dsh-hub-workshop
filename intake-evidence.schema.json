@@ -6,7 +6,7 @@
   "required": ["schema", "projectId", "releaseId", "management", "source", "runtime", "capability", "checks", "verifiedAt", "verifier"],
   "additionalProperties": false,
   "properties": {
-    "schema": { "const": "omdsh-workshop-intake-evidence/v1" },
+    "schema": { "enum": ["omdsh-workshop-intake-evidence/v1", "omdsh-workshop-intake-evidence/v2"] },
     "projectId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
     "releaseId": { "type": "string", "minLength": 3 },
     "management": { "enum": ["transactional", "managed", "guided"] },
@@ -74,12 +74,20 @@
         "update": { "$ref": "#/$defs/check" },
         "disable": { "$ref": "#/$defs/check" },
         "remove": { "$ref": "#/$defs/check" },
-        "recovery": { "$ref": "#/$defs/check" }
+        "recovery": { "$ref": "#/$defs/check" },
+        "failureIsolation": { "$ref": "#/$defs/check" },
+        "hotReload": { "$ref": "#/$defs/check" }
       }
     },
     "verifiedAt": { "type": "string", "format": "date-time" },
     "verifier": { "type": "string", "minLength": 1 }
   },
+  "allOf": [
+    {
+      "if": { "properties": { "schema": { "const": "omdsh-workshop-intake-evidence/v2" } } },
+      "then": { "properties": { "checks": { "required": ["failureIsolation", "hotReload"] } } }
+    }
+  ],
   "$defs": {
     "check": {
       "type": "object",

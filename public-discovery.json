@@ -1,6 +1,6 @@
 {
   "schema": "omdsh-public-discovery/v1",
-  "generatedAt": "2026-08-14T05:42:30.547Z",
+  "generatedAt": "2026-08-15T00:18:51.934Z",
   "policy": {
     "visibility": "Public repository visibility supports discovery only.",
     "authority": "A repository appears in the install Registry only after Workshop review and immutable source admission.",
@@ -332,17 +332,65 @@
   "topic": {
     "name": "dsh-plugin",
     "source": "https://github.com/topics/dsh-plugin",
-    "observedRepositoryCount": 1118,
-    "observedPages": 13,
+    "observedRepositoryCount": 2474,
+    "observedPages": 29,
     "status": "discovery-only",
     "collection": {
-      "method": "anonymous-partitioned-github-search",
+      "method": "authenticated-recursive-partitioned-github-search",
+      "authenticatedAccount": "mattheliu",
+      "creationTimeUpperBoundExclusive": "2026-08-15T00:15:56Z",
+      "transactionalSnapshot": false,
+      "internallyReconciled": true,
+      "stableConsecutiveRounds": 1,
+      "roundsAttempted": 2,
+      "acceptedFingerprint": "350bc6bd6a0b2e51b280bb43bfe111f7fdc1cc2567a5462fe0ae540a68d12bda",
+      "searchCapHandled": true,
       "partitions": [
-        "topic:dsh-plugin created:<2026-08-13",
-        "topic:dsh-plugin created:2026-08-13",
-        "topic:dsh-plugin created:>=2026-08-14"
+        {
+          "query": "topic:dsh-plugin created:<2026-07-31T00:00:00Z",
+          "count": 128,
+          "pages": 2
+        },
+        {
+          "query": "topic:dsh-plugin created:2026-07-31T00:00:00Z..2026-08-07T12:07:57Z",
+          "count": 63,
+          "pages": 1
+        },
+        {
+          "query": "topic:dsh-plugin created:2026-08-07T12:07:58Z..2026-08-11T06:11:56Z",
+          "count": 90,
+          "pages": 1
+        },
+        {
+          "query": "topic:dsh-plugin created:2026-08-11T06:11:57Z..2026-08-13T03:13:56Z",
+          "count": 65,
+          "pages": 1
+        },
+        {
+          "query": "topic:dsh-plugin created:2026-08-13T03:13:57Z..2026-08-14T01:44:56Z",
+          "count": 674,
+          "pages": 7
+        },
+        {
+          "query": "topic:dsh-plugin created:2026-08-14T01:44:57Z..2026-08-14T07:22:41Z",
+          "count": 501,
+          "pages": 6
+        },
+        {
+          "query": "topic:dsh-plugin created:2026-08-14T07:22:42Z..2026-08-14T13:00:26Z",
+          "count": 516,
+          "pages": 6
+        },
+        {
+          "query": "topic:dsh-plugin created:2026-08-14T13:00:27Z..2026-08-15T00:15:55Z",
+          "count": 495,
+          "pages": 5
+        }
       ],
-      "searchCapHandled": true
+      "rawObservedRepositoryCount": 2532,
+      "retiredOwnerExclusionsApplied": true,
+      "excludedRepositoryCount": 58,
+      "requestCount": 72
     }
   }
 }

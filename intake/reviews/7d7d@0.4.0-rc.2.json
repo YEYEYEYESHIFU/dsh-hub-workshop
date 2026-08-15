@@ -1,0 +1,126 @@
+{
+  "schema": "omdsh-workshop-real-project-review/v1",
+  "id": "7d7d",
+  "releaseId": "7d7d@0.4.0-rc.2",
+  "source": {
+    "repository": "https://github.com/omdsh-dev/7d7d",
+    "ref": "1c8ea4981fcfdb58e8f9726058b950aaf8cc9404",
+    "path": null,
+    "packagePath": "package.json",
+    "publiclyReachable": true,
+    "observedDefaultHead": "1c8ea4981fcfdb58e8f9726058b950aaf8cc9404",
+    "tree": "96d5a8e39904f6a3899da039495fa1c74292c3cf"
+  },
+  "catalog": {
+    "version": "0.4.0-rc.2",
+    "license": "MIT",
+    "kind": "ui",
+    "legacyManagement": "profile-bundle"
+  },
+  "package": {
+    "name": "@mattheliu/7d7d",
+    "version": "0.4.0-rc.2",
+    "license": "MIT",
+    "private": true,
+    "workshopManifest": "valid",
+    "legacySignals": [
+      "dsh.bundle.patch:./cordis.patch.yml"
+    ],
+    "lifecycleScripts": []
+  },
+  "sequence": [
+    {
+      "stage": "fixed-source",
+      "state": "passed",
+      "reason": "Anonymous public Git fetch resolved the exact commit and tree 96d5a8e39904f6a3899da039495fa1c74292c3cf."
+    },
+    {
+      "stage": "type-plan",
+      "state": "passed",
+      "reason": "A valid author declaration is available for Harness planning."
+    },
+    {
+      "stage": "trust-review",
+      "state": "completed",
+      "reason": "Assisted static review recorded 1 finding(s) without executing source code."
+    },
+    {
+      "stage": "adapter",
+      "state": "blocked",
+      "reason": "Source execution requires a separate explicit human trust decision after a valid type plan."
+    },
+    {
+      "stage": "evidence",
+      "state": "saved",
+      "reason": "Pre-admission review evidence is stored at intake/reviews/7d7d@0.4.0-rc.2.json."
+    },
+    {
+      "stage": "human-review",
+      "state": "pending",
+      "reason": "Independent maintainer review has not been recorded."
+    },
+    {
+      "stage": "admission",
+      "state": "not-created",
+      "reason": "Admission is a separate explicit change after approved review and passing Harness evidence."
+    }
+  ],
+  "typePlan": {
+    "state": "ready",
+    "declaredProtocol": "harness-profile",
+    "declaredAdapter": "profile-bundle",
+    "observedLegacyProtocol": "harness-profile",
+    "observedLegacyAdapter": "profile-bundle",
+    "migrationOptions": [],
+    "reason": "Author declaration and fixed release facts are sufficient to generate a typed Harness plan."
+  },
+  "trustReview": {
+    "state": "pending-human",
+    "method": "assisted-static-public-source-review",
+    "sourceExecutionAuthorized": false,
+    "checks": {
+      "publicCommit": "passed",
+      "packageJson": "passed",
+      "workshopManifest": "passed",
+      "catalogVersion": "passed",
+      "license": "passed",
+      "artifact": "passed",
+      "credentials": "passed",
+      "symlinkContainment": "passed",
+      "nativeCode": "passed",
+      "lifecycleScripts": "passed",
+      "processExecutionIntent": "review-required",
+      "rc6Baseline": "not-applicable"
+    },
+    "findings": [
+      {
+        "severity": "review",
+        "code": "process-execution-intent",
+        "evidence": "1 tracked file(s) contain process-execution intent and require manual inspection."
+      }
+    ]
+  },
+  "adapter": {
+    "state": "blocked",
+    "name": "profile-bundle",
+    "reason": "Awaiting a separate explicit human trust decision.",
+    "report": null
+  },
+  "humanReview": {
+    "state": "pending",
+    "reviewer": null,
+    "reason": "The generated assisted review cannot approve its own independent human gate."
+  },
+  "admission": {
+    "state": "not-created",
+    "reason": "No approved human review or passing RC.6 Harness report exists for this fixed release."
+  },
+  "claims": {
+    "rc6Verified": false,
+    "seamlessInstall": "unknown",
+    "failureIsolation": "unknown",
+    "hotReload": "unknown"
+  },
+  "reviewedAt": "2026-08-14T14:59:51.325Z",
+  "reviewer": "codex-assisted-pre-admission-review"
+}

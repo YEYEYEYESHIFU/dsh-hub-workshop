@@ -2,6 +2,7 @@
 
 import { readFile, readdir } from 'node:fs/promises'
 import { resolve } from 'node:path'
+import { buildCatalogPresentation } from './catalog-presentation-lib.mjs'
 
 const ROOT = resolve(import.meta.dirname, '..')
 const BUILD = resolve(ROOT, '.public-site')
@@ -38,6 +39,7 @@ const [catalog, registry, recipes, ecosystem, workshop, runRecords, admissions, 
 ])
 
 if (catalog.schema !== 'dsh-hub-index/v0.4') throw new Error('catalog schema mismatch')
+const presentation = buildCatalogPresentation(catalog)
 if (registry.schema !== 'omdsh-registry/v1') throw new Error('Registry schema mismatch')
 if (recipes.schema !== 'omdsh-workshop-recipes/v1') throw new Error('Recipes schema mismatch')
 if (ecosystem.schema !== 'omdsh-agent-ecosystem/v1') throw new Error('Ecosystem schema mismatch')
@@ -76,8 +78,8 @@ if (inventory.schema !== 'omdsh-workshop-verification-inventory/v1'
   || inventory.summary?.verification?.['current-baseline-passed'] !== undefined
   || inventory.summary?.registry?.admitted !== undefined
   || inventory.summary?.management?.transactional !== 2
-  || inventory.summary?.management?.managed !== 9
-  || inventory.summary?.management?.guided !== catalog.packages.length - 11
+  || inventory.summary?.management?.managed !== undefined
+  || inventory.summary?.management?.guided !== catalog.packages.length - 2
   || inventory.projects.some((project) => !project.capabilities?.manifest || !project.capabilities?.install?.seamless || !project.capabilities?.install?.failureIsolation || !project.capabilities?.lifecycle?.hotReload || !project.capabilities?.integration || !project.capabilities?.admission)) {
   throw new Error('verification inventory must cover every Catalog project without claiming current-baseline verification or Registry admission')
 }
@@ -87,6 +89,13 @@ if (topicAudit.schema !== 'omdsh-topic-plugin-audit/v3'
   || Object.values(topicAudit.stats?.decisions || {}).reduce((total, count) => total + count, 0) !== topicAudit.stats.repositories) {
   throw new Error('Topic plugin audit must classify every observed repository exactly once')
 }
+if (topicRepositories.repositories.some((entry) => !Number.isFinite(Date.parse(entry.createdAt)))
+  || topicAudit.repositories.some((entry) => !entry.evidence?.creation)
+  || topicAudit.repositories.some((entry) => entry.decision === 'include' && entry.evidence.creation.eligible !== true)
+  || !topicAudit.policy?.creation?.includes('2026-07-31T00:00:00.000Z')
+  || !topicAudit.policy?.dependencies?.includes('devDependencies')) {
+  throw new Error('Topic audit must enforce the community creation window and production dependency evidence')
+}
 const qualifiedRepositories = new Set(topicAudit.repositories
   .filter((entry) => entry.decision === 'include'
     && entry.qualification === 'verified'
@@ -94,6 +103,7 @@ const qualifiedRepositories = new Set(topicAudit.repositories
   .map((entry) => `${entry.owner}/${entry.name}`.toLocaleLowerCase('en-US')))
 const catalogRepositories = new Set(catalog.packages.map((entry) => new URL(entry.repository).pathname.split('/').filter(Boolean).slice(0, 2).join('/').toLocaleLowerCase('en-US')))
 if (catalog.packages.length !== catalog.stats?.packages
+  || presentation.listings.length !== catalog.stats?.listings
   || catalog.stats?.repositories !== catalogRepositories.size
   || catalog.stats?.observedTopicRepositories !== topicRepositories.observedRepositoryCount
   || catalog.stats?.qualifiedRepositories !== topicAudit.stats.decisions.include
@@ -104,21 +114,26 @@ if (catalog.packages.length !== catalog.stats?.packages
   || new Set(catalog.packages.map((entry) => entry.id)).size !== catalog.packages.length
   || catalogRepositories.size !== qualifiedRepositories.size
   || [...catalogRepositories].some((repository) => !qualifiedRepositories.has(repository))
+  || catalog.packages.some((entry) => !Number.isFinite(Date.parse(entry.discovery?.createdAt)))
+  || catalog.packages.some((entry) => !['community-repository-created-in-window', 'official-owner-exempt'].includes(entry.discovery?.creationEligibility))
   || catalog.packages.some((entry) => entry.status === 'discovery'
     && !/^verified-/.test(entry.discovery?.qualification || ''))) {
   throw new Error('public catalog must contain only qualified plugin entries and eleven reviewed candidates')
 }
 const [pluginApi, pluginTypes, marketApi] = await Promise.all([json('api/v1/plugins.json'), json('api/v1/plugin-types.json'), json('api/v1/market.json')])
 if (pluginApi.schema !== 'omdsh-ai-plugins/v1'
-  || pluginApi.count !== catalog.packages.length
-  || pluginApi.projects.length !== catalog.packages.length
+  || pluginApi.count !== presentation.listings.length
+  || pluginApi.componentCount !== catalog.packages.length
+  || pluginApi.projects.length !== presentation.listings.length
   || pluginApi.projects.some((project) => project.registry?.state !== 'ineligible')
   || pluginApi.projects.some((project) => !project.capabilities?.install?.seamless)
+  || pluginApi.projects.some((project) => !Number.isFinite(Date.parse(project.discovery?.createdAt)))
   || pluginTypes.schema !== 'omdsh-ai-plugin-types/v1'
-  || pluginTypes.totals?.catalogProjects !== catalog.packages.length
+  || pluginTypes.totals?.catalogProjects !== presentation.listings.length
+  || pluginTypes.totals?.catalogComponents !== catalog.packages.length
   || pluginTypes.management.find((entry) => entry.id === 'transactional')?.count !== 2
-  || pluginTypes.management.find((entry) => entry.id === 'managed')?.count !== 9
-  || pluginTypes.management.find((entry) => entry.id === 'guided')?.count !== catalog.packages.length - 11) {
+  || (pluginTypes.management.find((entry) => entry.id === 'managed')?.count ?? 0) !== 0
+  || pluginTypes.management.find((entry) => entry.id === 'guided')?.count !== catalog.packages.length - 2) {
   throw new Error('plugin API must project the full Catalog and verification inventory without install authority')
 }
 const nonPluginIds = new Set(marketLayers.projects.map((project) => project.id))
@@ -135,8 +150,8 @@ if (marketLayers.schema !== 'omdsh-market-layers/v2'
   throw new Error('non-plugin market layers must preserve review facts, stay disjoint from the plugin Catalog, and remain ineligible for installation')
 }
 if (marketApi.schema !== 'omdsh-ai-market/v1'
-  || marketApi.totals?.projects !== catalog.packages.length + marketLayers.projects.length
-  || marketApi.totals?.plugin !== catalog.packages.length
+  || marketApi.totals?.projects !== presentation.listings.length + marketLayers.projects.length
+  || marketApi.totals?.plugin !== presentation.listings.length
   || marketApi.totals?.infrastructure !== marketLayers.totals.infrastructure
   || marketApi.totals?.distribution !== marketLayers.totals.distribution
   || marketApi.totals?.installable !== 0
@@ -175,7 +190,7 @@ if (topicRepositories.schema !== 'dsh-topic-discovery/v1'
 }
 
 const builtFiles = await files(BUILD)
-if (builtFiles.length !== 53) throw new Error(`public build must contain exactly 53 files, received ${builtFiles.length}`)
+if (builtFiles.length !== 55) throw new Error(`public build must contain exactly 55 files, received ${builtFiles.length}`)
 for (const repository of repositories.repositories) {
   if (!/^https:\/\/github[.]com\/omdsh-dev\/[A-Za-z0-9._-]+$/.test(repository.url)) {
     throw new Error(`unapproved public repository URL: ${repository.url}`)
@@ -233,7 +248,8 @@ if (!app.includes('featured.empty.recoverable') || !app.includes('visiblePackage
 }
 if (!home.includes('data-featured-mode="stars"')
   || !app.includes('projectStars')
-  || !app.includes('commitUpdatedAt')) {
+  || !app.includes('commitUpdatedAt')
+  || !app.includes("t('project.created')")) {
   throw new Error('featured lanes must use GitHub stars and repository commit activity')
 }
 if (!app.includes('selectSpotlightPackages')

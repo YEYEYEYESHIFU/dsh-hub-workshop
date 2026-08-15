@@ -2,6 +2,7 @@
 
 import { readFile, rename, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
+import { buildCatalogPresentation } from './catalog-presentation-lib.mjs'
 
 const ROOT = resolve(import.meta.dirname, '..')
 const json = async (path) => JSON.parse(await readFile(resolve(ROOT, path), 'utf8'))
@@ -20,6 +21,8 @@ const [catalog, candidates, inventory, marketLayers] = await Promise.all([
   json('market-layers.json'),
 ])
 const inventoryById = new Map(inventory.projects.map((project) => [project.id, project]))
+const presentation = buildCatalogPresentation(catalog)
+const publicProjects = presentation.listings
 const labels = {
   kinds: {
     skill: ['Skill', 'Skill'],
@@ -65,9 +68,9 @@ function countBy(values, select) {
   return result
 }
 
-const catalogKinds = countBy(catalog.packages, (project) => project.kind)
+const catalogKinds = countBy(publicProjects, (project) => project.kind)
 const candidateKinds = countBy(candidates.projects || [], (project) => project.kind)
-const catalogCategories = countBy(catalog.packages, (project) => project.category || 'uncategorized')
+const catalogCategories = countBy(publicProjects, (project) => project.category || 'uncategorized')
 const candidateCategories = countBy(candidates.projects || [], (project) => project.category || 'uncategorized')
 const management = countBy(inventory.projects, (project) => project.management)
 const reviews = countBy(inventory.projects, (project) => project.review.state)
@@ -97,7 +100,7 @@ function taxonomy(group, catalogCounts, candidateCounts) {
       id,
       labels: { zh, en },
       counts: { catalog: catalogCount, candidates: candidateCount, total: catalogCount + candidateCount },
-      examples: catalog.packages.filter((project) => (group === 'kinds' ? project.kind : project.category || 'uncategorized') === id).slice(0, 3).map((project) => project.id),
+      examples: publicProjects.filter((project) => (group === 'kinds' ? project.kind : project.category || 'uncategorized') === id).slice(0, 3).map((project) => project.id),
     }
   })
 }
@@ -110,6 +113,8 @@ const pluginTypes = {
     packageManifest: '/package-manifest.schema.json',
     submission: '/submission.schema.json',
     verification: '/intake-evidence.schema.json',
+    harnessPlan: '/harness-plan.schema.json',
+    harnessReport: '/harness-report.schema.json',
     mcp: {
       protocolVersion: '2026-07-28',
       registryManifest: 'server.json',
@@ -117,9 +122,11 @@ const pluginTypes = {
     },
   },
   totals: {
-    catalogProjects: catalog.packages.length,
+    catalogProjects: publicProjects.length,
+    catalogComponents: catalog.packages.length,
+    presentationGroups: presentation.groups.length,
     candidateProjects: (candidates.projects || []).length,
-    projects: catalog.packages.length + (candidates.projects || []).length,
+    projects: publicProjects.length + (candidates.projects || []).length,
   },
   kinds: taxonomy('kinds', catalogKinds, candidateKinds),
   categories: taxonomy('categories', catalogCategories, candidateCategories),
@@ -160,9 +167,30 @@ const plugins = {
       installAuthority: '/registry-v1.json',
     },
   },
-  count: catalog.packages.length,
-  projects: catalog.packages.map((project) => {
-    const status = inventoryById.get(project.id)
+  count: publicProjects.length,
+  componentCount: catalog.packages.length,
+  projects: publicProjects.map((project) => {
+    const componentStatuses = (project.presentationGroup?.components || [project])
+      .map((component) => inventoryById.get(component.id))
+      .filter(Boolean)
+    const status = componentStatuses.length === 1
+      ? componentStatuses[0]
+      : {
+          management: componentStatuses.every((component) => component.management === componentStatuses[0].management)
+            ? componentStatuses[0].management
+            : 'guided',
+          review: componentStatuses.find((component) => component.review.state === 'blocked')?.review
+            || componentStatuses.find((component) => component.review.state === 'needs-fix')?.review
+            || componentStatuses.find((component) => component.review.state === 'pending-review')?.review
+            || componentStatuses[0].review,
+          verification: componentStatuses.find((component) => component.verification.state === 'blocked')?.verification
+            || componentStatuses.find((component) => component.verification.state === 'untested')?.verification
+            || componentStatuses[0].verification,
+          registry: {
+            state: componentStatuses.every((component) => component.registry.state === 'admitted') ? 'admitted' : 'ineligible',
+          },
+          capabilities: project.workshop,
+        }
     return {
       id: project.id,
       name: project.name,
@@ -175,11 +203,45 @@ const plugins = {
         ref: project.ref,
         path: project.repositoryPath || null,
       },
+      discovery: project.discovery ? {
+        createdAt: project.discovery.createdAt || null,
+        creationEligibility: project.discovery.creationEligibility || null,
+        officialExempt: project.discovery.officialExempt === true,
+        dependencyEvidence: project.discovery.dependencyEvidence || {
+          productionHarness: [],
+          versionedProductionHarness: [],
+          unboundedProductionHarness: [],
+          referencedProductionHarness: [],
+          developmentOnlyHarness: [],
+        },
+      } : null,
       management: status.management,
       review: status.review,
       verification: status.verification,
       registry: status.registry,
       capabilities: status.capabilities,
+      presentation: project.presentationGroup ? {
+        type: 'repository-suite',
+        componentCounts: project.presentationGroup.componentCounts,
+        components: project.presentationGroup.components.map((component) => {
+          const componentStatus = inventoryById.get(component.id)
+          return {
+            id: component.id,
+            name: component.name,
+            summary: publicSummary(component),
+            kind: component.kind,
+            source: {
+              repository: component.repository,
+              ref: component.ref,
+              path: component.repositoryPath || null,
+            },
+            review: componentStatus.review,
+            verification: componentStatus.verification,
+            registry: componentStatus.registry,
+            capabilities: componentStatus.capabilities,
+          }
+        }),
+      } : null,
     }
   }),
 }
@@ -198,6 +260,7 @@ const marketProjects = [
     categories: [project.category],
     tags: project.tags,
     source: project.source,
+    discovery: project.discovery,
     review: project.review,
     verification: project.verification,
     registry: project.registry,

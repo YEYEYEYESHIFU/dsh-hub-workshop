@@ -1,0 +1,5 @@
+- insert:
+    - id: harness-profile-probe
+      name: '@omdsh/harness-profile-probe'
+      config:
+        marker: updated

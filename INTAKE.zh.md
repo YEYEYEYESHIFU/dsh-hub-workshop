@@ -51,7 +51,24 @@ Topic、关键词和仓库自述只负责进入候选池。根目录没有可安
 
 作者声明只会显示“已声明”。没有对应证据路径、证据文件不存在、测试环境不匹配或结果不可复现时都不能升级为“已验证”。MCP 的独立进程失败可丢弃，只证明隔离边界；它不会自动获得 DSH Profile 安装或 Registry 权限。
 
-入库记录使用 `intake.schema.json`，运行证据使用 `intake-evidence.schema.json`，公开队列为 `intake-queue.json`，当前官方事实为 `official-baseline.json`。四个文件都由 CI 做 fail-closed 校验。
+入库记录使用 `intake.schema.json`，分类型计划使用 `harness-plan.schema.json`，执行报告使用 `harness-report.schema.json`，运行证据使用 `intake-evidence.schema.json`，公开队列为 `intake-queue.json`，当前官方事实为 `official-baseline.json`。新 v2 投稿必须使用 Harness 生成的 v2 证据；CI 全部做 fail-closed 校验。
+
+### 真实项目逐项审查
+
+遗留 Catalog 候选不能批量继承旧验证。`npm run intake:review-real` 会按项目串行执行匿名公开 Git 固定、类型计划预检和辅助静态信任审查，并把一项目一文件的结果写入 `intake/reviews/`。缺少 `package.json#dshWorkshop`、固定版本不一致、仍锁旧 Runtime 或依赖未公开 Repository Plugin 契约的项目会停在 adapter 之前；脚本不会执行项目代码、代替独立人工审核或写入 admission。
+
+```bash
+# 串行审查当前遗留真实候选
+npm run intake:review-real
+
+# 只重新审查一个项目
+npm run intake:review-real -- --id 7d7d
+
+# 离线校验已保存的逐项目证据和零授权事实
+npm run intake:review-check
+```
+
+顺序固定为：公开 commit → 类型计划 → 人工信任门禁 → 对应 adapter → report/evidence → 独立人工审核 → 单独 admission。任何前置阶段失败都必须保持 `RC.6 verified=false`。
 
 `verification-inventory.json` 对 Catalog 每一个项目给出当前接入处理、审核、官方基线验证和 Registry 状态。未知项目只能使用引导式公开处理；它们不会因为出现在 Catalog 就被视为完成测试。
 
@@ -63,6 +80,13 @@ npm run intake:validate -- /path/to/submission.json
 
 # 生成待审核记录到标准输出；不会自动写入队列
 npm run intake:prepare -- /path/to/submission.json
+
+# 按 Profile、Repository、MCP、Cordis、Skill 或第三方类型生成只读计划
+# 只生成计划，不执行投稿代码
+npm run harness:plan -- /path/to/submission.json
+
+# 将已通过的 Harness report 转换成 v2 Intake evidence
+npm run harness:evidence -- intake/records/project@version.json harness-report.json environment.json
 
 # CI 使用：从 GitHub Issue 解析清单并完成公开固定来源预检
 npm run intake:issue -- /path/to/github-event.json
@@ -79,9 +103,25 @@ npm run intake:check
 # 联网核验 npm 上的官方版本、integrity 及未开放包状态
 npm run baseline:verify
 
+# 维护者本地 adapter 回归：Skill 只做静态检查，绝不执行 Skill
+npm run harness:skill
+
+# 维护者本地 adapter 回归：在 deny-network 子进程中验证 MCP 2026-07-28
+npm run harness:mcp
+
+# 维护者本地 adapter 回归：安装精确 RC.6 后验证完整 Profile 生命周期
+npm run harness:profile
+
+# 按 Skill → MCP → Profile 的顺序执行以上三类本地夹具
+npm run harness:verify
+
 # 全量构建与测试
 npm run validate
 ```
+
+以上四个 `harness:*` 回归命令只使用仓库内维护者夹具，输出不能直接作为任何社区项目的入库证据。真实投稿必须另行固定公开 commit、完成人工信任判断，再交给对应 adapter；adapter 会自行核对 Git `origin`、HEAD、投稿子路径和干净工作树，不能只相信调用方传入的 commit 字符串。不得把“不存在于夹具中的项目”套用为已验证。Profile 命令只在安装精确 `@deepseek-ai/dsh@0.1.0-rc.6` 时联网，随后 RC.6、pnpm 与插件进程在临时工作区内执行，禁网、禁安装脚本，并在结束时强制清理。MCP 通过 `server/discover → tools/list → tools/call` 验证，崩溃工具只能终止其隔离子进程。Skill adapter 只解析 frontmatter、引用、路径、链接、文件类型和命令文本，不执行 Skill 中的任何指令。
+
+当前隔离执行器要求 macOS `sandbox-exec`。每次创建沙箱都会先自检“工作区内可写、工作区外不可写、不能创建网络 socket”；任一断言失败，整份 report 失败关闭。其他平台必须先提供等价的强制隔离器，不能退化为无沙箱执行。
 
 Author Studio 会把完整清单直接带入 GitHub Issue。Issue 创建后，`intake` 工作流只读核验公开仓库、完整 commit 和声明路径；通过后，由 `github-actions[bot]` 在独立分支写入 `pending-review` 记录、重建队列并创建审核 PR。自动化不克隆投稿仓库、不执行其脚本、不批准投稿，也不写 Registry。维护者仍须在 PR 中完成人工边界审核；运行证据保存在 `intake/evidence/`，正式安装准入仍须通过独立 admission 变更发布。
 
@@ -91,7 +131,7 @@ Author Studio 会把完整清单直接带入 GitHub Issue。Issue 创建后，`i
 - 测试必须记录精确 Runtime 包、版本与 integrity；只写“兼容最新版”无效。
 - 供应链至少记录许可、权限、install scripts、native code、漏洞扫描和外部副作用。
 - 静态证据必须分别说明清单、声明入口、DSH 专属注册路径、兼容区间与权限；不能只写“结构正确”。
-- 可执行接入必须填写结构化 `capability` 断言，证明目标能力已注册、已调用且观察结果符合预期；仅加载成功不得通过。
-- 事务安装与未来恢复的配置安装均须验证 install、ready、functional、update、disable、remove、recovery。
+- Profile、Repository Plugin、Cordis 与 MCP 必须在固定 package manifest 中填写结构化 `capability` 断言；Skill 与纯第三方说明不得声明运行时能力。Harness 计划固定该断言，adapter 回报的 ID、类型、调用方式和预期必须完全一致，并另行记录实际观察值；仅加载成功不得通过。
+- 事务安装与未来恢复的配置安装均须验证 install、ready、functional、update、disable、remove、recovery、failureIsolation；声明 hot-reload 时还必须验证 dispose 与 reactivate。
 - 引导接入必须保持无可执行安装意图；只能显示固定来源和阅读说明。
 - 一旦官方 baseline 改变，旧 `current-baseline-passed` 自动视为过期，不得继续进入 Registry。

@@ -289,15 +289,27 @@
     </main>
 
     <footer class="site-footer">
-      <a class="footer-brand" href="./">DSH Hub Workshop</a>
-      <p data-i18n="footer.notice">DSH Hub Workshop 只做索引，不对插件内容做安全担保。是否信任与安装，请自行核验。</p>
-      <div class="footer-links">
-        <a href="catalog.json">JSON API</a>
-        <a href="collections-v1.json" data-i18n="footer.collectionsApi">合集 API</a>
-        <a href="community-v1.json" data-i18n="footer.communityApi">讨论 API</a>
-        <a href="contributing.html" data-i18n="nav.contribute">收录</a>
-        <a href="https://github.com/orgs/omdsh-dev/repositories">omdsh-dev</a>
+      <div class="footer-summary">
+        <a class="footer-brand" href="./">DSH Hub Workshop</a>
+        <p data-i18n="footer.notice">DSH Hub Workshop 只做索引，不对插件内容做安全担保。是否信任与安装，请自行核验。</p>
       </div>
+      <nav class="footer-group" aria-label="站点资源" data-i18n-aria-label="footer.resources">
+        <strong class="footer-heading" data-i18n="footer.resources">站点资源</strong>
+        <div class="footer-links">
+          <a href="catalog.json">JSON API</a>
+          <a href="collections-v1.json" data-i18n="footer.collectionsApi">合集 API</a>
+          <a href="community-v1.json" data-i18n="footer.communityApi">讨论 API</a>
+          <a href="contributing.html" data-i18n="nav.contribute">收录</a>
+          <a href="https://github.com/orgs/omdsh-dev/repositories">omdsh-dev</a>
+        </div>
+      </nav>
+      <nav class="footer-group footer-ecosystem" aria-label="生态外链" data-i18n-aria-label="footer.ecosystem">
+        <strong class="footer-heading" data-i18n="footer.ecosystem">生态外链</strong>
+        <a class="footer-external-link" href="https://dshfind.com/" target="_blank" rel="noopener noreferrer">
+          <span><b>dshfind</b><small data-i18n="footer.dshfindDescription">DSH 学习与分享社区</small></span>
+          <span aria-hidden="true">↗</span>
+        </a>
+      </nav>
     </footer>
 
     <dialog id="package-dialog" class="package-dialog" aria-labelledby="dialog-title">

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.omdsh-dev/harness-mcp-probe",
+  "title": "OMDSH Harness MCP Probe",
+  "description": "A local-only MCP process isolation fixture.",
+  "version": "1.0.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@omdsh/harness-mcp-probe",
+      "version": "1.0.0",
+      "transport": { "type": "stdio" }
+    }
+  ]
+}

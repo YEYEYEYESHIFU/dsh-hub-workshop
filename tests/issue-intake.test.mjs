@@ -38,6 +38,7 @@ function manifestV2() {
   value.project.id = 'issue-test-plugin-v2'
   value.project.repository = 'https://github.com/example/issue-test-plugin-v2'
   value.management.instructions = `Read https://github.com/example/issue-test-plugin-v2/tree/${SHA}`
+  value.release.updateFrom = null
   value.packageManifest = {
     schema: 'omdsh-workshop-package/v1',
     type: 'plugin',
@@ -94,6 +95,7 @@ test('Issue automation creates pending review only after immutable public-source
   assert.equal(prepared.record.review.state, 'pending-review')
   assert.equal(prepared.record.registry.state, 'ineligible')
   assert.match(prepared.record.tests.static.evidence, /fixed commit resolved/)
+  assert.equal(prepared.plan, null)
 })
 
 test('Issue automation rejects a private source before creating an intake record', async () => {
@@ -110,6 +112,10 @@ test('v2 Issue automation binds the submitted capability manifest to fixed packa
   const prepared = await prepareIssueIntake(event(`\`\`\`json\n${JSON.stringify(value)}\n\`\`\``), { root, fetchImpl: githubV2Fetch(value) })
   assert.equal(prepared.record.id, 'issue-test-plugin-v2@1.0.0')
   assert.match(prepared.record.tests.static.evidence, /package.json/)
+  assert.equal(prepared.plan.schema, 'omdsh-workshop-harness-plan/v1')
+  assert.equal(prepared.plan.releaseId, prepared.record.id)
+  assert.equal(prepared.plan.classification.protocol, 'third-party')
+  assert.equal(prepared.plan.policy.sourceExecution, 'disabled-until-explicitly-trusted')
 })
 
 test('v2 Issue automation rejects a package manifest that is not in the fixed commit', async () => {

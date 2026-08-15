@@ -1,0 +1,139 @@
+{
+  "schema": "omdsh-workshop-intake/v1",
+  "id": "7d7d@0.4.0-rc.2",
+  "submission": {
+    "repository": "https://github.com/omdsh-dev/7d7d",
+    "ref": "1c8ea4981fcfdb58e8f9726058b950aaf8cc9404",
+    "path": null,
+    "manifest": {
+      "schema": "omdsh-workshop-submission/v2",
+      "operation": "add-release",
+      "project": {
+        "id": "7d7d",
+        "displayName": "7d7d 游戏门户",
+        "summary": "在 DSH Web UI 中生成、同步并游玩 HTML5 与同源自托管 Ruffle Flash 游戏的社区门户。",
+        "kind": "ui",
+        "category": "interface",
+        "tags": [
+          "games",
+          "html5",
+          "ruffle"
+        ],
+        "repository": "https://github.com/omdsh-dev/7d7d",
+        "path": null,
+        "author": {
+          "name": "mattheliu",
+          "url": "https://github.com/mattheliu"
+        },
+        "license": "MIT"
+      },
+      "release": {
+        "version": "0.4.0-rc.2",
+        "ref": "1c8ea4981fcfdb58e8f9726058b950aaf8cc9404",
+        "updatedAt": "2026-08-13T20:55:45+08:00",
+        "channel": "beta",
+        "compatibility": "Exact @deepseek-ai/dsh@0.1.0-rc.6 Harness evaluation.",
+        "changelog": "Migrated to the current typed Workshop contract and fixed public source.",
+        "capabilities": {
+          "requiresFabric": false,
+          "deepHook": false,
+          "restartRequired": true
+        },
+        "profileBundle": {
+          "packageName": "@mattheliu/7d7d",
+          "spec": "github:omdsh-dev/7d7d#1c8ea4981fcfdb58e8f9726058b950aaf8cc9404"
+        },
+        "updateFrom": {
+          "version": "0.4.0-rc.1",
+          "ref": "80b6ddb779a009d378a1c30c85dfef598f527997"
+        }
+      },
+      "management": {
+        "method": "profile-bundle",
+        "protocol": "harness-profile",
+        "label": "Transactional candidate Profile review",
+        "instructions": "Evaluate the fixed Profile Bundle in an ephemeral candidate generation.",
+        "source": null
+      },
+      "declarations": {
+        "permissions": "filesystem:write, network:outbound, ui:extend, webserver:register",
+        "testing": "Run the typed adapter against this exact source and preserve the complete report.",
+        "trustedPublisherRequested": false,
+        "installScriptsMustRemainDisabled": true
+      },
+      "packageManifest": {
+        "schema": "omdsh-workshop-package/v1",
+        "type": "plugin",
+        "integration": {
+          "protocol": "harness-profile",
+          "artifact": "cordis.patch.yml"
+        },
+        "install": {
+          "mode": "transactional",
+          "adapter": "profile-bundle",
+          "failurePolicy": "generation-rollback",
+          "touchesCurrentBeforeActivation": false
+        },
+        "lifecycle": {
+          "activation": "restart-profile",
+          "dispose": "supported"
+        },
+        "permissions": [
+          "filesystem:write",
+          "network:outbound",
+          "ui:extend",
+          "webserver:register"
+        ],
+        "capability": {
+          "id": "7d7d-routes-registered",
+          "kind": "service",
+          "invocation": "boot the RC.6 candidate Profile and activate the 7d7d Cordis entry",
+          "expected": "the /7d7d prefix and /7d7d/api/server.json routes are both registered"
+        },
+        "evidence": {
+          "install": "docs/WORKSHOP.md",
+          "failureIsolation": "docs/WORKSHOP.md",
+          "hotReload": null,
+          "remove": "docs/WORKSHOP.md"
+        }
+      }
+    }
+  },
+  "classification": {
+    "management": "transactional"
+  },
+  "baseline": {
+    "package": "@deepseek-ai/dsh",
+    "version": "0.1.0-rc.6",
+    "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+  },
+  "review": {
+    "state": "pending-review"
+  },
+  "verification": {
+    "state": "untested"
+  },
+  "tests": {
+    "static": {
+      "required": true,
+      "status": "passed",
+      "evidence": "submission manifest validation"
+    },
+    "supplyChain": {
+      "required": true,
+      "status": "pending"
+    },
+    "officialBaseline": {
+      "required": true,
+      "status": "pending"
+    },
+    "lifecycle": {
+      "required": true,
+      "status": "pending"
+    }
+  },
+  "registry": {
+    "state": "ineligible",
+    "reason": "current-baseline-verification-required"
+  }
+}

@@ -70,6 +70,12 @@ export function validateSubmission(manifest) {
     if (String(release.profileBundle?.spec || '').includes('#')) {
       requireCondition(release.profileBundle.spec.endsWith(`#${release.ref}`), 'Profile Bundle spec must pin the submitted commit', errors)
     }
+    if (manifest.schema === 'omdsh-workshop-submission/v2') {
+      requireCondition(typeof release.updateFrom?.version === 'string' && release.updateFrom.version.length > 0, 'transactional v2 intake requires a previous release version for update testing', errors)
+      requireCondition(COMMIT_RE.test(release.updateFrom?.ref || ''), 'transactional v2 intake requires a fixed previous release commit', errors)
+      requireCondition(release.updateFrom?.ref !== release.ref, 'previous release commit must differ from the submitted release', errors)
+      requireCondition(release.updateFrom?.version !== release.version, 'previous release version must differ from the submitted release', errors)
+    }
   }
   if (mode === 'managed') {
     requireCondition(management.protocol === 'harness-repository', 'managed intake must use harness-repository', errors)
@@ -78,12 +84,19 @@ export function validateSubmission(manifest) {
     requireCondition(source !== null, 'managed intake source must pin a .dsh-plugin directory', errors)
     if (source) requireCondition(source[1] === release.ref, 'Repository Plugin source must pin the submitted commit', errors)
     requireCondition(String(management.instructions || '').includes(String(management.source || '')), 'managed instructions must contain the pinned source', errors)
+    if (manifest.schema === 'omdsh-workshop-submission/v2') {
+      requireCondition(typeof release.updateFrom?.version === 'string' && release.updateFrom.version.length > 0, 'managed v2 intake requires a previous release version for update testing', errors)
+      requireCondition(COMMIT_RE.test(release.updateFrom?.ref || ''), 'managed v2 intake requires a fixed previous release commit', errors)
+      requireCondition(release.updateFrom?.ref !== release.ref, 'previous release commit must differ from the submitted release', errors)
+      requireCondition(release.updateFrom?.version !== release.version, 'previous release version must differ from the submitted release', errors)
+    }
   }
   if (mode === 'guided') {
     requireCondition(['harness-cordis', 'mcp', 'skill', 'third-party'].includes(management.protocol), 'guided intake must declare harness-cordis, MCP, Skill, or third-party protocol', errors)
     requireCondition(release.profileBundle === null, 'guided intake cannot declare a Profile Bundle', errors)
     requireCondition(management.source === null, 'guided intake cannot expose executable install source', errors)
     requireCondition(!GUIDED_COMMAND_RE.test(management.instructions || ''), 'guided intake must not expose an executable install command', errors)
+    if (manifest.schema === 'omdsh-workshop-submission/v2') requireCondition(release.updateFrom === null, 'guided v2 intake cannot claim an executable update source', errors)
   }
   if (manifest.schema === 'omdsh-workshop-submission/v2' && packageManifest && typeof packageManifest === 'object') {
     requireCondition(packageManifest.integration?.protocol === management.protocol, 'package manifest protocol must match submission management protocol', errors)
@@ -163,7 +176,10 @@ function notApplicable(check) {
 export function applyEvidence(record, evidence, baseline) {
   const errors = []
   const mode = record.classification.management
-  requireCondition(evidence?.schema === 'omdsh-workshop-intake-evidence/v1', 'unsupported evidence schema', errors)
+  requireCondition(['omdsh-workshop-intake-evidence/v1', 'omdsh-workshop-intake-evidence/v2'].includes(evidence?.schema), 'unsupported evidence schema', errors)
+  if (record.submission.manifest.schema === 'omdsh-workshop-submission/v2') {
+    requireCondition(evidence?.schema === 'omdsh-workshop-intake-evidence/v2', 'v2 submission requires typed Harness v2 evidence', errors)
+  }
   requireCondition(evidence?.projectId === record.submission.manifest.project.id, 'evidence project does not match submission', errors)
   requireCondition(evidence?.releaseId === record.id, 'evidence release does not match submission', errors)
   requireCondition(evidence?.management === mode, 'evidence management mode does not match intake', errors)
@@ -178,6 +194,10 @@ export function applyEvidence(record, evidence, baseline) {
     for (const name of ['install', 'ready', 'functional', 'update', 'disable', 'remove', 'recovery']) {
       requireCondition(notApplicable(evidence?.checks?.[name]), `guided ${name} check must be not-applicable`, errors)
     }
+    if (evidence?.schema === 'omdsh-workshop-intake-evidence/v2') {
+      requireCondition(notApplicable(evidence?.checks?.failureIsolation), 'guided failureIsolation check must be not-applicable', errors)
+      requireCondition(notApplicable(evidence?.checks?.hotReload), 'guided hotReload check must be not-applicable', errors)
+    }
   } else {
     requireCondition(`${evidence?.runtime?.package}@${evidence?.runtime?.version}` === `${baseline.runtime.package}@${baseline.runtime.version}`, 'evidence does not use the current official runtime', errors)
     requireCondition(evidence?.runtime?.integrity === baseline.runtime.integrity, 'evidence runtime integrity does not match the official baseline', errors)
@@ -191,6 +211,11 @@ export function applyEvidence(record, evidence, baseline) {
     }
     for (const name of ['install', 'ready', 'functional', 'update', 'disable', 'remove', 'recovery']) {
       requireCondition(passed(evidence?.checks?.[name]), `${mode} ${name} check must pass`, errors)
+    }
+    if (evidence?.schema === 'omdsh-workshop-intake-evidence/v2') {
+      requireCondition(passed(evidence?.checks?.failureIsolation), `${mode} failureIsolation check must pass`, errors)
+      const hotReloadDeclared = record.submission.manifest.packageManifest?.lifecycle?.activation === 'hot-reload'
+      requireCondition(hotReloadDeclared ? passed(evidence?.checks?.hotReload) : notApplicable(evidence?.checks?.hotReload), `${mode} hotReload check does not match the package manifest`, errors)
     }
   }
   if (errors.length > 0) throw new Error(errors.join('; '))

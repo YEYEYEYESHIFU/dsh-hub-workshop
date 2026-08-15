@@ -3,6 +3,7 @@ import { resolve } from 'node:path'
 import { isDeepStrictEqual } from 'node:util'
 
 import { createIntakeRecord, validateSubmission } from './intake-lib.mjs'
+import { createHarnessPlan } from './typed-harness-lib.mjs'
 import { validateOfficialMcpManifest } from './workshop-manifest-lib.mjs'
 
 const MAX_ISSUE_BODY_BYTES = 128 * 1024
@@ -110,6 +111,32 @@ export async function verifyPublicSubmissionSource(manifest, { fetchImpl = fetch
     if (!isDeepStrictEqual(packageJson.dshWorkshop, manifest.packageManifest)) {
       throw new Error('submission packageManifest does not match fixed package.json#dshWorkshop')
     }
+    if (packageJson.version !== manifest.release.version) throw new Error('submitted release version does not match fixed package.json')
+    if (manifest.release.profileBundle && packageJson.name !== manifest.release.profileBundle.packageName) {
+      throw new Error('Profile Bundle package name does not match fixed package.json')
+    }
+    if (manifest.release.updateFrom) {
+      const previousCommit = await githubJson(`${apiBase}/git/commits/${manifest.release.updateFrom.ref}`, {
+        fetchImpl,
+        token,
+        description: 'fixed previous release commit lookup',
+      })
+      if (previousCommit.sha !== manifest.release.updateFrom.ref) throw new Error('fixed previous release commit did not resolve exactly')
+      const previousPackageValue = await githubJson(`${apiBase}/contents/${encodedPath(packageJsonPath)}?ref=${manifest.release.updateFrom.ref}`, {
+        fetchImpl,
+        token,
+        description: `fixed previous package.json ${packageJsonPath}`,
+      })
+      let previousPackageJson
+      try {
+        previousPackageJson = JSON.parse(decodedGithubFile(previousPackageValue, 'previous package.json'))
+      } catch (error) {
+        throw new Error(`fixed previous package.json is invalid: ${error.message}`)
+      }
+      if (previousPackageJson.name !== packageJson.name || previousPackageJson.version !== manifest.release.updateFrom.version) {
+        throw new Error('previous package identity/version does not match the declared update origin')
+      }
+    }
     if (manifest.packageManifest.integration.protocol === 'mcp') {
       const serverPath = joinedRepositoryPath(manifest.project.path, manifest.packageManifest.integration.mcp.serverManifest)
       let serverManifest
@@ -127,6 +154,7 @@ export async function verifyPublicSubmissionSource(manifest, { fetchImpl = fetch
     repository: repositoryFacts.html_url || manifest.project.repository.replace(/\/$/, ''),
     ref: commit.sha,
     paths: [...paths].sort(),
+    updateFrom: manifest.release.updateFrom ? structuredClone(manifest.release.updateFrom) : null,
     archived: repositoryFacts.archived === true,
   }
 }
@@ -141,15 +169,25 @@ export async function prepareIssueIntake(event, { root, fetchImpl = fetch, token
   const baseline = JSON.parse(await readFile(resolve(root, 'official-baseline.json'), 'utf8'))
   const record = createIntakeRecord(manifest, baseline)
   const recordPath = resolve(root, 'intake/records', `${record.id}.json`)
+  const plan = manifest.schema === 'omdsh-workshop-submission/v2' ? createHarnessPlan(manifest, baseline) : null
+  const planPath = plan ? resolve(root, 'intake/plans', `${record.id}.json`) : null
   try {
     await readFile(recordPath)
     throw new Error(`${record.id}: an intake record already exists`)
   } catch (error) {
     if (error?.code !== 'ENOENT') throw error
   }
+  if (planPath) {
+    try {
+      await readFile(planPath)
+      throw new Error(`${record.id}: a typed Harness plan already exists`)
+    } catch (error) {
+      if (error?.code !== 'ENOENT') throw error
+    }
+  }
 
   const source = await verifyPublicSubmissionSource(manifest, { fetchImpl, token })
   record.review.notes = `Automatically prepared from #${event.issue.number}; public fixed-source preflight passed. Human review is still required.`
   record.tests.static.evidence = `submission manifest validation; public repository and fixed commit resolved${source.paths.length ? `; pinned path(s): ${source.paths.join(', ')}` : ''}`
-  return { manifest, record, recordPath, source }
+  return { manifest, record, recordPath, plan, planPath, source }
 }

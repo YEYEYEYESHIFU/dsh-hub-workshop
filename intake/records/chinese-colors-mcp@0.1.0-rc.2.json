@@ -1,0 +1,137 @@
+{
+  "schema": "omdsh-workshop-intake/v1",
+  "id": "chinese-colors-mcp@0.1.0-rc.2",
+  "submission": {
+    "repository": "https://github.com/omdsh-dev/toybox",
+    "ref": "86e98729b92db0b9fe901c39e32bca74cf8c0f54",
+    "path": "/plugins/chinese-colors-mcp/.dsh-plugin",
+    "manifest": {
+      "schema": "omdsh-workshop-submission/v2",
+      "operation": "add-release",
+      "project": {
+        "id": "chinese-colors-mcp",
+        "displayName": "中国传统色 MCP",
+        "summary": "搜索中国传统色、按日期取今日色，并生成带文化典故的和谐色板。",
+        "kind": "mcp",
+        "category": "fun",
+        "tags": [
+          "颜色",
+          "设计",
+          "文化"
+        ],
+        "repository": "https://github.com/omdsh-dev/toybox",
+        "path": "/plugins/chinese-colors-mcp/.dsh-plugin",
+        "author": {
+          "name": "mattheliu",
+          "url": "https://github.com/mattheliu"
+        },
+        "license": "MIT"
+      },
+      "release": {
+        "version": "0.1.0-rc.2",
+        "ref": "86e98729b92db0b9fe901c39e32bca74cf8c0f54",
+        "updatedAt": "2026-08-13T13:18:30Z",
+        "channel": "beta",
+        "compatibility": "Exact @deepseek-ai/dsh@0.1.0-rc.6 Harness evaluation.",
+        "changelog": "Migrated to the current typed Workshop contract and fixed public source.",
+        "capabilities": {
+          "requiresFabric": false,
+          "deepHook": false,
+          "restartRequired": true
+        },
+        "profileBundle": null,
+        "updateFrom": null
+      },
+      "management": {
+        "method": "guided",
+        "protocol": "mcp",
+        "label": "Isolated MCP review",
+        "instructions": "Review the fixed MCP server in an isolated process after explicit trust approval.",
+        "source": null
+      },
+      "declarations": {
+        "permissions": "none",
+        "testing": "Run the typed adapter against this exact source and preserve the complete report.",
+        "trustedPublisherRequested": false,
+        "installScriptsMustRemainDisabled": true
+      },
+      "packageManifest": {
+        "schema": "omdsh-workshop-package/v1",
+        "type": "plugin",
+        "integration": {
+          "protocol": "mcp",
+          "artifact": "server.json",
+          "mcp": {
+            "protocolVersions": [
+              "2026-07-28"
+            ],
+            "serverManifest": "server.json",
+            "registrySchema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json"
+          }
+        },
+        "install": {
+          "mode": "isolated-trial",
+          "adapter": "mcp-server",
+          "failurePolicy": "discard-process",
+          "touchesCurrentBeforeActivation": false
+        },
+        "lifecycle": {
+          "activation": "restart-plugin",
+          "dispose": "supported"
+        },
+        "permissions": [],
+        "capability": {
+          "id": "color_search",
+          "kind": "tool",
+          "invocation": "color_search({keyword: '黛'})",
+          "expected": "🔍 找到 3 个与 \"黛\" 相关的传统色：\n\n**黛紫** #574266 · RGB(87,66,102) · 紫系\n  📜 青黛染紫，温润含蓄\n**黛蓝** #425066 · RGB(66,80,102) · 青系\n  📜 青黛沉蓝，远山含黛\n**秋香** #D9B611 · RGB(217,182,17) · 黄系\n  📜 秋天的稻香之色，黛玉穿的\"秋香色\""
+        },
+        "evidence": {
+          "install": null,
+          "failureIsolation": null,
+          "hotReload": null,
+          "remove": null
+        }
+      }
+    }
+  },
+  "classification": {
+    "management": "guided"
+  },
+  "baseline": {
+    "package": "@deepseek-ai/dsh",
+    "version": "0.1.0-rc.6",
+    "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+  },
+  "review": {
+    "state": "pending-review"
+  },
+  "verification": {
+    "state": "untested"
+  },
+  "tests": {
+    "static": {
+      "required": true,
+      "status": "passed",
+      "evidence": "submission manifest validation"
+    },
+    "supplyChain": {
+      "required": true,
+      "status": "pending"
+    },
+    "officialBaseline": {
+      "required": false,
+      "status": "not-applicable",
+      "evidence": "guided entries expose no executable install intent"
+    },
+    "lifecycle": {
+      "required": false,
+      "status": "not-applicable",
+      "evidence": "guided entries have no Workshop-owned lifecycle"
+    }
+  },
+  "registry": {
+    "state": "ineligible",
+    "reason": "guided-catalog-only"
+  }
+}

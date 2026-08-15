@@ -78,6 +78,7 @@
           "additionalProperties": false,
           "properties": {
             "stars": { "type": "integer", "minimum": 0 },
+            "createdAt": { "type": ["string", "null"], "format": "date-time" },
             "commitUpdatedAt": { "type": "string", "format": "date-time" },
             "metadataUpdatedAt": { "type": "string", "format": "date-time" },
             "archived": { "type": "boolean" }

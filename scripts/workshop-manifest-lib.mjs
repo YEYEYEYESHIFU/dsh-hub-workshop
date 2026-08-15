@@ -12,6 +12,9 @@ const DISPOSE = new Set(['supported', 'unsupported', 'unknown'])
 const PATH_RE = /^(?!\/)(?!.*(?:^|\/)\.\.(?:\/|$))[A-Za-z0-9._-]+(?:\/[A-Za-z0-9._-]+)*$/
 const PERMISSION_RE = /^[a-z][a-z0-9-]*:[a-z][a-z0-9-]*$/
 const MCP_VERSION_RE = /^20[0-9]{2}-[0-9]{2}-[0-9]{2}$/
+const CAPABILITY_ID_RE = /^[a-z0-9][a-z0-9._-]*$/
+const CAPABILITY_KINDS = new Set(['tool', 'command', 'service', 'ui', 'event', 'provider', 'other'])
+const EXECUTABLE_PROTOCOLS = new Set(['harness-profile', 'harness-repository', 'harness-cordis', 'mcp'])
 
 const object = (value) => value && typeof value === 'object' && !Array.isArray(value)
 const uniqueStrings = (value) => Array.isArray(value) && value.every((item) => typeof item === 'string') && new Set(value).size === value.length
@@ -41,6 +44,16 @@ export function validateWorkshopManifest(manifest) {
   require(ACTIVATIONS.has(lifecycle.activation), 'unsupported lifecycle activation')
   require(DISPOSE.has(lifecycle.dispose), 'unsupported lifecycle dispose fact')
   require(uniqueStrings(manifest.permissions) && manifest.permissions.every((value) => PERMISSION_RE.test(value)), 'permissions must be unique scope:access values')
+  if (manifest.capability !== undefined) {
+    const capability = manifest.capability || {}
+    require(object(capability), 'capability must be an object')
+    require(typeof capability.id === 'string' && CAPABILITY_ID_RE.test(capability.id), 'capability.id is invalid')
+    require(CAPABILITY_KINDS.has(capability.kind), 'capability.kind is invalid')
+    require(typeof capability.invocation === 'string' && capability.invocation.length > 0, 'capability.invocation is required')
+    require(typeof capability.expected === 'string' && capability.expected.length > 0, 'capability.expected is required')
+  }
+  if (EXECUTABLE_PROTOCOLS.has(integration.protocol)) require(object(manifest.capability), `${integration.protocol} requires a named capability target`)
+  else require(manifest.capability === undefined, `${integration.protocol} cannot declare a runtime capability target`)
   require(object(evidence), 'evidence must be an object')
   for (const name of ['install', 'failureIsolation', 'hotReload', 'remove']) {
     require(Object.hasOwn(evidence, name) && pathOrNull(evidence[name]), `evidence.${name} must be null or a safe repository path`)
@@ -96,10 +109,19 @@ export function validateOfficialMcpManifest({ packageJson, serverManifest, decla
 export function capabilityProfile({ declaration = null, manifestSource = 'legacy-file-evidence', integrationProtocol = 'third-party', verificationState = 'untested', registryState = 'ineligible' } = {}) {
   const verified = verificationState === 'current-baseline-passed' && registryState === 'admitted'
   if (!declaration) {
+    const legacyAdapter = {
+      'harness-profile': 'profile-bundle',
+      'harness-repository': 'repository-plugin',
+      mcp: 'mcp-server',
+      skill: 'skill',
+      'harness-cordis': 'third-party',
+      'third-party': 'third-party',
+    }[integrationProtocol] || 'third-party'
     return {
       manifest: { status: 'legacy-evidence', source: manifestSource, schema: null },
       install: {
         mode: 'guided',
+        adapter: legacyAdapter,
         seamless: { state: 'unknown', reason: 'current-baseline-lifecycle-not-verified' },
         failureIsolation: { state: 'unknown', policy: 'manual', reason: 'isolation-not-declared' },
       },

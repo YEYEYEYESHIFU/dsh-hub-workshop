@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { appendFile, readFile, writeFile } from 'node:fs/promises'
+import { appendFile, mkdir, readFile, writeFile } from 'node:fs/promises'
 import { basename, resolve } from 'node:path'
 
 import { prepareIssueIntake } from './issue-intake-lib.mjs'
@@ -15,6 +15,10 @@ const result = await prepareIssueIntake(event, {
   token: process.env.GITHUB_TOKEN || '',
 })
 await writeFile(result.recordPath, `${JSON.stringify(result.record, null, 2)}\n`, { flag: 'wx' })
+if (result.planPath) {
+  await mkdir(resolve(ROOT, 'intake/plans'), { recursive: true })
+  await writeFile(result.planPath, `${JSON.stringify(result.plan, null, 2)}\n`, { flag: 'wx' })
+}
 
 const runId = String(process.env.GITHUB_RUN_ID || 'local').replace(/[^0-9A-Za-z-]/g, '')
 const outputs = {
@@ -22,9 +26,10 @@ const outputs = {
   issue_number: String(event.issue.number),
   record_id: result.record.id,
   record_path: `intake/records/${basename(result.recordPath)}`,
+  plan_path: result.planPath ? `intake/plans/${basename(result.planPath)}` : '',
 }
 if (process.env.GITHUB_OUTPUT) {
   await appendFile(process.env.GITHUB_OUTPUT, Object.entries(outputs).map(([key, value]) => `${key}=${value}\n`).join(''))
 }
 
-console.log(`prepared ${result.record.id} from Issue #${event.issue.number}; Registry remains ${result.record.registry.state}`)
+console.log(`prepared ${result.record.id} from Issue #${event.issue.number}${result.plan ? ' with a typed Harness plan' : ''}; Registry remains ${result.record.registry.state}`)

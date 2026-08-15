@@ -29,7 +29,7 @@ You are working inside an author's repository that is ready for DSH Hub Workshop
 
 4. Generate JSON that conforms exactly to `https://hub.omdsh.dev/submission.schema.json` without extra fields:
    - `schema` is `omdsh-workshop-submission/v2`;
-   - `packageManifest` exactly matches `package.json#dshWorkshop` at the pinned commit and separately declares install mode, failure policy, whether current is touched before activation, hot reload/restart, dispose, structured permissions, and evidence paths;
+   - `packageManifest` exactly matches `package.json#dshWorkshop` at the pinned commit and separately declares install mode, failure policy, whether current is touched before activation, hot reload/restart, dispose, structured permissions, and evidence paths. Profile, Repository Plugin, Cordis, and MCP submissions also name one concrete `capability` (ID, kind, invocation, and expected observation); loaded/started alone is not functional evidence;
    - `operation` is `create-project` or `add-release`;
    - use `null` for a repository-root `project.path`, otherwise a path beginning with `/`;
    - use a full 40-character `release.ref` and a verifiable ISO 8601 `updatedAt`;

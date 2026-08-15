@@ -35,6 +35,8 @@ const FILES = [
   'developer-guide.html',
   'distribution.schema.json',
   'ecosystem-repositories.json',
+  'harness-plan.schema.json',
+  'harness-report.schema.json',
   'index.html',
   'install.html',
   'intake-evidence.schema.json',

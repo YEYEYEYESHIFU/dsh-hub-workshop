@@ -1,0 +1,43 @@
+{
+  "name": "@omdsh/harness-mcp-probe",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "mcpName": "io.github.omdsh-dev/harness-mcp-probe",
+  "dshWorkshop": {
+    "schema": "omdsh-workshop-package/v1",
+    "type": "plugin",
+    "integration": {
+      "protocol": "mcp",
+      "artifact": "server.json",
+      "mcp": {
+        "protocolVersions": ["2026-07-28"],
+        "serverManifest": "server.json",
+        "registrySchema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json"
+      }
+    },
+    "install": {
+      "mode": "isolated-trial",
+      "adapter": "mcp-server",
+      "failurePolicy": "discard-process",
+      "touchesCurrentBeforeActivation": false
+    },
+    "lifecycle": {
+      "activation": "restart-plugin",
+      "dispose": "supported"
+    },
+    "permissions": [],
+    "capability": {
+      "id": "harness-echo",
+      "kind": "tool",
+      "invocation": "tools/call harness-echo with an empty argument object",
+      "expected": "fixture-ok"
+    },
+    "evidence": {
+      "install": null,
+      "failureIsolation": null,
+      "hotReload": null,
+      "remove": null
+    }
+  }
+}

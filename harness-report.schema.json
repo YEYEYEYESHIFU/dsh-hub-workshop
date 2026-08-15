@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hub.omdsh.dev/harness-report.schema.json",
+  "title": "OMDSH Workshop typed test Harness report",
+  "type": "object",
+  "required": ["schema", "planId", "projectId", "releaseId", "source", "updateFrom", "baseline", "profileBase", "classification", "status", "execution", "steps", "cleanup", "claims", "verifiedAt", "verifier"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "omdsh-workshop-harness-report/v1" },
+    "planId": { "type": "string", "minLength": 3 },
+    "projectId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "releaseId": { "type": "string", "minLength": 3 },
+    "source": { "$ref": "harness-plan.schema.json#/$defs/source" },
+    "updateFrom": {
+      "oneOf": [
+        { "$ref": "harness-plan.schema.json#/$defs/updateFrom" },
+        { "type": "null" }
+      ]
+    },
+    "baseline": { "$ref": "harness-plan.schema.json#/$defs/baseline" },
+    "profileBase": {
+      "oneOf": [
+        { "$ref": "harness-plan.schema.json#/$defs/profileBase" },
+        { "type": "null" }
+      ]
+    },
+    "classification": { "$ref": "harness-plan.schema.json#/properties/classification" },
+    "status": { "enum": ["passed", "failed", "blocked"] },
+    "execution": {
+      "type": "object",
+      "required": ["adapter", "trustedSourceExecution", "workspace"],
+      "additionalProperties": false,
+      "properties": {
+        "adapter": { "type": "string", "minLength": 1 },
+        "trustedSourceExecution": { "const": true },
+        "workspace": { "const": "ephemeral" }
+      }
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "status", "evidence", "facts"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9.-]*$" },
+          "status": { "enum": ["passed", "failed", "blocked", "not-applicable"] },
+          "evidence": { "type": "string", "minLength": 1, "maxLength": 4096 },
+          "facts": { "type": "object", "additionalProperties": { "type": ["boolean", "string", "number"] } },
+          "capability": {
+            "type": "object",
+            "required": ["id", "kind", "invocation", "expected", "observed"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "kind": { "enum": ["tool", "command", "service", "ui", "event", "provider", "other"] },
+              "invocation": { "type": "string", "minLength": 1 },
+              "expected": { "type": "string", "minLength": 1 },
+              "observed": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    "cleanup": {
+      "type": "object",
+      "required": ["status", "evidence", "facts"],
+      "additionalProperties": false,
+      "properties": {
+        "status": { "enum": ["passed", "failed", "blocked"] },
+        "evidence": { "type": "string", "minLength": 1, "maxLength": 4096 },
+        "facts": {
+          "type": "object",
+          "required": ["workspaceRemoved"],
+          "additionalProperties": { "type": ["boolean", "string", "number"] },
+          "properties": { "workspaceRemoved": { "type": "boolean" } }
+        }
+      }
+    },
+    "claims": {
+      "type": "object",
+      "required": ["seamlessInstall", "failureIsolation", "hotReload", "protocolCompatibility", "registryReadiness"],
+      "additionalProperties": false,
+      "properties": {
+        "seamlessInstall": { "$ref": "#/$defs/resultClaim" },
+        "failureIsolation": { "$ref": "#/$defs/resultClaim" },
+        "hotReload": { "$ref": "#/$defs/resultClaim" },
+        "protocolCompatibility": { "$ref": "#/$defs/resultClaim" },
+        "registryReadiness": { "$ref": "#/$defs/resultClaim" }
+      }
+    },
+    "verifiedAt": { "type": "string", "format": "date-time" },
+    "verifier": { "type": "string", "minLength": 1 }
+  },
+  "$defs": {
+    "resultClaim": {
+      "type": "object",
+      "required": ["state", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "state": { "enum": ["verified", "failed", "blocked", "not-claimed", "not-declared", "catalog-only", "evidence-ready"] },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

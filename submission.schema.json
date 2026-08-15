@@ -89,6 +89,20 @@
               }
             }
           ]
+        },
+        "updateFrom": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "required": ["version", "ref"],
+              "additionalProperties": false,
+              "properties": {
+                "version": { "type": "string", "minLength": 1 },
+                "ref": { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+              }
+            }
+          ]
         }
       }
     },
@@ -149,7 +163,33 @@
   "allOf": [
     {
       "if": { "properties": { "schema": { "const": "omdsh-workshop-submission/v2" } } },
-      "then": { "required": ["schema", "operation", "project", "release", "management", "declarations", "packageManifest"] }
+      "then": {
+        "required": ["schema", "operation", "project", "release", "management", "declarations", "packageManifest"],
+        "properties": { "release": { "required": ["updateFrom"] } }
+      }
+    },
+    {
+      "if": {
+        "properties": { "management": { "properties": { "method": { "enum": ["profile-bundle", "repository-plugin"] } } } }
+      },
+      "then": {
+        "properties": {
+          "release": {
+            "properties": {
+              "updateFrom": { "type": "object" }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "release": {
+            "properties": {
+              "updateFrom": { "type": "null" }
+            }
+          }
+        }
+      }
     },
     {
       "if": {

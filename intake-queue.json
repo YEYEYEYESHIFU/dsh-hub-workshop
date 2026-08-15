@@ -15,5 +15,148 @@
     ],
     "failClosed": true
   },
-  "records": []
+  "records": [
+    {
+      "schema": "omdsh-workshop-intake/v1",
+      "id": "dsh-composer-history@0.4.0",
+      "submission": {
+        "repository": "https://github.com/PerryLink/dsh-composer-history",
+        "ref": "b271ac3274fdc33942bacc14648888b3f1c3b885",
+        "path": null,
+        "manifest": {
+          "schema": "omdsh-workshop-submission/v2",
+          "operation": "create-project",
+          "project": {
+            "id": "dsh-composer-history",
+            "displayName": "dsh-composer-history",
+            "summary": "Terminal-style input history for the DeepSeek Harness web composer: edge-first arrow recall with exact draft/caret restore, browser-local persisted history, Ctrl+R reverse search, and sliding-context awareness.",
+            "kind": "ui",
+            "category": "interface",
+            "tags": [
+              "dsh-plugin",
+              "composer",
+              "input-history",
+              "keyboard",
+              "reverse-search",
+              "compaction"
+            ],
+            "repository": "https://github.com/PerryLink/dsh-composer-history",
+            "path": null,
+            "author": {
+              "name": "PerryLink",
+              "url": "https://github.com/PerryLink"
+            },
+            "license": "Apache-2.0"
+          },
+          "release": {
+            "version": "0.4.0",
+            "ref": "b271ac3274fdc33942bacc14648888b3f1c3b885",
+            "updatedAt": "2026-08-15T08:30:00Z",
+            "channel": "stable",
+            "compatibility": "0.1.0-rc.6",
+            "changelog": "0.4.0: search overlay polish, search on by default, coverage gates, release automation; dsh.bundle and dshWorkshop manifests declared.",
+            "capabilities": {
+              "requiresFabric": false,
+              "deepHook": false,
+              "restartRequired": true
+            },
+            "profileBundle": {
+              "packageName": "dsh-composer-history",
+              "spec": "0.4.0"
+            },
+            "updateFrom": null
+          },
+          "management": {
+            "method": "profile-bundle",
+            "protocol": "harness-profile",
+            "label": "Profile bundle (cordis.patch.yml)",
+            "instructions": "Install the package into the profile (pnpm add dsh-composer-history, or npm), then let the dsh.bundle patch register the composer-history row; config defaults come from the Config schema.",
+            "source": null
+          },
+          "declarations": {
+            "permissions": "Browser-local history store (localStorage key dsh.composer-history.v1) only; no network access, no host filesystem access, no model requests.",
+            "testing": "217 vitest unit tests plus a jsdom bundle smoke test executing the built client bundle; rc.6 headless boot self-check passed (dsh 0.1.0-rc.6, --patch row insert, agent reply, exit 0).",
+            "trustedPublisherRequested": false,
+            "installScriptsMustRemainDisabled": true
+          },
+          "packageManifest": {
+            "schema": "omdsh-workshop-package/v1",
+            "type": "plugin",
+            "integration": {
+              "protocol": "harness-profile",
+              "artifact": "cordis.patch.yml"
+            },
+            "install": {
+              "mode": "transactional",
+              "adapter": "profile-bundle",
+              "failurePolicy": "generation-rollback",
+              "touchesCurrentBeforeActivation": false
+            },
+            "lifecycle": {
+              "activation": "restart-plugin",
+              "dispose": "supported"
+            },
+            "permissions": [
+              "browser:local-storage"
+            ],
+            "compatibility": {
+              "dshVersions": [
+                "0.1.0-rc.6"
+              ]
+            },
+            "capability": {
+              "id": "composer-history-recall",
+              "kind": "ui",
+              "invocation": "ArrowUp with the caret on the composer's first line",
+              "expected": "the newest user message fills the draft and the caret moves to its end"
+            },
+            "evidence": {
+              "install": null,
+              "failureIsolation": null,
+              "hotReload": null,
+              "remove": null
+            }
+          }
+        }
+      },
+      "classification": {
+        "management": "transactional"
+      },
+      "baseline": {
+        "package": "@deepseek-ai/dsh",
+        "version": "0.1.0-rc.6",
+        "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+      },
+      "review": {
+        "state": "pending-review",
+        "notes": "Automatically prepared from #18; public fixed-source preflight passed. Human review is still required."
+      },
+      "verification": {
+        "state": "untested"
+      },
+      "tests": {
+        "static": {
+          "required": true,
+          "status": "passed",
+          "evidence": "submission manifest validation; public repository and fixed commit resolved; pinned path(s): /cordis.patch.yml, /package.json"
+        },
+        "supplyChain": {
+          "required": true,
+          "status": "pending"
+        },
+        "officialBaseline": {
+          "required": true,
+          "status": "pending"
+        },
+        "lifecycle": {
+          "required": true,
+          "status": "pending"
+        }
+      },
+      "registry": {
+        "state": "ineligible",
+        "reason": "current-baseline-verification-required"
+      }
+    }
+  ]
 }

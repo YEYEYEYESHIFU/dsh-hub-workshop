@@ -15,5 +15,152 @@
     ],
     "failClosed": true
   },
-  "records": []
+  "records": [
+    {
+      "schema": "omdsh-workshop-intake/v1",
+      "id": "dsh-auto-review@0.4.1",
+      "submission": {
+        "repository": "https://github.com/PerryLink/dsh-auto-review",
+        "ref": "d7ca634b13f71e68c6f529651b75e99967c2e30e",
+        "path": null,
+        "manifest": {
+          "schema": "omdsh-workshop-submission/v2",
+          "operation": "create-project",
+          "project": {
+            "id": "dsh-auto-review",
+            "displayName": "dsh-auto-review",
+            "summary": "Second-model AI auto-review on the DeepSeek Harness approval answerer chain: read-only reviewer subagent, structured allow/deny verdicts, fail-closed, fully auditable.",
+            "kind": "extension",
+            "category": "safety",
+            "tags": [
+              "auto-review",
+              "approval",
+              "ai-safety",
+              "second-model",
+              "fail-closed"
+            ],
+            "repository": "https://github.com/PerryLink/dsh-auto-review",
+            "path": null,
+            "author": {
+              "name": "PerryLink",
+              "url": "https://github.com/PerryLink"
+            },
+            "license": "Apache-2.0",
+            "media": null
+          },
+          "release": {
+            "version": "0.4.1",
+            "ref": "d7ca634b13f71e68c6f529651b75e99967c2e30e",
+            "updatedAt": "2026-08-15T08:55:36.761Z",
+            "channel": "stable",
+            "compatibility": "0.1.0-rc.6",
+            "changelog": "0.4.1 adds the omdsh-workshop-package/v1 dshWorkshop intake manifest plus author-run install/remove evidence; runtime behavior is unchanged from 0.4.0.",
+            "capabilities": {
+              "requiresFabric": false,
+              "deepHook": false,
+              "restartRequired": true
+            },
+            "profileBundle": {
+              "packageName": "dsh-auto-review",
+              "spec": "0.4.1"
+            },
+            "updateFrom": null
+          },
+          "management": {
+            "method": "profile-bundle",
+            "protocol": "harness-profile",
+            "label": "dsh-auto-review",
+            "instructions": "dsh plugin --profile <name> add dsh-auto-review   # npm channel; or pnpm pack and add the tarball; or git source with the pinned commit",
+            "source": null
+          },
+          "declarations": {
+            "permissions": "Session-log append (log-only autoReview/* audit events), approval-request answering on the official answerer chain, one read-only reviewer subagent per AI review, /auto-review command registration, tools/post-execute observation. No writes outside the session/profile; no network beyond the reviewer subagent inheriting the session LLM route.",
+            "testing": "135 vitest tests green (node + jsdom); CI green on Node 22/24 (typecheck/test/build/self-contained/pack/smoke-install); real headless profile boot with the plugin row mounted completed a real model turn (exit 0); removal boot without the row also completed a real turn (exit 0); author evidence files under docs/omdsh-evidence/.",
+            "trustedPublisherRequested": false,
+            "installScriptsMustRemainDisabled": true
+          },
+          "packageManifest": {
+            "schema": "omdsh-workshop-package/v1",
+            "type": "plugin",
+            "integration": {
+              "protocol": "harness-profile",
+              "artifact": "cordis.patch.yml"
+            },
+            "install": {
+              "mode": "transactional",
+              "adapter": "profile-bundle",
+              "failurePolicy": "generation-rollback",
+              "touchesCurrentBeforeActivation": false
+            },
+            "lifecycle": {
+              "activation": "restart-profile",
+              "dispose": "supported"
+            },
+            "permissions": [
+              "session:append",
+              "approval:answer",
+              "subagent:spawn",
+              "command:register",
+              "tools:observe"
+            ],
+            "compatibility": {
+              "dshVersions": [
+                "0.1.0-rc.6"
+              ]
+            },
+            "capability": {
+              "id": "auto-review-command",
+              "kind": "command",
+              "invocation": "/auto-review status",
+              "expected": "reports the session's auto-review switch state, the per-turn AI-verdict and reviewer-failure budgets, any active circuit trip, and the cumulative allows/denies/fallbacks/never-rejects"
+            },
+            "evidence": {
+              "install": "docs/omdsh-evidence/install.md",
+              "failureIsolation": null,
+              "hotReload": null,
+              "remove": "docs/omdsh-evidence/remove.md"
+            }
+          }
+        }
+      },
+      "classification": {
+        "management": "transactional"
+      },
+      "baseline": {
+        "package": "@deepseek-ai/dsh",
+        "version": "0.1.0-rc.6",
+        "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+      },
+      "review": {
+        "state": "pending-review",
+        "notes": "Automatically prepared from #21; public fixed-source preflight passed. Human review is still required."
+      },
+      "verification": {
+        "state": "untested"
+      },
+      "tests": {
+        "static": {
+          "required": true,
+          "status": "passed",
+          "evidence": "submission manifest validation; public repository and fixed commit resolved; pinned path(s): /cordis.patch.yml, /docs/omdsh-evidence/install.md, /docs/omdsh-evidence/remove.md, /package.json"
+        },
+        "supplyChain": {
+          "required": true,
+          "status": "pending"
+        },
+        "officialBaseline": {
+          "required": true,
+          "status": "pending"
+        },
+        "lifecycle": {
+          "required": true,
+          "status": "pending"
+        }
+      },
+      "registry": {
+        "state": "ineligible",
+        "reason": "current-baseline-verification-required"
+      }
+    }
+  ]
 }

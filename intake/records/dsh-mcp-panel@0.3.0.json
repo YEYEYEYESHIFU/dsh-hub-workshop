@@ -1,0 +1,141 @@
+{
+  "schema": "omdsh-workshop-intake/v1",
+  "id": "dsh-mcp-panel@0.3.0",
+  "submission": {
+    "repository": "https://github.com/PerryLink/dsh-mcp-panel",
+    "ref": "3e1f6b05a1ea5a31c911a68d1788b2e881f99006",
+    "path": null,
+    "manifest": {
+      "schema": "omdsh-workshop-submission/v2",
+      "operation": "create-project",
+      "project": {
+        "id": "dsh-mcp-panel",
+        "displayName": "dsh-mcp-panel",
+        "summary": "Read-only runtime management panel for the official DeepSeek Harness MCP client: /mcp command and a Settings tab with connection status, registered tools, errors and reconnect counts.",
+        "kind": "manager",
+        "category": "developer-tools",
+        "tags": [
+          "mcp",
+          "observability",
+          "panel"
+        ],
+        "repository": "https://github.com/PerryLink/dsh-mcp-panel",
+        "path": null,
+        "author": {
+          "name": "PerryLink",
+          "url": "https://github.com/PerryLink"
+        },
+        "license": "Apache-2.0"
+      },
+      "release": {
+        "version": "0.3.0",
+        "ref": "3e1f6b05a1ea5a31c911a68d1788b2e881f99006",
+        "updatedAt": "2026-08-15T16:00:35+08:00",
+        "channel": "stable",
+        "compatibility": "DeepSeek Harness >= 0.1.0-rc.5 (peer dependencies pin the 0.1.0-rc.6 package line)",
+        "changelog": "https://github.com/PerryLink/dsh-mcp-panel/blob/3e1f6b05a1ea5a31c911a68d1788b2e881f99006/CHANGELOG.md",
+        "capabilities": {
+          "requiresFabric": false,
+          "deepHook": false,
+          "restartRequired": false
+        },
+        "profileBundle": {
+          "packageName": "dsh-mcp-panel",
+          "spec": "0.3.0"
+        },
+        "updateFrom": null
+      },
+      "management": {
+        "method": "profile-bundle",
+        "protocol": "harness-profile",
+        "label": "Profile Bundle (cordis.patch.yml via dsh plugin add)",
+        "instructions": "Install with `dsh plugin --profile web add dsh-mcp-panel@0.3.0` (or `github:PerryLink/dsh-mcp-panel#v0.3.0`), then restart or let the web surface hot-reload its cordis.patch.yml. Manual fallback: place the package in the profile node_modules and add the documented mcp-panel row to cordis.patch.yml.",
+        "source": null
+      },
+      "declarations": {
+        "permissions": "network:outbound (one-shot and optional passive Streamable HTTP probes to user-configured endpoints); native-code:none. No filesystem writes; loader entries and the tool registry are read in-process.",
+        "testing": "109 vitest unit tests; full gate: typecheck (checkout + npm faces), test, build, verify:self-contained, verify:artifacts; end-to-end headless /mcp run against a real web profile.",
+        "trustedPublisherRequested": false,
+        "installScriptsMustRemainDisabled": true
+      },
+      "packageManifest": {
+        "schema": "omdsh-workshop-package/v1",
+        "type": "plugin",
+        "integration": {
+          "protocol": "harness-profile",
+          "artifact": "cordis.patch.yml"
+        },
+        "install": {
+          "mode": "transactional",
+          "adapter": "profile-bundle",
+          "failurePolicy": "generation-rollback",
+          "touchesCurrentBeforeActivation": false
+        },
+        "lifecycle": {
+          "activation": "hot-reload",
+          "dispose": "supported"
+        },
+        "permissions": [
+          "network:outbound",
+          "native-code:none"
+        ],
+        "compatibility": {
+          "dshVersions": [
+            "0.1.0-rc.5",
+            "0.1.0-rc.6"
+          ]
+        },
+        "capability": {
+          "id": "mcp-command",
+          "kind": "command",
+          "invocation": "/mcp",
+          "expected": "lists configured MCP servers with connection status, tool counts, last errors and reconnect counts, with localized output"
+        },
+        "evidence": {
+          "install": null,
+          "failureIsolation": null,
+          "hotReload": null,
+          "remove": null
+        }
+      }
+    }
+  },
+  "classification": {
+    "management": "transactional"
+  },
+  "baseline": {
+    "package": "@deepseek-ai/dsh",
+    "version": "0.1.0-rc.6",
+    "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+  },
+  "review": {
+    "state": "pending-review",
+    "notes": "Automatically prepared from #16; public fixed-source preflight passed. Human review is still required."
+  },
+  "verification": {
+    "state": "untested"
+  },
+  "tests": {
+    "static": {
+      "required": true,
+      "status": "passed",
+      "evidence": "submission manifest validation; public repository and fixed commit resolved; pinned path(s): /cordis.patch.yml, /package.json"
+    },
+    "supplyChain": {
+      "required": true,
+      "status": "pending"
+    },
+    "officialBaseline": {
+      "required": true,
+      "status": "pending"
+    },
+    "lifecycle": {
+      "required": true,
+      "status": "pending"
+    }
+  },
+  "registry": {
+    "state": "ineligible",
+    "reason": "current-baseline-verification-required"
+  }
+}

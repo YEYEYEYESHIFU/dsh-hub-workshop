@@ -1,0 +1,147 @@
+{
+  "schema": "omdsh-workshop-intake/v1",
+  "id": "dsh-coyote@0.2.0",
+  "submission": {
+    "repository": "https://github.com/THEWOLFWALKER/dsh-coyote",
+    "ref": "a5aa95813ebdb59d07bcfe7b776b97c4398f29de",
+    "path": null,
+    "manifest": {
+      "schema": "omdsh-workshop-submission/v2",
+      "operation": "create-project",
+      "project": {
+        "id": "dsh-coyote",
+        "displayName": "dsh-coyote",
+        "summary": "Adults-only DG-LAB Coyote e-stim plugin for DeepSeek Harness: eight safety-bounded coyote_* tools and a DSH-aligned web panel behind one safety envelope.",
+        "kind": "extension",
+        "category": "fun",
+        "tags": [
+          "dg-lab",
+          "coyote",
+          "e-stim",
+          "adults-only",
+          "safety",
+          "waveform",
+          "cordis",
+          "plugin"
+        ],
+        "repository": "https://github.com/THEWOLFWALKER/dsh-coyote",
+        "path": null,
+        "author": {
+          "name": "THEWOLFWALKER",
+          "url": "https://github.com/THEWOLFWALKER"
+        },
+        "license": "MIT"
+      },
+      "release": {
+        "version": "0.2.0",
+        "ref": "a5aa95813ebdb59d07bcfe7b776b97c4398f29de",
+        "updatedAt": "2026-08-16T02:13:01Z",
+        "channel": "stable",
+        "compatibility": "@deepseek-ai/dsh@0.1.0-rc.6 (official public baseline); Node >=22; peer @deepseek-ai/cordis@^4.0.1, @deepseek-ai/dsh-tools@^0.1.0-rc.6, @deepseek-ai/schemastery@^3.18.1",
+        "changelog": "v0.2.0 adds opt-in event-driven auto-stim on top of the eight coyote_* tools, the DSH-aligned web panel, and the safety envelope. This submission declares the omdsh-workshop-package/v1 dshWorkshop intake manifest.",
+        "capabilities": {
+          "requiresFabric": false,
+          "deepHook": false,
+          "restartRequired": true
+        },
+        "profileBundle": {
+          "packageName": "dsh-coyote",
+          "spec": "0.2.0"
+        },
+        "updateFrom": null
+      },
+      "management": {
+        "method": "profile-bundle",
+        "protocol": "harness-profile",
+        "label": "dsh-coyote (cordis.patch.yml profile bundle)",
+        "instructions": "Install the npm package through the DeepSeek Harness profile bundle mechanism (dsh plugin add dsh-coyote), then restart the host so the injected web client panel is served. The bundle patch inserts the row automatically with zero required config; tune the safety caps (softLimitA/B, port) in the profile cordis.patch.yml as documented in the repository README.",
+        "source": null
+      },
+      "declarations": {
+        "permissions": "Listens on a configurable WebSocket host/port (default 0.0.0.0:9999) as the DG-LAB V3 socket server that the official App connects to after QR pairing; reads and writes imported community waveforms under the configurable waveformDir. No subprocess, no shell, no native code, no outbound network, no install scripts; adults-only hardware control.",
+        "testing": "148 vitest tests pass at the pinned commit across 17 suites (protocol codec, waveform composer/library/importer/scheduler, runtime safety envelope, auto-stim, GUI bridge, tools, client harness, entry).",
+        "trustedPublisherRequested": false,
+        "installScriptsMustRemainDisabled": true
+      },
+      "packageManifest": {
+        "schema": "omdsh-workshop-package/v1",
+        "type": "plugin",
+        "integration": {
+          "protocol": "harness-profile",
+          "artifact": "cordis.patch.yml"
+        },
+        "install": {
+          "mode": "transactional",
+          "adapter": "profile-bundle",
+          "failurePolicy": "generation-rollback",
+          "touchesCurrentBeforeActivation": false
+        },
+        "lifecycle": {
+          "activation": "restart-host",
+          "dispose": "supported"
+        },
+        "permissions": [
+          "harness:tool",
+          "harness:event",
+          "network:listen",
+          "files:write"
+        ],
+        "compatibility": {
+          "dshVersions": [
+            "0.1.0-rc.6"
+          ]
+        },
+        "capability": {
+          "id": "coyote_set_strength",
+          "kind": "tool",
+          "invocation": "invoke the model-facing coyote_set_strength tool with a channel and an absolute value or a relative delta through the DSH ToolRuntime",
+          "expected": "a structured result reporting the strength actually applied per channel and any soft/device/rate clamping reason; output never exceeds the safety envelope"
+        },
+        "evidence": {
+          "install": null,
+          "failureIsolation": null,
+          "hotReload": null,
+          "remove": null
+        }
+      }
+    }
+  },
+  "classification": {
+    "management": "transactional"
+  },
+  "baseline": {
+    "package": "@deepseek-ai/dsh",
+    "version": "0.1.0-rc.6",
+    "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+  },
+  "review": {
+    "state": "pending-review",
+    "notes": "Automatically prepared from #26; public fixed-source preflight passed. Human review is still required."
+  },
+  "verification": {
+    "state": "untested"
+  },
+  "tests": {
+    "static": {
+      "required": true,
+      "status": "passed",
+      "evidence": "submission manifest validation; public repository and fixed commit resolved; pinned path(s): /cordis.patch.yml, /package.json"
+    },
+    "supplyChain": {
+      "required": true,
+      "status": "pending"
+    },
+    "officialBaseline": {
+      "required": true,
+      "status": "pending"
+    },
+    "lifecycle": {
+      "required": true,
+      "status": "pending"
+    }
+  },
+  "registry": {
+    "state": "ineligible",
+    "reason": "current-baseline-verification-required"
+  }
+}

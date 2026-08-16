@@ -111,7 +111,9 @@
     "state": "pending-review"
   },
   "verification": {
-    "state": "untested"
+    "state": "blocked",
+    "verifiedAt": "2026-08-14T12:38:08.141Z",
+    "evidence": "intake/reports/session-teleport@0.6.0-rc.2.profile.json"
   },
   "tests": {
     "static": {
@@ -121,19 +123,22 @@
     },
     "supplyChain": {
       "required": true,
-      "status": "pending"
+      "status": "passed",
+      "evidence": "no package lifecycle scripts; installation is forced to ignore scripts"
     },
     "officialBaseline": {
       "required": true,
-      "status": "pending"
+      "status": "blocked",
+      "evidence": "PostgreSQL runtime validation blocked: POSTGRES_TEST_URL is unset; no local postgres or psql binaries are installed; the Docker daemon is unavailable. The database-backed /health check is required before DSH_TELEPORT_ENABLE=1."
     },
     "lifecycle": {
       "required": true,
-      "status": "pending"
+      "status": "blocked",
+      "evidence": "lifecycle steps did not run after the blocking required step"
     }
   },
   "registry": {
     "state": "ineligible",
-    "reason": "current-baseline-verification-required"
+    "reason": "current-baseline-verification-blocked"
   }
 }

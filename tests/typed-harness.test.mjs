@@ -58,7 +58,7 @@ function submission(type) {
   const executable = ['profile', 'repository', 'mcp', 'cordis'].includes(type)
   return {
     schema: 'omdsh-workshop-submission/v2',
-    operation: 'create-project',
+    operation: ['profile', 'repository'].includes(type) ? 'add-release' : 'create-project',
     project: {
       id,
       displayName: `Harness ${type}`,
@@ -270,6 +270,22 @@ test('transactional Harness produces v2 evidence only after lifecycle, isolation
   delete downgraded.checks.failureIsolation
   delete downgraded.checks.hotReload
   assert.throws(() => applyEvidence(record, downgraded, baseline), /v2 submission requires typed Harness v2 evidence/)
+})
+
+test('an initial transactional release is fully verified without inventing a previous version', async () => {
+  const manifest = submission('profile')
+  manifest.operation = 'create-project'
+  manifest.release.updateFrom = null
+  const plan = createHarnessPlan(manifest, baseline)
+  assert.equal(plan.updateFrom, null)
+  assert.equal(plan.steps.some((step) => step.id === 'update-source.immutable'), false)
+  assert.equal(plan.steps.some((step) => step.id === 'update.apply'), false)
+  const report = await runHarnessPlan(plan, passingAdapter(), { verifiedAt: NOW, verifier: 'synthetic-initial-release' })
+  assert.equal(report.status, 'passed')
+  const record = createIntakeRecord(manifest, baseline)
+  const evidence = harnessReportToEvidence({ record, report, baseline, environment: {} })
+  assert.equal(evidence.checks.update.status, 'not-applicable')
+  assert.equal(applyEvidence(record, evidence, baseline).verification.state, 'current-baseline-passed')
 })
 
 test('missing current protection fails closed and blocks later activation', async () => {

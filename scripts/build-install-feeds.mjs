@@ -4,6 +4,8 @@ import { createHash } from 'node:crypto'
 import { readFile, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { validateHarnessReport } from './typed-harness-lib.mjs'
+import { capabilityProfile } from './workshop-manifest-lib.mjs'
 
 const ROOT = resolve(import.meta.dirname, '..')
 const ORIGINS = [
@@ -14,6 +16,30 @@ const COMMIT_RE = /^[0-9a-f]{40}$/
 const PACKAGE_RE = /^(?:@[a-z0-9][a-z0-9._-]*\/)?[a-z0-9][a-z0-9._-]*$/
 const PINNED_GITHUB_RE = /^github:[A-Za-z0-9_.-]+\/[A-Za-z0-9._-]+#[0-9a-f]{40}$/
 const BLOCKED_SOURCE_RE = /^github:[A-Za-z0-9_.-]+\/[A-Za-z0-9._-]+#[0-9a-f]{40}(?:&path:\/[^\s&]+\/\.dsh-plugin)?$/
+const REQUIRED_PROFILE_STEPS = Object.freeze([
+  'source.immutable',
+  'manifest.validate',
+  'artifact.present',
+  'protocol.contract',
+  'compatibility.baseline',
+  'permissions.review',
+  'supply-chain.review',
+  'sandbox.policy',
+  'runtime.exact',
+  'candidate.create',
+  'install.scripts-disabled',
+  'install.apply',
+  'ready.probe',
+  'capability.invoke',
+  'failure.inject-candidate',
+  'failure.current-unchanged',
+  'failure.discard-candidate',
+  'activation.switch',
+  'lifecycle.restart',
+  'disable.apply',
+  'remove.apply',
+  'recovery.generation',
+])
 
 export function canonicalJson(value) {
   if (value === null || typeof value === 'boolean' || typeof value === 'string') return JSON.stringify(value)
@@ -64,7 +90,7 @@ function releaseId(pkg) {
   return `${pkg.id}@${pkg.version}`
 }
 
-export function validateAdmission(admission, pkg, audit, evidenceDigest, baseline) {
+export function validateAdmission(admission, pkg, audit, evidenceDigest, baseline, plan = null, record = null) {
   assert(admission?.decision === 'admitted', `${admission?.id ?? 'admission'}: unsupported decision`)
   assert(admission.mode === 'profile-bundle', `${admission.id}: only Profile Bundle admission is currently supported`)
   assert(pkg !== undefined, `${admission.id}: missing Catalog project`)
@@ -73,9 +99,19 @@ export function validateAdmission(admission, pkg, audit, evidenceDigest, baselin
   assert(admission.source.ref === pkg.ref, `${admission.id}: ref differs from Catalog`)
   assert((admission.source.path ?? null) === (pkg.repositoryPath || null), `${admission.id}: path differs from Catalog`)
   assert(admission.version === pkg.version, `${admission.id}: version differs from Catalog`)
-  assert(pkg.workshop?.manifest?.status === 'valid', `${admission.id}: Registry admission requires package.json#dshWorkshop`)
-  assert(pkg.workshop?.install?.adapter === 'profile-bundle', `${admission.id}: Workshop manifest adapter differs from Profile Bundle admission`)
-  assert(pkg.workshop?.install?.mode === 'transactional', `${admission.id}: Workshop manifest must declare transactional installation`)
+  const declaration = record?.submission?.manifest?.packageManifest
+  if (record) {
+    assert(record.id === releaseId(pkg), `${admission.id}: Intake release differs from Catalog`)
+    assert(record.review?.state === 'approved', `${admission.id}: Intake review is not approved`)
+    assert(record.verification?.state === 'current-baseline-passed', `${admission.id}: Intake verification did not pass`)
+    assert(record.registry?.state === 'admitted', `${admission.id}: Intake record is not admitted`)
+    assert(record.submission.repository === admission.source.repository
+      && record.submission.ref === admission.source.ref
+      && (record.submission.path ?? null) === (admission.source.path ?? null), `${admission.id}: Intake source differs from Admission`)
+  }
+  assert(declaration?.schema === 'omdsh-workshop-package/v1' || pkg.workshop?.manifest?.status === 'valid', `${admission.id}: Registry admission requires package.json#dshWorkshop`)
+  assert((declaration?.install?.adapter ?? pkg.workshop?.install?.adapter) === 'profile-bundle', `${admission.id}: Workshop manifest adapter differs from Profile Bundle admission`)
+  assert((declaration?.install?.mode ?? pkg.workshop?.install?.mode) === 'transactional', `${admission.id}: Workshop manifest must declare transactional installation`)
   assert(PACKAGE_RE.test(admission.packageName), `${admission.id}: invalid package name`)
   assert(PINNED_GITHUB_RE.test(admission.spec), `${admission.id}: spec must be a commit-pinned GitHub package`)
   assert(admission.spec.endsWith(`#${admission.source.ref}`), `${admission.id}: spec does not match source ref`)
@@ -86,6 +122,31 @@ export function validateAdmission(admission, pkg, audit, evidenceDigest, baselin
   assert(['unknown', 'present', 'absent'].includes(admission.risk.installScripts), `${admission.id}: unsupported install-script fact`)
   assert(['unknown', 'requested', 'verified'].includes(admission.risk.trustedPublisher), `${admission.id}: unsupported publisher fact`)
   assert(admission.evidence.sha256 === evidenceDigest, `${admission.id}: evidence digest mismatch`)
+  if (audit.schema === 'omdsh-workshop-harness-report/v1') {
+    assert(plan !== null, `${admission.id}: typed Harness admission requires its fixed plan`)
+    const reportErrors = validateHarnessReport(audit, plan)
+    assert(reportErrors.length === 0, `${admission.id}: invalid Harness report: ${reportErrors.join('; ')}`)
+    assert(audit.status === 'passed', `${admission.id}: Harness report did not pass`)
+    assert(audit.classification?.adapter === 'profile-bundle', `${admission.id}: Harness adapter is not Profile Bundle`)
+    assert(canonicalJson(audit.source) === canonicalJson({
+      repository: admission.source.repository,
+      ref: admission.source.ref,
+      path: admission.source.path,
+    }), `${admission.id}: Harness source mismatch`)
+    assert(`${audit.baseline.package}@${audit.baseline.version}` === baseline, `${admission.id}: Harness runtime mismatch`)
+    const stepById = new Map(audit.steps.map((step) => [step.id, step]))
+    for (const id of REQUIRED_PROFILE_STEPS) {
+      assert(stepById.get(id)?.status === 'passed', `${admission.id}: required Harness step ${id} did not pass`)
+    }
+    if (plan.steps.some((step) => step.id === 'update.apply')) {
+      assert(stepById.get('update.apply')?.status === 'passed', `${admission.id}: required Harness step update.apply did not pass`)
+    }
+    assert(audit.cleanup?.status === 'passed' && audit.cleanup?.facts?.workspaceRemoved === true, `${admission.id}: Harness cleanup did not pass`)
+    assert(typeof admission.approval?.reviewer === 'string' && admission.approval.reviewer !== '', `${admission.id}: approval reviewer is required`)
+    normalizedTimestamp(admission.approval?.reviewedAt, `${admission.id}.approval.reviewedAt`)
+    normalizedTimestamp(audit.verifiedAt, `${admission.id}.report.verifiedAt`)
+    return true
+  }
   assert(audit.schema === 'omdsh-registry-audit/v1', `${admission.id}: unsupported audit schema`)
   assert(audit.projectId === admission.id, `${admission.id}: audit project mismatch`)
   assert(audit.releaseId === releaseId(pkg), `${admission.id}: audit release mismatch`)
@@ -124,12 +185,71 @@ export function validateAdmission(admission, pkg, audit, evidenceDigest, baselin
   return true
 }
 
-function catalogProjection(catalog, admissions, audits) {
+function intakeAdmissionState(record) {
+  if (record?.verification?.state === 'blocked' || record?.verification?.state === 'failed') return 'verification-blocked'
+  if (record?.classification?.management === 'guided' && record?.verification?.state === 'source-evidence-passed') return 'guided-evidence-passed'
+  if (record?.verification?.state === 'current-baseline-passed') return 'verification-passed-review-pending'
+  return null
+}
+
+function catalogProjection(catalog, admissions, audits, queue) {
   const output = structuredClone(catalog)
   const admissionById = new Map(admissions.admissions.map((item) => [item.id, item]))
+  const recordByProject = new Map((queue?.records || []).map((record) => [record.submission.manifest.project.id, record]))
   for (const pkg of output.packages) {
     const admission = admissionById.get(pkg.id)
+    const exactRecord = recordByProject.get(pkg.id)
+    const record = exactRecord?.submission?.manifest?.release?.version === pkg.version ? exactRecord : null
+    if (record?.submission?.manifest?.packageManifest) {
+      pkg.workshop = capabilityProfile({
+        declaration: record.submission.manifest.packageManifest,
+        manifestSource: 'package.json#dshWorkshop',
+        integrationProtocol: record.submission.manifest.management.protocol,
+        verificationState: record.verification.state,
+        registryState: record.registry.state,
+      })
+    }
     if (admission === undefined) {
+      const intakeState = record ? intakeAdmissionState(record) : null
+      if (intakeState !== null && pkg.workshop?.admission) {
+        pkg.workshop.admission.state = intakeState
+        if (intakeState === 'verification-passed-review-pending') {
+          pkg.compatibility = `已在 ${queue.officialBaseline} 完成固定来源、安装、能力、故障隔离和恢复验证；等待一次人工批准后进入 Registry。`
+          pkg.install = {
+            type: 'manual',
+            label: '验证通过，等待准入',
+            source: pkg.repository,
+            command: pkg.repository,
+            note: 'Harness 已通过，但 Registry 尚未授予安装权限。维护者批准该精确 Release 后，Admission 与 Feed 会自动生成。',
+          }
+          pkg.workshop.install.seamless = { state: 'verified', reason: 'current-baseline-lifecycle-passed' }
+          pkg.workshop.install.failureIsolation = {
+            ...pkg.workshop.install.failureIsolation,
+            state: 'verified',
+            reason: 'current-profile-protected-in-test',
+          }
+        } else if (intakeState === 'guided-evidence-passed') {
+          const protocol = record.submission.manifest.management.protocol
+          pkg.compatibility = `已完成固定来源的 ${protocol.toUpperCase()} 专项验证；属于引导接入，不授予 Registry 安装权限。`
+          pkg.install = {
+            type: 'manual',
+            protocol: protocol === 'harness-cordis' ? 'harness-cordis' : 'third-party',
+            label: '查看已验证接入说明',
+            source: pkg.repository,
+            command: pkg.repository,
+            note: '专项验证已通过；工作坊只提供固定来源和接入边界，不替代对应协议或工具的安装管理器。',
+          }
+        } else {
+          pkg.compatibility = `当前固定 Release 的验证被阻塞；不提供安装入口。${record.verification.evidence ? ` ${record.verification.evidence}` : ''}`
+          pkg.install = {
+            type: 'manual',
+            label: '查看阻塞原因',
+            source: pkg.repository,
+            command: pkg.repository,
+            note: '该版本未通过当前验证门禁，只保留固定来源供排查。',
+          }
+        }
+      }
       if (pkg.install.type !== 'manual') {
         pkg.compatibility = `${pkg.compatibility || '兼容性尚未验证'} 当前 Registry 没有授予安装权限。`
         pkg.install = {
@@ -168,7 +288,8 @@ function catalogProjection(catalog, admissions, audits) {
   }
   const catalogUpdated = normalizedTimestamp(output.updated, 'catalog.updated')
   const admissionsUpdated = normalizedTimestamp(admissions.updatedAt, 'admissions.updatedAt')
-  output.updated = new Date(Math.max(Date.parse(catalogUpdated), Date.parse(admissionsUpdated))).toISOString()
+  const queueUpdated = normalizedTimestamp(queue.generatedAt, 'queue.generatedAt')
+  output.updated = new Date(Math.max(Date.parse(catalogUpdated), Date.parse(admissionsUpdated), Date.parse(queueUpdated))).toISOString()
   const installMethods = {}
   for (const pkg of output.packages) installMethods[pkg.install.type] = (installMethods[pkg.install.type] ?? 0) + 1
   output.stats.installMethods = Object.fromEntries(Object.entries(installMethods).sort(([left], [right]) => left.localeCompare(right)))
@@ -257,6 +378,32 @@ function registryDocument(catalog, admissions) {
 }
 
 function runRecord(pkg, audit) {
+  if (audit.schema === 'omdsh-workshop-harness-report/v1') {
+    const capability = audit.steps.find((step) => step.capability)?.capability
+    return {
+      id: `${pkg.id}-${pkg.version.replaceAll('.', '-')}-${audit.baseline.version.replaceAll('.', '-')}-${audit.verifier}`,
+      projectId: pkg.id,
+      releaseId: releaseId(pkg),
+      environment: {
+        harnessSnapshot: `${audit.baseline.package}@${audit.baseline.version}`,
+        profile: audit.profileBase?.package || 'typed-harness',
+        platform: audit.execution?.workspace || 'ephemeral',
+      },
+      checks: {
+        install: 'passed',
+        ready: 'passed',
+        task: {
+          result: 'passed',
+          title: capability?.id || '固定能力调用通过',
+          translations: { en: capability?.id || 'Pinned capability invocation passed' },
+        },
+      },
+      verifier: audit.verifier,
+      verifiedAt: audit.verifiedAt,
+      evidenceUrl: `https://github.com/omdsh-dev/dsh-hub-workshop/blob/main/intake/reports/${encodeURIComponent(audit.releaseId)}.profile.json`,
+      reproduces: null,
+    }
+  }
   return {
     id: `${pkg.id}-${pkg.version.replaceAll('.', '-')}-rc5-macos-arm64-mattheliu`,
     projectId: pkg.id,
@@ -397,10 +544,11 @@ function ecosystemDocument(workshop, registry) {
 }
 
 export async function buildFeeds({ root = ROOT, write = true } = {}) {
-  const [catalogSource, admissions, community] = await Promise.all([
+  const [catalogSource, admissions, community, queue] = await Promise.all([
     json(root, 'catalog.json'),
     json(root, 'registry-admissions.json'),
     json(root, 'community-v1.json'),
+    json(root, 'intake-queue.json'),
   ])
   assert(catalogSource.schema === 'dsh-hub-index/v0.4', 'unsupported Catalog schema')
   assert(admissions.schema === 'omdsh-registry-admissions/v1', 'unsupported Registry admissions schema')
@@ -417,23 +565,27 @@ export async function buildFeeds({ root = ROOT, write = true } = {}) {
     assert(catalogSource.packages.some((pkg) => pkg.id === item.id), `${item.id}: blocked project is missing from Catalog`)
     assert(BLOCKED_SOURCE_RE.test(item.source), `${item.id}: blocked source is not immutable`)
     assert(item.staticVerification === 'passed', `${item.id}: blocked candidate lacks static verification`)
-    assert(item.runtimeVerification === 'blocked', `${item.id}: blocked candidate has an invalid runtime state`)
+    assert(['blocked', 'passed', 'not-applicable'].includes(item.runtimeVerification), `${item.id}: excluded candidate has an invalid runtime state`)
   }
   const audits = new Map()
   for (const admission of admissions.admissions) {
     const bytes = await readFile(resolve(root, admission.evidence.path))
     const audit = JSON.parse(bytes.toString('utf8'))
+    const plan = admission.evidence.plan ? await json(root, admission.evidence.plan) : null
     validateAdmission(
       admission,
       catalogSource.packages.find((item) => item.id === admission.id),
       audit,
       sha256(bytes),
       admissions.runtimeBaseline,
+      plan,
+      queue.records.find((record) => record.submission.manifest.project.id === admission.id
+        && record.submission.manifest.release.version === admission.version),
     )
     audits.set(admission.id, audit)
   }
 
-  const catalog = catalogProjection(catalogSource, admissions, audits)
+  const catalog = catalogProjection(catalogSource, admissions, audits, queue)
   const registry = registryDocument(catalog, admissions)
   const records = {
     $schema: './run-records.schema.json',

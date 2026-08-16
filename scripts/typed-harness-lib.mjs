@@ -55,9 +55,9 @@ function lifecycleSteps(declaration, executor, scope) {
   return []
 }
 
-function profileSteps(declaration) {
+function profileSteps(declaration, hasPreviousRelease) {
   return [
-    step('update-source.immutable', 'static', 'static', 'source-only', { sourceImmutable: true, previousVersionMatched: true }),
+    ...(hasPreviousRelease ? [step('update-source.immutable', 'static', 'static', 'source-only', { sourceImmutable: true, previousVersionMatched: true })] : []),
     step('sandbox.policy', 'sandbox', 'profile', 'ephemeral-workspace', { workspaceEphemeral: true, networkDeniedByDefault: true, installScriptsDisabled: true, currentProtected: true }),
     step('runtime.exact', 'sandbox', 'profile', 'candidate-profile', { runtimeExact: true, profileBaseExact: true }),
     step('candidate.create', 'sandbox', 'profile', 'candidate-profile', { candidateCreated: true, currentUntouched: true, profileBaseBound: true }),
@@ -70,16 +70,16 @@ function profileSteps(declaration) {
     step('failure.discard-candidate', 'failure', 'profile', 'candidate-profile', { candidateDiscarded: true }),
     step('activation.switch', 'lifecycle', 'profile', 'current-profile-controlled', { activated: true, previousRetained: true }),
     ...lifecycleSteps(declaration, 'profile', 'current-profile-controlled'),
-    step('update.apply', 'update', 'profile', 'candidate-profile', { updatePassed: true }),
+    ...(hasPreviousRelease ? [step('update.apply', 'update', 'profile', 'candidate-profile', { updatePassed: true })] : []),
     step('disable.apply', 'disable', 'profile', 'candidate-profile', { disablePassed: true }),
     step('remove.apply', 'remove', 'profile', 'candidate-profile', { removePassed: true }),
     step('recovery.generation', 'recovery', 'profile', 'current-profile-controlled', { recoveryPassed: true, previousRestored: true }),
   ]
 }
 
-function repositorySteps(declaration) {
+function repositorySteps(declaration, hasPreviousRelease) {
   return [
-    step('update-source.immutable', 'static', 'static', 'source-only', { sourceImmutable: true, previousVersionMatched: true }),
+    ...(hasPreviousRelease ? [step('update-source.immutable', 'static', 'static', 'source-only', { sourceImmutable: true, previousVersionMatched: true })] : []),
     step('sandbox.policy', 'sandbox', 'repository', 'ephemeral-workspace', { workspaceEphemeral: true, networkDeniedByDefault: true, installScriptsDisabled: true, currentProtected: true }),
     step('runtime.exact', 'sandbox', 'repository', 'candidate-profile', { runtimeExact: true }),
     step('candidate.create', 'sandbox', 'repository', 'candidate-profile', { candidateCreated: true, currentUntouched: true }),
@@ -90,7 +90,7 @@ function repositorySteps(declaration) {
     step('failure.current-unchanged', 'failure', 'repository', 'current-profile-controlled', { currentUnchanged: true }),
     step('failure.discard-candidate', 'failure', 'repository', 'candidate-profile', { candidateDiscarded: true }),
     ...lifecycleSteps(declaration, 'repository', 'candidate-profile'),
-    step('update.apply', 'update', 'repository', 'candidate-profile', { updatePassed: true }),
+    ...(hasPreviousRelease ? [step('update.apply', 'update', 'repository', 'candidate-profile', { updatePassed: true })] : []),
     step('disable.apply', 'disable', 'repository', 'candidate-profile', { disablePassed: true }),
     step('remove.apply', 'remove', 'repository', 'candidate-profile', { removePassed: true }),
     step('recovery.candidate', 'recovery', 'repository', 'candidate-profile', { recoveryPassed: true, candidateDiscarded: true }),
@@ -195,8 +195,9 @@ export function createHarnessPlan(submission, baseline) {
   }
 
   let typedSteps = []
-  if (declaration.install.adapter === 'profile-bundle') typedSteps = profileSteps(declaration)
-  else if (declaration.install.adapter === 'repository-plugin') typedSteps = repositorySteps(declaration)
+  const hasPreviousRelease = submission.release.updateFrom !== null
+  if (declaration.install.adapter === 'profile-bundle') typedSteps = profileSteps(declaration, hasPreviousRelease)
+  else if (declaration.install.adapter === 'repository-plugin') typedSteps = repositorySteps(declaration, hasPreviousRelease)
   else if (declaration.install.adapter === 'mcp-server') typedSteps = mcpSteps(declaration)
   else if (protocol === 'harness-cordis') typedSteps = cordisSteps(declaration)
   else if (declaration.install.adapter === 'skill') typedSteps = skillSteps()

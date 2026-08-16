@@ -1,0 +1,95 @@
+{
+  "schema": "omdsh-workshop-intake-evidence/v2",
+  "projectId": "7d7d",
+  "releaseId": "7d7d@0.4.0-rc.2",
+  "management": "transactional",
+  "source": {
+    "repository": "https://github.com/omdsh-dev/7d7d",
+    "ref": "1c8ea4981fcfdb58e8f9726058b950aaf8cc9404",
+    "path": null
+  },
+  "runtime": {
+    "package": "@deepseek-ai/dsh",
+    "version": "0.1.0-rc.6",
+    "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg==",
+    "profile": "web",
+    "platform": "ephemeral",
+    "node": "24.3.0"
+  },
+  "capability": {
+    "id": "7d7d-routes-registered",
+    "kind": "service",
+    "invocation": "boot the RC.6 candidate Profile and activate the 7d7d Cordis entry",
+    "expected": "the /7d7d prefix and /7d7d/api/server.json routes are both registered",
+    "observed": "7d7d-routes-registered",
+    "assertion": "registered-invoked-and-observed"
+  },
+  "checks": {
+    "static": {
+      "status": "passed",
+      "evidence": "clean Git origin, HEAD, and source path match 1c8ea4981fcfdb58e8f9726058b950aaf8cc9404; Git tree 96d5a8e39904f6a3899da039495fa1c74292c3cf"
+    },
+    "manifest": {
+      "status": "passed",
+      "evidence": "package.json#dshWorkshop passed the public manifest contract"
+    },
+    "entry": {
+      "status": "passed",
+      "evidence": "artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/7d7d/cordis.patch.yml"
+    },
+    "dshContract": {
+      "status": "passed",
+      "evidence": "RC.6 dsh.bundle.patch resolves to ./cordis.patch.yml"
+    },
+    "compatibility": {
+      "status": "passed",
+      "evidence": "adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6"
+    },
+    "permissions": {
+      "status": "passed",
+      "evidence": "reviewed 4 declared permission scope(s)"
+    },
+    "supplyChain": {
+      "status": "passed",
+      "evidence": "no package lifecycle scripts; installation is forced to ignore scripts"
+    },
+    "install": {
+      "status": "passed",
+      "evidence": "RC.6 pnpm forwarder installed the fixed bundle and --dump-config resolved its patch"
+    },
+    "ready": {
+      "status": "passed",
+      "evidence": "RC.6 booted the candidate and 7d7d-routes-registered became ready in pid 32998"
+    },
+    "functional": {
+      "status": "passed",
+      "evidence": "the live RC.6 Profile registered, invoked, and observed 7d7d-routes-registered; GET /7d7d/api/manifest.json returned HTTP 200 with 18 game(s)"
+    },
+    "update": {
+      "status": "passed",
+      "evidence": "RC.6 upgraded an isolated candidate from 0.4.0-rc.1 to target 0.4.0-rc.2 while current remained unchanged"
+    },
+    "disable": {
+      "status": "passed",
+      "evidence": "removing the bundle from dsh.profile.bundles disabled its patch while retaining the dependency"
+    },
+    "remove": {
+      "status": "passed",
+      "evidence": "RC.6 plugin forwarder removed the dependency and reconciled the bundle list"
+    },
+    "recovery": {
+      "status": "passed",
+      "evidence": "previous generation was restored byte-for-byte as current"
+    },
+    "failureIsolation": {
+      "status": "passed",
+      "evidence": "failed candidate left current Profile and protected sentinel unchanged"
+    },
+    "hotReload": {
+      "status": "not-applicable",
+      "evidence": "hot reload was not declared"
+    }
+  },
+  "verifiedAt": "2026-08-14T12:43:01.409Z",
+  "verifier": "local-fixed-checkout-rc6-profile"
+}

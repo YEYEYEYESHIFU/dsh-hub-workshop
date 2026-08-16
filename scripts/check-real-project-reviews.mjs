@@ -6,7 +6,10 @@ import { resolve } from 'node:path'
 import { reviewDigest, validateRealProjectReview } from './real-project-review-lib.mjs'
 
 const ROOT = resolve(import.meta.dirname, '..')
-const index = JSON.parse(await readFile(resolve(ROOT, 'intake/real-project-review-index.json'), 'utf8'))
+const [index, queue] = await Promise.all([
+  JSON.parse(await readFile(resolve(ROOT, 'intake/real-project-review-index.json'), 'utf8')),
+  JSON.parse(await readFile(resolve(ROOT, 'intake-queue.json'), 'utf8')),
+])
 const errors = []
 if (index.schema !== 'omdsh-workshop-real-project-review-index/v1') errors.push('unsupported real-project review index schema')
 if (index.baseline !== '@deepseek-ai/dsh@0.1.0-rc.6') errors.push('real-project review index baseline is not exact RC.6')
@@ -30,6 +33,14 @@ const expected = {
   rc6Verified: facts.filter((item) => item.rc6Verified).length,
 }
 if (JSON.stringify(index.summary) !== JSON.stringify(expected)) errors.push('real-project review summary is stale')
+const harness = {
+  passed: queue.records.filter((item) => ['current-baseline-passed', 'source-evidence-passed'].includes(item.verification.state)).length,
+  currentBaselinePassed: queue.records.filter((item) => item.verification.state === 'current-baseline-passed').length,
+  guidedEvidencePassed: queue.records.filter((item) => item.verification.state === 'source-evidence-passed').length,
+  blocked: queue.records.filter((item) => item.verification.state === 'blocked').length,
+  admissions: queue.records.filter((item) => item.registry.state === 'admitted').length,
+}
+if (queue.records.length !== expected.projects) errors.push('real-project review index and typed Harness queue differ in project count')
 if (errors.length) throw new Error(errors.join('\n'))
 
-console.log(`real-project reviews accepted: ${expected.projects} fixed cases, ${expected.typePlansReady} ready plans, ${expected.adaptersPassed} adapter passes, ${expected.admissions} admissions, ${expected.rc6Verified} RC.6 verified`)
+console.log(`pre-admission reviews accepted: ${expected.projects} fixed cases, ${expected.typePlansReady} ready plans; typed Harness: ${harness.passed} passed (${harness.currentBaselinePassed} RC.6 lifecycle, ${harness.guidedEvidencePassed} guided protocol), ${harness.blocked} blocked, ${harness.admissions} admitted`)

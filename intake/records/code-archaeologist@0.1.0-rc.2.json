@@ -96,17 +96,20 @@
     "state": "pending-review"
   },
   "verification": {
-    "state": "untested"
+    "state": "source-evidence-passed",
+    "verifiedAt": "2026-08-14T12:49:23.102Z",
+    "evidence": "intake/evidence/code-archaeologist@0.1.0-rc.2.json"
   },
   "tests": {
     "static": {
       "required": true,
       "status": "passed",
-      "evidence": "submission manifest validation"
+      "evidence": "package.json#dshWorkshop passed the public manifest contract | artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/toybox/plugins/code-archaeologist/.dsh-plugin/skills/code-archaeologist/SKILL.md | Skill matches the RC.6 one-level filesystem provider contract | adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6 | reviewed 1 declared permission scope(s)"
     },
     "supplyChain": {
       "required": true,
-      "status": "pending"
+      "status": "passed",
+      "evidence": "no package lifecycle scripts; installation is forced to ignore scripts"
     },
     "officialBaseline": {
       "required": false,

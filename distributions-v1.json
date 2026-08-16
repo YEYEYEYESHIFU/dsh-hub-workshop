@@ -1,0 +1,20 @@
+{
+  "schema": "omdsh-distributions/v1",
+  "generatedAt": "2026-08-14T00:10:00.000Z",
+  "registry": {
+    "schema": "omdsh-registry/v1",
+    "snapshotId": "sha256:e7efe723476a31cdc1754f08cb79c8af0a7879ca23cb437acf24d2b817330f8e",
+    "revision": 1786642051000,
+    "origins": [
+      "https://hub.omdsh.dev/registry-v1.json",
+      "https://hub.0.org.cn/registry-v1.json"
+    ]
+  },
+  "policy": {
+    "installAuthority": "omdsh-registry/v1",
+    "componentAuthority": "never-elevated-by-composition",
+    "application": "candidate-and-confirm",
+    "externalSideEffects": "not-covered"
+  },
+  "distributions": []
+}

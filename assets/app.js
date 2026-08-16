@@ -15,7 +15,7 @@ const state = {
   view: 'grid',
   featuredMode: 'stars',
   authorsExpanded: false,
-  marketLayer: 'all',
+  marketLayer: 'plugin',
   scope: 'all',
   snapshot: '',
   visible: 24,
@@ -45,6 +45,10 @@ const elements = {
   scope: document.querySelector('#catalog-scope'),
   marketLayers: document.querySelector('#market-layer-options'),
   marketLayerDescription: document.querySelector('#market-layer-description'),
+  advancedFilter: document.querySelector('#advanced-filter'),
+  activeFilterCount: document.querySelector('#active-filter-count'),
+  filterPanel: document.querySelector('.filter-panel'),
+  ecosystemCount: document.querySelector('[data-ecosystem-count]'),
   featuredTabs: document.querySelector('#featured-tabs'),
   catalogShell: document.querySelector('.catalog-shell'),
   results: document.querySelector('.results-panel'),
@@ -272,11 +276,30 @@ function integrationLabel(pkg) {
     : t('install.guidedCompatibility')
 }
 
+function packageAccessState(pkg) {
+  const state = pkg.workshop?.admission?.state
+  if (state === 'registry-admitted') return 'registry'
+  if (state === 'verification-passed-review-pending') return 'verified-pending'
+  if (state === 'guided-evidence-passed') return 'guided-verified'
+  if (state === 'verification-blocked') return 'blocked'
+  return 'source-only'
+}
+
+function installFilterGroup(pkg) {
+  const access = packageAccessState(pkg)
+  if (['verified-pending', 'blocked'].includes(access)) return 'pending'
+  if (['guided-verified', 'source-only'].includes(access)) return 'guided'
+  return installGroup(pkg.install.type)
+}
+
 function catalogAccessLabel(pkg) {
   if (projectMarketLayer(pkg) !== 'plugin') return marketLayerLabel(projectMarketLayer(pkg))
-  return installGroup(pkg.install.type) === 'guided'
-    ? integrationLabel(pkg)
-    : managementLabel(pkg.install.type)
+  const access = packageAccessState(pkg)
+  if (access === 'registry') return t('access.registry')
+  if (access === 'verified-pending') return t('access.verifiedPending')
+  if (access === 'guided-verified') return t('access.guidedVerified')
+  if (access === 'blocked') return t('access.blocked')
+  return t('access.sourceOnly')
 }
 
 function omdshCommand(pkg) {
@@ -713,7 +736,7 @@ function filteredPackages() {
     if (state.kind !== 'all'
       && pkg.kind !== state.kind
       && !(pkg.presentationGroup?.components || []).some((component) => component.kind === state.kind)) return false
-    if (state.install !== 'all' && installGroup(pkg.install.type) !== state.install) return false
+    if (state.install !== 'all' && installFilterGroup(pkg) !== state.install) return false
     if (state.channel !== 'all' && releaseChannel(pkg) !== state.channel) return false
     return true
   })
@@ -734,9 +757,12 @@ function packageCard(pkg) {
   const visual = projectVisual(pkg, visualFormat)
   const version = pkg.version ? `v${pkg.version}` : pkg.ref.slice(0, 7)
   const { release } = projectRelease(pkg)
-  const guided = installGroup(pkg.install.type) === 'guided'
+  const access = packageAccessState(pkg)
+  const guided = access === 'guided-verified'
+  const verifiedPending = access === 'verified-pending'
+  const sourceOnly = access === 'source-only'
   const informational = projectMarketLayer(pkg) !== 'plugin'
-  const installBlocked = !guided && ['blocked', 'review-required'].includes(release?.listing?.state)
+  const installBlocked = access === 'blocked'
   return `
     <article class="package-card market-layer-${escapeHtml(projectMarketLayer(pkg))}">
       <button class="package-thumb project-visual mark-${escapeHtml(pkg.category || 'uncategorized')}" type="button" data-media-state="${visual.state}" data-visual-format="${visualFormat}" data-open-package="${escapeHtml(pkg.id)}" aria-label="${escapeHtml(formatText('row.open', { name: copy.name }))}">
@@ -782,9 +808,15 @@ function packageCard(pkg) {
             <code>${escapeHtml(t('market.informationalOnly'))}</code>
           </span>
           <span class="copy-label">↗</span>
-        </a>` : installBlocked ? `<div class="install-preview install-preview-blocked"><span><strong>${escapeHtml(t('project.installUnavailable'))}</strong><code>${escapeHtml(factValue(release?.listing?.state || 'blocked'))}</code></span></div>` : guided ? `<a class="install-preview" href="${escapeHtml(detailUrl(pkg))}">
+        </a>` : installBlocked ? `<div class="install-preview install-preview-blocked"><span><strong>${escapeHtml(t('project.installUnavailable'))}</strong><code>${escapeHtml(t('access.blocked'))}</code></span></div>` : verifiedPending ? `<div class="install-preview install-preview-blocked"><span><strong>${escapeHtml(t('install.awaitingApproval'))}</strong><code>${escapeHtml(t('access.verifiedPending'))}</code></span></div>` : guided ? `<a class="install-preview" href="${escapeHtml(detailUrl(pkg))}">
           <span>
-            <strong>${escapeHtml(omdshActionLabel(pkg))}</strong>
+            <strong>${escapeHtml(t('install.viewVerifiedGuide'))}</strong>
+            <code>${escapeHtml(pkg.repository.replace('https://github.com/', ''))}</code>
+          </span>
+          <span class="copy-label">↗</span>
+        </a>` : sourceOnly ? `<a class="install-preview" href="${escapeHtml(detailUrl(pkg))}">
+          <span>
+            <strong>${escapeHtml(t('install.viewSourceOnly'))}</strong>
             <code>${escapeHtml(pkg.repository.replace('https://github.com/', ''))}</code>
           </span>
           <span class="copy-label">↗</span>
@@ -993,6 +1025,18 @@ function renderMarketLayers() {
   if (elements.scope) {
     elements.scope.hidden = !['all', 'plugin'].includes(state.marketLayer)
   }
+  if (elements.ecosystemCount) {
+    elements.ecosystemCount.textContent = String(counts.infrastructure + counts.distribution)
+  }
+}
+
+function renderAdvancedFilterState() {
+  if (!elements.activeFilterCount) return
+  const count = [state.install, state.channel, state.category]
+    .filter((value) => value !== 'all').length
+  elements.activeFilterCount.textContent = String(count)
+  elements.activeFilterCount.hidden = count === 0
+  elements.advancedFilter?.classList.toggle('has-active-filters', count > 0)
 }
 
 function render() {
@@ -1010,6 +1054,7 @@ function render() {
   elements.pagination.hidden = packages.length === 0
   elements.loadMore.hidden = visiblePackages.length >= packages.length
   renderMarketLayers()
+  renderAdvancedFilterState()
   refreshMasonryLayout()
 
   document.querySelectorAll('.category-filter').forEach((button) => {
@@ -1151,7 +1196,7 @@ function renderWorkshopModes() {
   const modes = ['transactional', 'managed', 'guided']
   const counts = Object.fromEntries(modes.map((mode) => [
     mode,
-    state.packages.filter((pkg) => installGroup(pkg.install.type) === mode).length,
+    state.packages.filter((pkg) => installFilterGroup(pkg) === mode).length,
   ]))
   elements.workshopModes.innerHTML = modes.map((mode) => `
     <button class="workshop-mode mode-${escapeHtml(mode)}" type="button" data-install-view="${escapeHtml(mode)}" aria-pressed="${state.install === mode}">
@@ -1474,8 +1519,11 @@ function openPackage(id, updateHash = true, requestedTab = 'overview') {
   const { project, release } = projectRelease(pkg)
   const version = release?.version ? `v${release.version}` : pkg.ref.slice(0, 7)
   const boundary = managementBoundary(pkg.install.type)
-  const guided = installGroup(pkg.install.type) === 'guided'
-  const installBlocked = !guided && ['blocked', 'review-required'].includes(release?.listing?.state)
+  const access = packageAccessState(pkg)
+  const guided = access === 'guided-verified'
+  const verifiedPending = access === 'verified-pending'
+  const sourceOnly = access === 'source-only'
+  const installBlocked = access === 'blocked'
   const detailVisual = projectVisual(pkg, 'cover', { decorative: false })
   const media = projectMedia(pkg)
   const evidenceProjectIds = new Set(pkg.presentationGroup?.componentIds || [pkg.id])
@@ -1529,13 +1577,21 @@ function openPackage(id, updateHash = true, requestedTab = 'overview') {
             <p>${escapeHtml(boundary.description)}</p>
           </div>
         </section>
-        ${installBlocked ? `<section class="install-panel install-unavailable"><div class="install-heading"><h3>${escapeHtml(t('project.installUnavailable'))}</h3><span>${escapeHtml(factValue(release?.listing?.state || 'blocked'))}</span></div><p>${escapeHtml(release?.notice || t('project.installUnavailableDescription'))}</p></section>` : guided ? `<section class="install-panel">
+        ${installBlocked ? `<section class="install-panel install-unavailable"><div class="install-heading"><h3>${escapeHtml(t('project.installUnavailable'))}</h3><span>${escapeHtml(t('access.blocked'))}</span></div><p>${escapeHtml(pkg.install.note || release?.notice || t('project.installUnavailableDescription'))}</p></section>` : verifiedPending ? `<section class="install-panel install-unavailable">
+          <div class="install-heading"><h3>${escapeHtml(t('install.awaitingApproval'))}</h3><span>${escapeHtml(t('access.verifiedPending'))}</span></div>
+          <p>${escapeHtml(pkg.install.note || t('install.awaitingApprovalNote'))}</p>
+          <a class="secondary-action" href="${escapeHtml(detailUrl(pkg))}">${escapeHtml(t('dialog.viewSource'))} ↗</a>
+        </section>` : guided ? `<section class="install-panel">
           <div class="install-heading">
-            <h3>${escapeHtml(omdshActionLabel(pkg))}</h3>
+            <h3>${escapeHtml(t('install.viewVerifiedGuide'))}</h3>
             <span>${escapeHtml(integrationRequirement(pkg))}</span>
           </div>
           <p class="install-note">${escapeHtml(pkg.install.note || omdshInstallNote(pkg))}</p>
           <a class="primary-action" href="${escapeHtml(detailUrl(pkg))}">${escapeHtml(t('row.source'))} ↗</a>
+        </section>` : sourceOnly ? `<section class="install-panel">
+          <div class="install-heading"><h3>${escapeHtml(t('install.viewSourceOnly'))}</h3><span>${escapeHtml(t('access.sourceOnly'))}</span></div>
+          <p class="install-note">${escapeHtml(pkg.install.note || t('install.note.guided'))}</p>
+          <a class="primary-action" href="${escapeHtml(detailUrl(pkg))}">${escapeHtml(t('dialog.viewSource'))} ↗</a>
         </section>` : `<section class="install-panel">
           <div class="install-heading">
             <h3>${escapeHtml(omdshActionLabel(pkg))}</h3>
@@ -1741,6 +1797,7 @@ function resetFilters() {
   state.sort = 'featured'
   state.visible = 24
   elements.search.value = ''
+  if (elements.advancedFilter) elements.advancedFilter.open = false
   renderFilters()
   render()
   alignResultsToTop()
@@ -1779,6 +1836,15 @@ function bindEvents() {
     renderAuthors()
   })
   window.addEventListener('resize', updateFeaturedRail)
+  elements.filterPanel?.addEventListener('pointermove', (event) => {
+    const bounds = elements.filterPanel.getBoundingClientRect()
+    elements.filterPanel.style.setProperty('--glass-x', `${event.clientX - bounds.left}px`)
+    elements.filterPanel.style.setProperty('--glass-y', `${event.clientY - bounds.top}px`)
+  })
+  elements.filterPanel?.addEventListener('pointerleave', () => {
+    elements.filterPanel.style.removeProperty('--glass-x')
+    elements.filterPanel.style.removeProperty('--glass-y')
+  })
   elements.kind.addEventListener('change', (event) => {
     state.kind = event.target.value
     state.visible = 24
@@ -1840,6 +1906,9 @@ function bindEvents() {
     }
   })
   document.addEventListener('click', (event) => {
+    if (elements.advancedFilter?.open && !elements.advancedFilter.contains(event.target)) {
+      elements.advancedFilter.open = false
+    }
     const projectTab = event.target.closest('[data-project-tab]')
     if (projectTab && elements.dialog.contains(projectTab)) {
       activateProjectTab(projectTab.dataset.projectTab)

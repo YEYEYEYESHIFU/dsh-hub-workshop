@@ -109,17 +109,20 @@
     "state": "pending-review"
   },
   "verification": {
-    "state": "untested"
+    "state": "source-evidence-passed",
+    "verifiedAt": "2026-08-14T12:49:30.488Z",
+    "evidence": "intake/evidence/time-capsule-mcp@0.1.0-rc.2.json"
   },
   "tests": {
     "static": {
       "required": true,
       "status": "passed",
-      "evidence": "submission manifest validation"
+      "evidence": "package.json#dshWorkshop passed the public manifest contract | artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/toybox/plugins/time-capsule-mcp/.dsh-plugin/server.json | server.json and package ownership conform to the official MCP Registry contract | adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6 | reviewed 1 declared permission scope(s)"
     },
     "supplyChain": {
       "required": true,
-      "status": "pending"
+      "status": "passed",
+      "evidence": "no package lifecycle scripts; installation is forced to ignore scripts"
     },
     "officialBaseline": {
       "required": false,

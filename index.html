@@ -8,9 +8,9 @@
     <meta name="description" content="面向 DeepSeek Harness 的公开社区工作坊：从 dsh-plugin Topic 核验真正的插件实现，并排除主仓、文档与无契约项目。" data-i18n-content="meta.description">
     <title>DSH Hub Workshop - DSH 社区工作坊</title>
     <link rel="icon" href="assets/atlas-symbol.png">
-    <link rel="stylesheet" href="assets/styles.css">
-    <script src="assets/site.js" data-i18n-src="assets/i18n.json" defer></script>
-    <script src="assets/app.js" defer></script>
+    <link rel="stylesheet" href="assets/styles.css?v=20260815-compact">
+    <script src="assets/site.js" data-i18n-src="assets/i18n.json?v=20260815-compact" defer></script>
+    <script src="assets/app.js?v=20260815-compact" defer></script>
   </head>
   <body class="layout-mod" data-title-key="meta.title">
     <a class="skip-link" href="#catalog" data-i18n="site.skip">跳到项目目录</a>
@@ -156,37 +156,56 @@
       <section id="catalog" class="catalog mod-browser" aria-labelledby="catalog-title">
         <div class="catalog-shell" data-view="grid">
           <aside class="filter-panel" aria-label="目录筛选" data-i18n-aria-label="catalog.filtersLabel">
-            <div class="filter-panel-heading">
-              <h2 data-i18n="filters.title">筛选</h2>
-              <button id="reset-filters-top" class="text-button" type="button" data-i18n="catalog.reset">重置</button>
+            <label class="search-field filter-search">
+              <span data-i18n="catalog.searchLabel">搜索</span>
+              <input id="search" type="search" placeholder="名称、作者或功能" data-i18n-placeholder="catalog.searchPlaceholder" autocomplete="off">
+              <kbd>/</kbd>
+            </label>
+            <label class="filter-kind">
+              <span data-i18n="catalog.typeLabel">扩展类型</span>
+              <select id="kind-filter" aria-label="扩展类型" data-i18n-aria-label="catalog.typeLabel"></select>
+            </label>
+            <div id="catalog-scope" class="catalog-scope compact-scope" role="group" aria-label="收录状态" data-i18n-aria-label="catalog.scopeLabel">
+              <button type="button" data-catalog-scope="all" aria-pressed="true"><span data-i18n="catalog.scope.all">全部</span><strong data-scope-count="all">-</strong></button>
+              <button type="button" data-catalog-scope="reviewed" aria-pressed="false"><span data-i18n="catalog.scope.reviewed">已收录</span><strong data-scope-count="reviewed">-</strong></button>
+              <button type="button" data-catalog-scope="candidates" aria-pressed="false"><span data-i18n="catalog.scope.candidates">待审核</span><strong data-scope-count="candidates">-</strong></button>
             </div>
-            <div class="catalog-controls">
-              <label class="search-field">
-                <span data-i18n="catalog.searchLabel">搜索</span>
-                <input id="search" type="search" placeholder="名称、作者或功能" data-i18n-placeholder="catalog.searchPlaceholder" autocomplete="off">
-                <kbd>/</kbd>
-              </label>
-              <label>
-                <span data-i18n="catalog.typeLabel">扩展类型</span>
-                <select id="kind-filter" aria-label="扩展类型" data-i18n-aria-label="catalog.typeLabel"></select>
-              </label>
-              <label>
-                <span data-i18n="catalog.installLabel">管理能力</span>
-                <select id="install-filter" aria-label="管理能力" data-i18n-aria-label="catalog.installLabel"></select>
-              </label>
-              <label>
-                <span data-i18n="catalog.channelLabel">发布通道</span>
-                <select id="channel-filter" aria-label="发布通道" data-i18n-aria-label="catalog.channelLabel"></select>
-              </label>
-            </div>
-            <div class="filter-category-heading" data-i18n="catalog.categoryLabel">按分类筛选</div>
-            <div id="category-filters" class="category-filters" aria-label="按分类筛选" data-i18n-aria-label="catalog.categoryLabel"></div>
+            <details id="advanced-filter" class="advanced-filter">
+              <summary>
+                <span data-i18n="catalog.moreFilters">更多筛选</span>
+                <strong id="active-filter-count" class="active-filter-count" hidden>0</strong>
+                <span class="advanced-filter-chevron" aria-hidden="true">⌄</span>
+              </summary>
+              <div class="advanced-filter-panel">
+                <div class="advanced-filter-heading">
+                  <strong data-i18n="catalog.refineResults">细化结果</strong>
+                  <button id="reset-filters-top" class="text-button" type="button" data-i18n="catalog.reset">重置</button>
+                </div>
+                <div class="advanced-filter-controls">
+                  <label>
+                    <span data-i18n="catalog.installLabel">管理能力</span>
+                    <select id="install-filter" aria-label="管理能力" data-i18n-aria-label="catalog.installLabel"></select>
+                  </label>
+                  <label>
+                    <span data-i18n="catalog.channelLabel">发布通道</span>
+                    <select id="channel-filter" aria-label="发布通道" data-i18n-aria-label="catalog.channelLabel"></select>
+                  </label>
+                </div>
+                <div class="filter-category-heading" data-i18n="catalog.categoryLabel">按分类筛选</div>
+                <div id="category-filters" class="category-filters" aria-label="按分类筛选" data-i18n-aria-label="catalog.categoryLabel"></div>
+                <a class="ecosystem-route" href="projects.html">
+                  <span data-i18n="catalog.ecosystemLink">生态项目移到独立页面</span>
+                  <strong data-ecosystem-count>-</strong>
+                  <span aria-hidden="true">↗</span>
+                </a>
+              </div>
+            </details>
           </aside>
 
           <div class="results-panel">
             <div class="catalog-heading">
               <div>
-                <h2 id="catalog-title" data-i18n="catalog.title">浏览全部项目</h2>
+                <h2 id="catalog-title" data-i18n="catalog.title">浏览全部插件</h2>
                 <p class="catalog-summary">
                   <span data-i18n="catalog.showing">当前显示</span>
                   <strong id="result-count">-</strong>
@@ -211,26 +230,12 @@
               </div>
             </div>
 
-            <section class="market-layer-bar" aria-labelledby="market-layer-label">
-              <span id="market-layer-label" class="market-layer-label" data-i18n="market.layersLabel">市场层级</span>
-              <div id="market-layer-options" class="catalog-scope market-layer-options" role="group" aria-label="市场层级" data-i18n-aria-label="market.layersLabel">
-                <button type="button" data-market-layer="all" aria-pressed="true"><span data-i18n="market.layer.all">全部项目</span><strong data-market-layer-count>0</strong></button>
-                <button type="button" data-market-layer="plugin" aria-pressed="false"><span data-i18n="market.layer.plugin">插件</span><strong data-market-layer-count>0</strong></button>
-                <button type="button" data-market-layer="infrastructure" aria-pressed="false"><span data-i18n="market.layer.infrastructure">生态基础设施</span><strong data-market-layer-count>0</strong></button>
-                <button type="button" data-market-layer="distribution" aria-pressed="false"><span data-i18n="market.layer.distribution">发行与组合</span><strong data-market-layer-count>0</strong></button>
+            <aside class="safety-note compact-safety-note" role="note" aria-labelledby="safety-title">
+              <div>
+                <strong id="safety-title" data-i18n="safety.title">使用前请自行核验</strong>
+                <p data-i18n="safety.description">市场收录只说明项目分类与固定来源。插件安装仍须通过独立门禁，基础设施与发行项目仅供浏览，不因此获得安装权限。</p>
               </div>
-              <p id="market-layer-description" class="market-layer-description" data-i18n="market.description.all">插件、基础设施和发行项目分层展示，安装权限仍只来自 Registry。</p>
-            </section>
-
-            <div id="catalog-scope" class="catalog-scope" role="group" aria-label="收录状态" data-i18n-aria-label="catalog.scopeLabel">
-              <button type="button" data-catalog-scope="all" aria-pressed="true"><span data-i18n="catalog.scope.all">全部</span><strong data-scope-count="all">-</strong></button>
-              <button type="button" data-catalog-scope="reviewed" aria-pressed="false"><span data-i18n="catalog.scope.reviewed">已收录</span><strong data-scope-count="reviewed">-</strong></button>
-              <button type="button" data-catalog-scope="candidates" aria-pressed="false"><span data-i18n="catalog.scope.candidates">待审核</span><strong data-scope-count="candidates">-</strong></button>
-            </div>
-
-            <aside class="safety-note" role="note" aria-labelledby="safety-title">
-              <strong id="safety-title" data-i18n="safety.title">使用前请自行核验</strong>
-              <p data-i18n="safety.description">市场收录只说明项目分类与固定来源。插件安装仍须通过独立门禁，基础设施与发行项目仅供浏览，不因此获得安装权限。</p>
+              <a href="registry.html" data-i18n="catalog.registryLink">查看安装门禁</a>
             </aside>
 
             <div id="catalog-list" class="catalog-list" aria-live="polite" aria-busy="true">

@@ -18,8 +18,30 @@ const ROOT = resolve(import.meta.dirname, '..')
 const snapshotPath = process.argv[2] ? resolve(process.argv[2]) : resolve(ROOT, 'topic-repositories.json')
 const outputPath = process.argv[3] ? resolve(process.argv[3]) : resolve(ROOT, 'topic-plugin-audit.json')
 const snapshot = JSON.parse(await readFile(snapshotPath, 'utf8'))
+const previousReport = await readFile(outputPath, 'utf8').then(JSON.parse).catch(() => null)
+const previousGeneratedAt = previousReport?.schema === 'omdsh-topic-plugin-audit/v3'
+  && Number.isFinite(Date.parse(previousReport.generatedAt))
+  ? previousReport.generatedAt
+  : null
+const previousByRepository = new Map((previousReport?.repositories || [])
+  .map((repository) => [`${repository.owner}/${repository.name}`.toLocaleLowerCase('en-US'), repository]))
+const currentCatalog = await readFile(resolve(ROOT, 'catalog.json'), 'utf8').then(JSON.parse).catch(() => ({ packages: [] }))
+const currentCatalogByRepository = new Map()
+for (const project of currentCatalog.packages || []) {
+  try {
+    const key = new URL(project.repository).pathname.split('/').filter(Boolean).slice(0, 2).join('/').toLocaleLowerCase('en-US')
+    const projects = currentCatalogByRepository.get(key) || []
+    projects.push(project)
+    currentCatalogByRepository.set(key, projects)
+  } catch {}
+}
+const currentCatalogRepositories = new Set(currentCatalogByRepository.keys())
 const USER_AGENT = 'omdsh-workshop-topic-audit/3.0'
 const decoder = new TextDecoder()
+const FETCH_TIMEOUT_MS = Number.parseInt(process.env.OMDSH_TOPIC_FETCH_TIMEOUT_MS || '5000', 10)
+const AUDIT_CONCURRENCY = Number.parseInt(process.env.OMDSH_TOPIC_AUDIT_CONCURRENCY || '48', 10)
+if (!Number.isInteger(FETCH_TIMEOUT_MS) || FETCH_TIMEOUT_MS < 1_000 || FETCH_TIMEOUT_MS > 60_000) throw new Error('invalid OMDSH_TOPIC_FETCH_TIMEOUT_MS')
+if (!Number.isInteger(AUDIT_CONCURRENCY) || AUDIT_CONCURRENCY < 1 || AUDIT_CONCURRENCY > 128) throw new Error('invalid OMDSH_TOPIC_AUDIT_CONCURRENCY')
 
 function result(decision, reasonCode, reason, { qualification = null, marketLayer = null, evidence = {} } = {}) {
   return { decision, reasonCode, reason, qualification, marketLayer, evidence }
@@ -101,7 +123,7 @@ const encodePath = (value) => value.split('/').map(encodeURIComponent).join('/')
 
 async function fetchText(url) {
   const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), 15_000)
+  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
   try {
     const response = await fetch(url, {
       headers: { 'user-agent': USER_AGENT, accept: 'text/html,application/json,text/plain;q=0.9,*/*;q=0.8' },
@@ -235,12 +257,15 @@ async function inspect(repository) {
   }
   if (obvious) return obvious
 
-  const rootHtml = await fetchText(treeUrl(repository))
-  const rootPaths = pathsFromHtml(rootHtml)
-  const rootNames = new Set(rootPaths.filter((path) => !path.includes('/')))
-  const readmePaths = ['README.md', 'README.zh-CN.md', 'README.zh.md', 'README_CN.md', 'README.en.md', 'readme.md']
+  // GitHub HTML tree pages are presentation surfaces, not protocol evidence,
+  // and become the dominant timeout when a Topic has thousands of entries.
+  // Read raw, deterministic contract paths directly. Unknown collections stay
+  // in review unless a curated decision expands their leaf components.
+  const rootPaths = []
+  // README claims are never sufficient for inclusion. Probe only files that
+  // can form protocol, package, dependency, or executable-artifact evidence;
+  // this avoids six guaranteed README 404s for thousands of Topic-only repos.
   const requested = [
-    ...readmePaths,
     'package.json',
     'dsh.plugin.json',
     'cordis.patch.yml',
@@ -253,12 +278,7 @@ async function inspect(repository) {
     '.mcp.json',
     'server.json',
   ]
-  const [files, pluginDirHtml, pluginsDirHtml, packagesDirHtml] = await Promise.all([
-    Promise.all(requested.map(async (path) => [path, await fetchText(rawUrl(repository, path))])),
-    rootNames.has('.dsh-plugin') ? fetchText(treeUrl(repository, '.dsh-plugin')) : null,
-    rootNames.has('plugins') ? fetchText(treeUrl(repository, 'plugins')) : null,
-    rootNames.has('packages') ? fetchText(treeUrl(repository, 'packages')) : null,
-  ])
+  const files = await Promise.all(requested.map(async (path) => [path, await fetchText(rawUrl(repository, path))]))
   const contents = Object.fromEntries(files.filter(([, source]) => source !== null))
   const pkg = parseJson(contents['package.json'])
   const dshManifest = parseJson(contents['dsh.plugin.json'])
@@ -266,8 +286,7 @@ async function inspect(repository) {
   const mcpManifest = parseJson(contents['mcp.json'] || contents['.mcp.json'])
   const officialMcpManifest = parseJson(contents['server.json'])
   const workshopManifest = pkg?.dshWorkshop
-  const readme = readmePaths.map((path) => contents[path] || '').join('\n')
-  const combinedText = `${productText(repository)}\n${readme}`
+  const combinedText = productText(repository)
   const lowerName = repository.name.toLocaleLowerCase('en-US')
   const hasDshClaim = DSH_RE.test(combinedText) || /(?:^|[-_.])dsh(?:[-_.]|$)|deepseek[-_.]?harness/i.test(lowerName)
   const hasPluginClaim = PLUGIN_WORD_RE.test(combinedText)
@@ -299,9 +318,9 @@ async function inspect(repository) {
     referencedProduction,
     linkedFromRuntimeOrManifest: referencedProduction.length > 0,
   }
-  const pluginDirPaths = pathsFromHtml(pluginDirHtml)
-  const pluginChildren = pathsFromHtml(pluginsDirHtml).filter((path) => path.startsWith('plugins/'))
-  const packageChildren = pathsFromHtml(packagesDirHtml).filter((path) => path.startsWith('packages/'))
+  const pluginDirPaths = []
+  const pluginChildren = []
+  const packageChildren = []
   const declaredSignals = []
   const strongSignals = []
   const validPatch = typeof bundlePatchSource === 'string'
@@ -443,8 +462,50 @@ async function inspect(repository) {
 }
 
 let completed = 0
-const audits = await mapLimit(snapshot.repositories, 16, async (repository) => {
-  const classification = await inspect(repository)
+let reused = 0
+const audits = await mapLimit(snapshot.repositories, AUDIT_CONCURRENCY, async (repository) => {
+  const key = repositoryKey(repository)
+  const previous = previousByRepository.get(key)
+  const sourceUnchanged = previousGeneratedAt !== null
+    && previous !== undefined
+    && previous.defaultBranch === repository.defaultBranch
+    && previous.archived === repository.archived
+    && (previous.reasonCode !== 'source-scan-unavailable' || !currentCatalogRepositories.has(key))
+    && Number.isFinite(Date.parse(repository.commitUpdatedAt))
+    && Date.parse(repository.commitUpdatedAt) <= Date.parse(previousGeneratedAt)
+    && !MANUAL_DECISIONS.has(key)
+  let classification
+  if (sourceUnchanged) {
+    const { owner, name, url, defaultBranch, archived, evidence, ...cached } = previous
+    classification = { ...cached, evidence }
+    reused += 1
+  } else {
+    classification = await inspect(repository)
+  }
+  if (classification.reasonCode === 'source-scan-unavailable' && currentCatalogByRepository.has(key)) {
+    const catalogProjects = currentCatalogByRepository.get(key)
+    const preservedProfile = catalogProjects.find((project) => project.workshop)?.workshop || null
+    classification = include(
+      'verified-catalog-refresh-pending',
+      '该仓库已有文件级 Catalog 证据；本次公开原始文件端点不可达，因此保留展示并等待重新扫描，不提升任何验证或安装状态。',
+      {
+        verificationLevel: 'preserved-catalog-evidence',
+        strongSignals: [...new Set(catalogProjects.map((project) => project.workshop?.manifest?.source || project.discovery?.qualification).filter(Boolean))],
+        pluginClaims: [...new Set(catalogProjects.map((project) => project.workshop?.integration?.protocol).filter(Boolean))],
+        refresh: { state: 'unavailable', attemptedAt: snapshot.generatedAt },
+        packageManifest: preservedProfile ? {
+          status: preservedProfile.manifest?.status || 'legacy-evidence',
+          source: preservedProfile.manifest?.source || 'preserved-catalog-evidence',
+          errors: ['public source refresh unavailable'],
+          declaration: null,
+          profile: preservedProfile,
+        } : {
+          status: 'absent', source: null, errors: ['public source refresh unavailable'], declaration: null, profile: null,
+        },
+        dependencyCheck: {},
+      },
+    )
+  }
   const creation = repositoryCreationPolicy(repository)
   completed += 1
   if (completed % 25 === 0 || completed === snapshot.repositories.length) {
@@ -465,6 +526,11 @@ const audits = await mapLimit(snapshot.repositories, 16, async (repository) => {
         explicitDshClaim: DSH_RE.test(productText(repository)) || /(?:^|[-_.])dsh(?:[-_.]|$)|deepseek[-_.]?harness/i.test(repository.name),
         explicitPluginClaim: PLUGIN_WORD_RE.test(productText(repository)),
       },
+      sourceSnapshot: {
+        commitUpdatedAt: repository.commitUpdatedAt,
+        metadataUpdatedAt: repository.metadataUpdatedAt,
+        reusedFromAudit: sourceUnchanged ? previousGeneratedAt : null,
+      },
     },
   }
 })
@@ -480,6 +546,12 @@ const report = {
   generatedAt: snapshot.generatedAt,
   topic: snapshot.topic,
   sourceSnapshotGeneratedAt: snapshot.generatedAt,
+  incremental: {
+    previousAuditGeneratedAt: previousGeneratedAt,
+    reusedRepositories: reused,
+    rescannedRepositories: audits.length - reused,
+    reuseRule: 'same repository, default branch, archived state, and no source push after the previous audit',
+  },
   policy: {
     plugin: 'package.json#dshWorkshop is the preferred admission contract. Legacy file-level plugin artifacts remain visible only as compatibility-mapped entries that need a manifest and current-baseline tests.',
     creation: `Community plugin repositories must be created at or after ${COMMUNITY_PLUGIN_CREATED_AT_CUTOFF}. Official exemptions are limited to explicit owners: ${OFFICIAL_REPOSITORY_OWNERS.join(', ')}. Missing created_at fails closed.`,

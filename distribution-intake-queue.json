@@ -1,0 +1,11 @@
+{
+  "schema": "omdsh-distribution-intake-queue/v1",
+  "generatedAt": "2026-08-13T17:27:31.000Z",
+  "registrySnapshotId": "sha256:e7efe723476a31cdc1754f08cb79c8af0a7879ca23cb437acf24d2b817330f8e",
+  "policy": {
+    "componentsMustAlreadyBeRegistryInstallable": true,
+    "compositionCannotElevateAuthority": true,
+    "humanCompositionReviewRequired": true
+  },
+  "records": []
+}

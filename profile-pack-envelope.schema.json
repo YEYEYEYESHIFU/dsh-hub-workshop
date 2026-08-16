@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hub.0.org.cn/profile-pack-envelope.schema.json",
+  "title": "OMDSH Signed Profile Pack Envelope",
+  "type": "object",
+  "required": ["schema", "pack", "provenance", "signature"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "omdsh-profile-pack-envelope/v1" },
+    "pack": { "$ref": "./profile-pack.schema.json" },
+    "provenance": {
+      "type": "object",
+      "required": ["publisher", "source", "issuedAt"],
+      "additionalProperties": false,
+      "properties": {
+        "publisher": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._/@:-]{0,127}$" },
+        "source": { "type": ["string", "null"], "format": "uri" },
+        "issuedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "signature": {
+      "type": "object",
+      "required": ["algorithm", "keyId", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "algorithm": { "const": "Ed25519" },
+        "keyId": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._/@:-]{0,127}$" },
+        "value": { "type": "string", "pattern": "^[A-Za-z0-9+/]+={0,2}$" }
+      }
+    }
+  }
+}

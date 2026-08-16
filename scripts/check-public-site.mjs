@@ -20,7 +20,7 @@ async function files(directory) {
   return output
 }
 
-const [catalog, registry, recipes, ecosystem, workshop, runRecords, admissions, repositories, discovery, topicRepositories, topicAudit, baseline, intake, inventory, marketLayers] = await Promise.all([
+const [catalog, registry, recipes, ecosystem, workshop, runRecords, admissions, repositories, discovery, topicRepositories, topicAudit, baseline, intake, inventory, marketLayers, distributionSchema, profilePackSchema, profilePackEnvelopeSchema, distributionIntake, distributions, distributionIntakeSchema, distributionsSchema] = await Promise.all([
   json('catalog.json'),
   json('registry-v1.json'),
   json('recipes-v1.json'),
@@ -36,6 +36,13 @@ const [catalog, registry, recipes, ecosystem, workshop, runRecords, admissions, 
   json('intake-queue.json'),
   json('verification-inventory.json'),
   json('market-layers.json'),
+  json('distribution.schema.json'),
+  json('profile-pack.schema.json'),
+  json('profile-pack-envelope.schema.json'),
+  json('distribution-intake-queue.json'),
+  json('distributions-v1.json'),
+  json('distribution-intake.schema.json'),
+  json('distributions-v1.schema.json'),
 ])
 
 if (catalog.schema !== 'dsh-hub-index/v0.4') throw new Error('catalog schema mismatch')
@@ -43,6 +50,27 @@ const presentation = buildCatalogPresentation(catalog)
 if (registry.schema !== 'omdsh-registry/v1') throw new Error('Registry schema mismatch')
 if (recipes.schema !== 'omdsh-workshop-recipes/v1') throw new Error('Recipes schema mismatch')
 if (ecosystem.schema !== 'omdsh-agent-ecosystem/v1') throw new Error('Ecosystem schema mismatch')
+if (distributionSchema.properties?.schema?.const !== 'omdsh-distribution/v1'
+  || distributionIntakeSchema.properties?.schema?.const !== 'omdsh-distribution-intake/v1'
+  || distributionsSchema.properties?.schema?.const !== 'omdsh-distributions/v1'
+  || !distributionSchema.required?.includes('agentPreset')
+  || profilePackSchema.$id !== 'https://hub.0.org.cn/profile-pack.schema.json'
+  || profilePackSchema.properties?.schema?.const !== 'omdsh-profile-pack/v1'
+  || profilePackEnvelopeSchema.properties?.schema?.const !== 'omdsh-profile-pack-envelope/v1'
+  || profilePackEnvelopeSchema.properties?.signature?.properties?.algorithm?.const !== 'Ed25519'
+  || profilePackSchema.properties?.policy?.properties?.activation?.const !== 'candidate-and-confirm') {
+  throw new Error('distribution and Profile Pack schemas must preserve the official preset and candidate boundaries')
+}
+if (distributionIntake.schema !== 'omdsh-distribution-intake-queue/v1'
+  || distributionIntake.registrySnapshotId !== registry.snapshotId
+  || distributionIntake.records.some((record) => record.publication?.state === 'admitted')
+  || distributions.schema !== 'omdsh-distributions/v1'
+  || distributions.registry?.snapshotId !== registry.snapshotId
+  || distributions.policy?.installAuthority !== 'omdsh-registry/v1'
+  || distributions.policy?.componentAuthority !== 'never-elevated-by-composition'
+  || distributions.distributions.length !== 0) {
+  throw new Error('public Distribution intake and feed must remain Registry-bound and grant no composition authority')
+}
 if (recipes.registry?.snapshotId !== registry.snapshotId
   || ecosystem.registry?.snapshotId !== registry.snapshotId
   || workshop.registry?.snapshotId !== registry.snapshotId) {
@@ -72,16 +100,23 @@ if (intake.schema !== 'omdsh-workshop-intake-queue/v1'
   || intake.records.some((record) => record.registry?.state === 'admitted')) {
   throw new Error('public intake queue must match the official baseline and current empty Registry')
 }
+const intakeVerification = Object.fromEntries(['current-baseline-passed', 'source-evidence-passed', 'blocked'].map((state) => [
+  state,
+  intake.records.filter((record) => record.verification?.state === state).length,
+]))
 if (inventory.schema !== 'omdsh-workshop-verification-inventory/v1'
   || inventory.summary?.catalogProjects !== catalog.packages.length
   || inventory.projects?.length !== catalog.packages.length
-  || inventory.summary?.verification?.['current-baseline-passed'] !== undefined
+  || (inventory.summary?.verification?.['current-baseline-passed'] ?? 0) !== intakeVerification['current-baseline-passed']
+  || (inventory.summary?.verification?.['source-evidence-passed'] ?? 0) !== intakeVerification['source-evidence-passed']
+  || (inventory.summary?.verification?.blocked ?? 0) !== intakeVerification.blocked
+  || (inventory.summary?.verification?.untested ?? 0) !== catalog.packages.length - intake.records.length
   || inventory.summary?.registry?.admitted !== undefined
   || inventory.summary?.management?.transactional !== 2
   || inventory.summary?.management?.managed !== undefined
   || inventory.summary?.management?.guided !== catalog.packages.length - 2
   || inventory.projects.some((project) => !project.capabilities?.manifest || !project.capabilities?.install?.seamless || !project.capabilities?.install?.failureIsolation || !project.capabilities?.lifecycle?.hotReload || !project.capabilities?.integration || !project.capabilities?.admission)) {
-  throw new Error('verification inventory must cover every Catalog project without claiming current-baseline verification or Registry admission')
+  throw new Error('verification inventory must cover every Catalog project, match Intake evidence, and grant no Registry admission')
 }
 if (topicAudit.schema !== 'omdsh-topic-plugin-audit/v3'
   || topicAudit.stats?.repositories !== topicRepositories.observedRepositoryCount
@@ -190,7 +225,7 @@ if (topicRepositories.schema !== 'dsh-topic-discovery/v1'
 }
 
 const builtFiles = await files(BUILD)
-if (builtFiles.length !== 55) throw new Error(`public build must contain exactly 55 files, received ${builtFiles.length}`)
+if (builtFiles.length !== 61) throw new Error(`public build must contain exactly 61 files, received ${builtFiles.length}`)
 for (const repository of repositories.repositories) {
   if (!/^https:\/\/github[.]com\/omdsh-dev\/[A-Za-z0-9._-]+$/.test(repository.url)) {
     throw new Error(`unapproved public repository URL: ${repository.url}`)
@@ -226,10 +261,12 @@ if (forbiddenPublicContent.test(contents)) {
   throw new Error('public site contains private-source, login, credential, or key material')
 }
 
-const [home, app, styles, configurations, developers, publish, contributing, agentPromptZh, agentPromptEn] = await Promise.all([
+const [home, app, styles, projectsPage, discoveryApp, configurations, developers, publish, contributing, agentPromptZh, agentPromptEn] = await Promise.all([
   readFile(resolve(ROOT, 'index.html'), 'utf8'),
   readFile(resolve(ROOT, 'assets/app.js'), 'utf8'),
   readFile(resolve(ROOT, 'assets/styles.css'), 'utf8'),
+  readFile(resolve(ROOT, 'projects.html'), 'utf8'),
+  readFile(resolve(ROOT, 'assets/discovery.js'), 'utf8'),
   readFile(resolve(ROOT, 'configurations.html'), 'utf8'),
   readFile(resolve(ROOT, 'developer-guide.html'), 'utf8'),
   readFile(resolve(ROOT, 'publish.html'), 'utf8'),
@@ -237,8 +274,14 @@ const [home, app, styles, configurations, developers, publish, contributing, age
   readFile(resolve(ROOT, 'agent-submission-prompt.zh.md'), 'utf8'),
   readFile(resolve(ROOT, 'agent-submission-prompt.en.md'), 'utf8'),
 ])
-for (const required of ['discover-stage', 'featured-tabs', 'market-layer-options', 'data-market-layer="infrastructure"', 'data-market-layer="distribution"', 'data-catalog-view="grid"', 'data-catalog-view="list"', 'catalog-pagination']) {
+for (const required of ['discover-stage', 'featured-tabs', 'advanced-filter', 'active-filter-count', 'data-ecosystem-count', 'data-catalog-view="grid"', 'data-catalog-view="list"', 'catalog-pagination']) {
   if (!home.includes(required)) throw new Error(`restored Workshop layout is missing ${required}`)
+}
+for (const required of ['ecosystem-project-list', 'data-ecosystem-layer="infrastructure"', 'data-ecosystem-layer="distribution"']) {
+  if (!projectsPage.includes(required)) throw new Error(`project directory is missing ${required}`)
+}
+if (!discoveryApp.includes("fetch('market-layers.json')") || !discoveryApp.includes('renderEcosystem')) {
+  throw new Error('ecosystem infrastructure and distributions must render on the project subpage')
 }
 if (!home.includes('class="github-star"') || !home.includes('https://github.com/omdsh-dev/dsh-hub-workshop')) {
   throw new Error('the primary navigation must expose the public Workshop GitHub Star link')
@@ -259,7 +302,9 @@ if (!app.includes('selectSpotlightPackages')
 }
 if (!publish.includes('copy-agent-submission-prompt')
   || !publish.includes('agent-submission-prompt.zh.md')
-  || !developers.includes('agent-submission-prompt.en.md')) {
+  || !developers.includes('agent-submission-prompt.en.md')
+  || !publish.includes('copy-distribution-cli')
+  || !publish.includes('omdsh pack build')) {
   throw new Error('Author Studio and developer guide must expose Agent submission instructions')
 }
 for (const prompt of [agentPromptZh, agentPromptEn]) {

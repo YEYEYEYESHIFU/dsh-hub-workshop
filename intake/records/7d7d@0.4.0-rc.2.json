@@ -111,29 +111,34 @@
     "state": "pending-review"
   },
   "verification": {
-    "state": "untested"
+    "state": "current-baseline-passed",
+    "verifiedAt": "2026-08-14T12:43:01.409Z",
+    "evidence": "intake/evidence/7d7d@0.4.0-rc.2.json"
   },
   "tests": {
     "static": {
       "required": true,
       "status": "passed",
-      "evidence": "submission manifest validation"
+      "evidence": "package.json#dshWorkshop passed the public manifest contract | artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/7d7d/cordis.patch.yml | RC.6 dsh.bundle.patch resolves to ./cordis.patch.yml | adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6 | reviewed 4 declared permission scope(s)"
     },
     "supplyChain": {
       "required": true,
-      "status": "pending"
+      "status": "passed",
+      "evidence": "no package lifecycle scripts; installation is forced to ignore scripts"
     },
     "officialBaseline": {
       "required": true,
-      "status": "pending"
+      "status": "passed",
+      "evidence": "@deepseek-ai/dsh@0.1.0-rc.6 (sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg==)"
     },
     "lifecycle": {
       "required": true,
-      "status": "pending"
+      "status": "passed",
+      "evidence": "install, ready, 7d7d-routes-registered capability invocation, update, disable, remove, and recovery passed"
     }
   },
   "registry": {
     "state": "ineligible",
-    "reason": "current-baseline-verification-required"
+    "reason": "review-approval-required"
   }
 }

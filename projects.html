@@ -8,9 +8,9 @@
     <meta name="description" content="浏览 omdsh-dev 的公开项目与 dsh-plugin Topic 发现入口。">
     <title>公开项目 - DSH Hub</title>
     <link rel="icon" href="assets/atlas-symbol.png">
-    <link rel="stylesheet" href="assets/styles.css">
+    <link rel="stylesheet" href="assets/styles.css?v=20260815-compact">
     <script src="assets/site.js" data-i18n-src="assets/i18n.json" defer></script>
-    <script src="assets/discovery.js" defer></script>
+    <script src="assets/discovery.js?v=20260815-compact" defer></script>
   </head>
   <body class="layout-mod" data-title-zh="公开项目" data-title-en="Public projects">
     <a class="skip-link" href="#project-directory">跳到项目清单</a>
@@ -61,7 +61,7 @@
         <dl class="project-discovery-stats" aria-label="公开发现统计">
           <div><dt data-project-count>62</dt><dd>omdsh-dev 项目</dd></div>
           <div><dt data-topic-count>946</dt><dd>dsh-plugin Topic</dd></div>
-          <div><dt>12</dt><dd>已核验详情候选</dd></div>
+          <div><dt data-market-project-count>-</dt><dd>生态项目</dd></div>
         </dl>
       </section>
 
@@ -77,6 +77,42 @@
           <p>从 GitHub Topic 继续探索全网公开扩展。当前完整快照会自动显示最新仓库数量；展示不代表 omdsh-dev 背书、兼容承诺或安装授权。</p>
         </div>
         <a class="primary-link" href="https://github.com/topics/dsh-plugin">在 GitHub 浏览 Topic</a>
+      </section>
+
+      <section id="ecosystem-projects" class="ecosystem-projects" aria-labelledby="ecosystem-projects-title">
+        <div class="ecosystem-projects-heading">
+          <div>
+            <h2 id="ecosystem-projects-title">
+              <span data-locale-content="zh">生态基础设施与发行项目</span>
+              <span data-locale-content="en" hidden>Ecosystem infrastructure and distributions</span>
+            </h2>
+            <p data-locale-content="zh">运行时、管理器、市场、目录服务和社区发行版集中在这里，不占用插件发现页的筛选空间。</p>
+            <p data-locale-content="en" hidden>Runtimes, managers, marketplaces, catalog services, and distributions live here without weighing down plugin discovery.</p>
+          </div>
+          <div class="ecosystem-layer-tabs" role="group" aria-label="生态项目层级">
+            <button type="button" data-ecosystem-layer="all" aria-pressed="true">
+              <span data-locale-content="zh">全部</span><span data-locale-content="en" hidden>All</span>
+              <strong data-ecosystem-layer-count="all">-</strong>
+            </button>
+            <button type="button" data-ecosystem-layer="infrastructure" aria-pressed="false">
+              <span data-locale-content="zh">基础设施</span><span data-locale-content="en" hidden>Infrastructure</span>
+              <strong data-ecosystem-layer-count="infrastructure">-</strong>
+            </button>
+            <button type="button" data-ecosystem-layer="distribution" aria-pressed="false">
+              <span data-locale-content="zh">发行与组合</span><span data-locale-content="en" hidden>Distributions</span>
+              <strong data-ecosystem-layer-count="distribution">-</strong>
+            </button>
+          </div>
+        </div>
+        <div id="ecosystem-project-list" class="ecosystem-project-grid" aria-live="polite" aria-busy="true">
+          <div class="ecosystem-project-card ecosystem-project-placeholder"></div>
+          <div class="ecosystem-project-card ecosystem-project-placeholder"></div>
+          <div class="ecosystem-project-card ecosystem-project-placeholder"></div>
+        </div>
+        <div id="ecosystem-empty-state" class="project-empty-state" hidden>
+          <strong>当前层级没有项目</strong>
+          <p>切换到其他层级后继续浏览。</p>
+        </div>
       </section>
 
       <section class="organization-projects" aria-labelledby="organization-projects-title">

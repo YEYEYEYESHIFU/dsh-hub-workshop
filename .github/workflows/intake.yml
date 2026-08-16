@@ -8,6 +8,12 @@ on:
       - 'intake/**'
       - 'intake-queue.json'
       - 'intake*.schema.json'
+      - 'distribution-intake/**'
+      - 'distribution-intake-queue.json'
+      - 'distribution-intake.schema.json'
+      - 'distribution-admissions.json'
+      - 'distributions-v1.json'
+      - 'distributions-v1.schema.json'
       - 'harness-*.schema.json'
       - 'package-manifest.schema.json'
       - 'official-baseline.json'
@@ -15,7 +21,10 @@ on:
       - 'scripts/intake*.mjs'
       - 'scripts/*harness*.mjs'
       - 'scripts/check-intake.mjs'
+      - 'scripts/*distribution*.mjs'
       - 'tests/intake.test.mjs'
+      - 'tests/distribution-intake.test.mjs'
+      - 'tests/distributions-feed.test.mjs'
       - 'tests/typed-harness.test.mjs'
   workflow_dispatch:
   schedule:
@@ -38,7 +47,8 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts
       - run: npm run intake:check
-      - run: node --test tests/intake.test.mjs tests/typed-harness.test.mjs
+      - run: npm run distribution:intake:check
+      - run: node --test tests/intake.test.mjs tests/typed-harness.test.mjs tests/distribution-intake.test.mjs tests/distributions-feed.test.mjs
 
   official-baseline:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
@@ -106,5 +116,59 @@ jobs:
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: node scripts/github-intake-pr.mjs failure
+
+  automate-distribution:
+    if: github.event_name == 'issues' && startsWith(github.event.issue.title, '[Distribution]')
+    concurrency:
+      group: distribution-issue-${{ github.event.issue.number }}
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - id: prepare
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/prepare-distribution-issue.mjs "$GITHUB_EVENT_PATH"
+      - run: npm run validate
+      - name: Commit the pending Distribution review record
+        env:
+          INTAKE_BRANCH: ${{ steps.prepare.outputs.branch }}
+          INTAKE_RECORD_ID: ${{ steps.prepare.outputs.record_id }}
+          INTAKE_RECORD_PATH: ${{ steps.prepare.outputs.record_path }}
+          ISSUE_NUMBER: ${{ steps.prepare.outputs.issue_number }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$INTAKE_BRANCH"
+          git add "$INTAKE_RECORD_PATH" distribution-intake-queue.json
+          git commit -m "Queue Distribution $INTAKE_RECORD_ID from #$ISSUE_NUMBER"
+          git push origin "$INTAKE_BRANCH"
+      - name: Open the Distribution review PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INTAKE_KIND: distribution
+          INTAKE_BRANCH: ${{ steps.prepare.outputs.branch }}
+          INTAKE_RECORD_ID: ${{ steps.prepare.outputs.record_id }}
+          ISSUE_NUMBER: ${{ steps.prepare.outputs.issue_number }}
+        run: node scripts/github-intake-pr.mjs open
+      - name: Report a failed Distribution preflight
+        if: failure()
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INTAKE_KIND: distribution
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: node scripts/github-intake-pr.mjs failure

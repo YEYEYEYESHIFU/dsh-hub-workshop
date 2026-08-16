@@ -7,82 +7,82 @@
     {
       "id": "7d7d",
       "mode": "profile-bundle",
-      "reason": "rc6-harness-pending-trust-review",
+      "reason": "review-approval-required",
       "source": "github:omdsh-dev/7d7d#1c8ea4981fcfdb58e8f9726058b950aaf8cc9404",
       "staticVerification": "passed",
-      "runtimeVerification": "blocked"
+      "runtimeVerification": "passed"
     },
     {
       "id": "github-integration",
       "mode": "guided",
-      "reason": "rc6-skill-static-review-pending",
+      "reason": "guided-catalog-only",
       "source": "github:omdsh-dev/dsh-github-integration#a190f89c71a179e5b8748db5bba21465e47de2c9&path:/plugins/github-integration/.dsh-plugin",
       "staticVerification": "passed",
-      "runtimeVerification": "blocked"
+      "runtimeVerification": "not-applicable"
     },
     {
       "id": "almanac-mcp",
       "mode": "guided",
-      "reason": "rc6-mcp-harness-pending-trust-review",
+      "reason": "guided-catalog-only",
       "source": "github:omdsh-dev/toybox#86e98729b92db0b9fe901c39e32bca74cf8c0f54&path:/plugins/almanac-mcp/.dsh-plugin",
       "staticVerification": "passed",
-      "runtimeVerification": "blocked"
+      "runtimeVerification": "not-applicable"
     },
     {
       "id": "bug-tamer",
       "mode": "guided",
-      "reason": "rc6-skill-static-review-pending",
+      "reason": "guided-catalog-only",
       "source": "github:omdsh-dev/toybox#86e98729b92db0b9fe901c39e32bca74cf8c0f54&path:/plugins/bug-tamer/.dsh-plugin",
       "staticVerification": "passed",
-      "runtimeVerification": "blocked"
+      "runtimeVerification": "not-applicable"
     },
     {
       "id": "chinese-colors-mcp",
       "mode": "guided",
-      "reason": "rc6-mcp-harness-pending-trust-review",
+      "reason": "guided-catalog-only",
       "source": "github:omdsh-dev/toybox#86e98729b92db0b9fe901c39e32bca74cf8c0f54&path:/plugins/chinese-colors-mcp/.dsh-plugin",
       "staticVerification": "passed",
-      "runtimeVerification": "blocked"
+      "runtimeVerification": "not-applicable"
     },
     {
       "id": "code-archaeologist",
       "mode": "guided",
-      "reason": "rc6-skill-static-review-pending",
+      "reason": "guided-catalog-only",
       "source": "github:omdsh-dev/toybox#86e98729b92db0b9fe901c39e32bca74cf8c0f54&path:/plugins/code-archaeologist/.dsh-plugin",
       "staticVerification": "passed",
-      "runtimeVerification": "blocked"
+      "runtimeVerification": "not-applicable"
     },
     {
       "id": "code-talent-scout",
       "mode": "guided",
-      "reason": "rc6-skill-static-review-pending",
+      "reason": "guided-catalog-only",
       "source": "github:omdsh-dev/toybox#86e98729b92db0b9fe901c39e32bca74cf8c0f54&path:/plugins/code-talent-scout/.dsh-plugin",
       "staticVerification": "passed",
-      "runtimeVerification": "blocked"
+      "runtimeVerification": "not-applicable"
     },
     {
       "id": "decision-dice-mcp",
       "mode": "guided",
-      "reason": "rc6-mcp-harness-pending-trust-review",
+      "reason": "guided-catalog-only",
       "source": "github:omdsh-dev/toybox#86e98729b92db0b9fe901c39e32bca74cf8c0f54&path:/plugins/decision-dice-mcp/.dsh-plugin",
       "staticVerification": "passed",
-      "runtimeVerification": "blocked"
+      "runtimeVerification": "not-applicable"
     },
     {
       "id": "naming-master-mcp",
       "mode": "guided",
-      "reason": "rc6-mcp-harness-pending-trust-review",
+      "reason": "guided-catalog-only",
       "source": "github:omdsh-dev/toybox#86e98729b92db0b9fe901c39e32bca74cf8c0f54&path:/plugins/naming-master-mcp/.dsh-plugin",
       "staticVerification": "passed",
-      "runtimeVerification": "blocked"
+      "runtimeVerification": "not-applicable"
     },
     {
       "id": "time-capsule-mcp",
       "mode": "guided",
-      "reason": "rc6-mcp-harness-pending-trust-review",
+      "reason": "guided-catalog-only",
       "source": "github:omdsh-dev/toybox#86e98729b92db0b9fe901c39e32bca74cf8c0f54&path:/plugins/time-capsule-mcp/.dsh-plugin",
       "staticVerification": "passed",
-      "runtimeVerification": "blocked"
+      "runtimeVerification": "not-applicable"
     },
     {
       "id": "session-teleport",

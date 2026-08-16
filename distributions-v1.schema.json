@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hub.0.org.cn/distributions-v1.schema.json",
+  "title": "OMDSH Community Distributions Feed",
+  "type": "object",
+  "required": ["schema", "generatedAt", "registry", "policy", "distributions"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "omdsh-distributions/v1" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "registry": {
+      "type": "object",
+      "required": ["schema", "snapshotId", "revision", "origins"],
+      "additionalProperties": false,
+      "properties": {
+        "schema": { "const": "omdsh-registry/v1" },
+        "snapshotId": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "revision": { "type": "integer", "minimum": 0 },
+        "origins": { "type": "array", "items": { "type": "string", "format": "uri" } }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "required": ["installAuthority", "componentAuthority", "application", "externalSideEffects"],
+      "additionalProperties": false,
+      "properties": {
+        "installAuthority": { "const": "omdsh-registry/v1" },
+        "componentAuthority": { "const": "never-elevated-by-composition" },
+        "application": { "const": "candidate-and-confirm" },
+        "externalSideEffects": { "const": "not-covered" }
+      }
+    },
+    "distributions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "summary", "translations", "maintainer", "latestRelease", "releases"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+          "title": { "type": "string", "minLength": 1 },
+          "summary": { "type": "string", "minLength": 12 },
+          "translations": { "type": "object" },
+          "maintainer": { "type": "object" },
+          "latestRelease": { "type": "string", "minLength": 3 },
+          "releases": { "type": "array", "minItems": 1 }
+        }
+      }
+    }
+  }
+}

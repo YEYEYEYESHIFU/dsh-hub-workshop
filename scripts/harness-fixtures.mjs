@@ -45,7 +45,7 @@ export async function fixtureSubmission(kind) {
   const transactional = fixture.method === 'profile-bundle'
   return {
     schema: 'omdsh-workshop-submission/v2',
-    operation: 'create-project',
+    operation: transactional ? 'add-release' : 'create-project',
     project: {
       id: fixture.projectId,
       displayName: `Local ${kind.toUpperCase()} Harness fixture`,

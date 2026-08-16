@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hub.0.org.cn/distribution-intake.schema.json",
+  "title": "OMDSH Distribution Intake Record",
+  "type": "object",
+  "required": ["schema", "id", "source", "manifest", "submission", "verification", "review", "publication"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "omdsh-distribution-intake/v1" },
+    "id": { "type": "string", "minLength": 3 },
+    "source": {
+      "type": "object",
+      "required": ["repository", "ref", "path"],
+      "additionalProperties": false,
+      "properties": {
+        "repository": { "type": "string", "pattern": "^https://github\\.com/" },
+        "ref": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "path": { "type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+\\.json$" }
+      }
+    },
+    "manifest": { "$ref": "./distribution.schema.json" },
+    "submission": {
+      "type": "object",
+      "required": ["issue", "compatibilityEvidence"],
+      "additionalProperties": false,
+      "properties": {
+        "issue": { "type": "integer", "minimum": 1 },
+        "compatibilityEvidence": { "type": "string", "minLength": 1 }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "required": ["fixedSource", "components", "registrySnapshotId"],
+      "additionalProperties": false,
+      "properties": {
+        "fixedSource": { "const": "passed" },
+        "components": { "const": "passed" },
+        "registrySnapshotId": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      }
+    },
+    "review": {
+      "type": "object",
+      "required": ["state"],
+      "additionalProperties": false,
+      "properties": {
+        "state": { "enum": ["pending-review", "needs-fix", "approved"] },
+        "reviewer": { "type": "string", "minLength": 1 },
+        "reviewedAt": { "type": "string", "format": "date-time" },
+        "notes": { "type": "string" }
+      }
+    },
+    "publication": {
+      "type": "object",
+      "required": ["state", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "state": { "enum": ["ineligible", "admitted"] },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

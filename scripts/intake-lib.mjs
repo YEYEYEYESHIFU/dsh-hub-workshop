@@ -71,10 +71,14 @@ export function validateSubmission(manifest) {
       requireCondition(release.profileBundle.spec.endsWith(`#${release.ref}`), 'Profile Bundle spec must pin the submitted commit', errors)
     }
     if (manifest.schema === 'omdsh-workshop-submission/v2') {
-      requireCondition(typeof release.updateFrom?.version === 'string' && release.updateFrom.version.length > 0, 'transactional v2 intake requires a previous release version for update testing', errors)
-      requireCondition(COMMIT_RE.test(release.updateFrom?.ref || ''), 'transactional v2 intake requires a fixed previous release commit', errors)
-      requireCondition(release.updateFrom?.ref !== release.ref, 'previous release commit must differ from the submitted release', errors)
-      requireCondition(release.updateFrom?.version !== release.version, 'previous release version must differ from the submitted release', errors)
+      if (manifest.operation === 'add-release') {
+        requireCondition(typeof release.updateFrom?.version === 'string' && release.updateFrom.version.length > 0, 'transactional add-release requires a previous release version for update testing', errors)
+        requireCondition(COMMIT_RE.test(release.updateFrom?.ref || ''), 'transactional add-release requires a fixed previous release commit', errors)
+        requireCondition(release.updateFrom?.ref !== release.ref, 'previous release commit must differ from the submitted release', errors)
+        requireCondition(release.updateFrom?.version !== release.version, 'previous release version must differ from the submitted release', errors)
+      } else {
+        requireCondition(release.updateFrom === null, 'initial transactional release must set updateFrom to null', errors)
+      }
     }
   }
   if (mode === 'managed') {
@@ -85,10 +89,14 @@ export function validateSubmission(manifest) {
     if (source) requireCondition(source[1] === release.ref, 'Repository Plugin source must pin the submitted commit', errors)
     requireCondition(String(management.instructions || '').includes(String(management.source || '')), 'managed instructions must contain the pinned source', errors)
     if (manifest.schema === 'omdsh-workshop-submission/v2') {
-      requireCondition(typeof release.updateFrom?.version === 'string' && release.updateFrom.version.length > 0, 'managed v2 intake requires a previous release version for update testing', errors)
-      requireCondition(COMMIT_RE.test(release.updateFrom?.ref || ''), 'managed v2 intake requires a fixed previous release commit', errors)
-      requireCondition(release.updateFrom?.ref !== release.ref, 'previous release commit must differ from the submitted release', errors)
-      requireCondition(release.updateFrom?.version !== release.version, 'previous release version must differ from the submitted release', errors)
+      if (manifest.operation === 'add-release') {
+        requireCondition(typeof release.updateFrom?.version === 'string' && release.updateFrom.version.length > 0, 'managed add-release requires a previous release version for update testing', errors)
+        requireCondition(COMMIT_RE.test(release.updateFrom?.ref || ''), 'managed add-release requires a fixed previous release commit', errors)
+        requireCondition(release.updateFrom?.ref !== release.ref, 'previous release commit must differ from the submitted release', errors)
+        requireCondition(release.updateFrom?.version !== release.version, 'previous release version must differ from the submitted release', errors)
+      } else {
+        requireCondition(release.updateFrom === null, 'initial managed release must set updateFrom to null', errors)
+      }
     }
   }
   if (mode === 'guided') {
@@ -209,9 +217,12 @@ export function applyEvidence(record, evidence, baseline) {
     for (const field of ['id', 'kind', 'invocation', 'expected', 'observed']) {
       requireCondition(typeof evidence?.capability?.[field] === 'string' && evidence.capability[field].length > 0, `${mode} capability ${field} is required`, errors)
     }
-    for (const name of ['install', 'ready', 'functional', 'update', 'disable', 'remove', 'recovery']) {
+    for (const name of ['install', 'ready', 'functional', 'disable', 'remove', 'recovery']) {
       requireCondition(passed(evidence?.checks?.[name]), `${mode} ${name} check must pass`, errors)
     }
+    const initialRelease = record.submission.manifest.operation === 'create-project'
+      && record.submission.manifest.release.updateFrom === null
+    requireCondition(initialRelease ? notApplicable(evidence?.checks?.update) : passed(evidence?.checks?.update), `${mode} update check does not match the release operation`, errors)
     if (evidence?.schema === 'omdsh-workshop-intake-evidence/v2') {
       requireCondition(passed(evidence?.checks?.failureIsolation), `${mode} failureIsolation check must pass`, errors)
       const hotReloadDeclared = record.submission.manifest.packageManifest?.lifecycle?.activation === 'hot-reload'

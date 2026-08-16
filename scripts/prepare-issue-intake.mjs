@@ -3,6 +3,7 @@
 import { appendFile, mkdir, readFile, writeFile } from 'node:fs/promises'
 import { basename, resolve } from 'node:path'
 
+import { buildIntakeQueue } from './build-intake-queue.mjs'
 import { prepareIssueIntake } from './issue-intake-lib.mjs'
 
 const ROOT = resolve(import.meta.dirname, '..')
@@ -19,6 +20,7 @@ if (result.planPath) {
   await mkdir(resolve(ROOT, 'intake/plans'), { recursive: true })
   await writeFile(result.planPath, `${JSON.stringify(result.plan, null, 2)}\n`, { flag: 'wx' })
 }
+await buildIntakeQueue({ root: ROOT })
 
 const runId = String(process.env.GITHUB_RUN_ID || 'local').replace(/[^0-9A-Za-z-]/g, '')
 const outputs = {

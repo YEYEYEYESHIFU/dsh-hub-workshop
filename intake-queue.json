@@ -1,6 +1,6 @@
 {
   "schema": "omdsh-workshop-intake-queue/v1",
-  "generatedAt": "2026-08-14T00:10:00.000Z",
+  "generatedAt": "2026-08-14T12:49:30.488Z",
   "officialBaseline": "@deepseek-ai/dsh@0.1.0-rc.6",
   "policy": {
     "managementModes": [
@@ -129,30 +129,35 @@
         "state": "pending-review"
       },
       "verification": {
-        "state": "untested"
+        "state": "current-baseline-passed",
+        "verifiedAt": "2026-08-14T12:43:01.409Z",
+        "evidence": "intake/evidence/7d7d@0.4.0-rc.2.json"
       },
       "tests": {
         "static": {
           "required": true,
           "status": "passed",
-          "evidence": "submission manifest validation"
+          "evidence": "package.json#dshWorkshop passed the public manifest contract | artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/7d7d/cordis.patch.yml | RC.6 dsh.bundle.patch resolves to ./cordis.patch.yml | adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6 | reviewed 4 declared permission scope(s)"
         },
         "supplyChain": {
           "required": true,
-          "status": "pending"
+          "status": "passed",
+          "evidence": "no package lifecycle scripts; installation is forced to ignore scripts"
         },
         "officialBaseline": {
           "required": true,
-          "status": "pending"
+          "status": "passed",
+          "evidence": "@deepseek-ai/dsh@0.1.0-rc.6 (sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg==)"
         },
         "lifecycle": {
           "required": true,
-          "status": "pending"
+          "status": "passed",
+          "evidence": "install, ready, 7d7d-routes-registered capability invocation, update, disable, remove, and recovery passed"
         }
       },
       "registry": {
         "state": "ineligible",
-        "reason": "current-baseline-verification-required"
+        "reason": "review-approval-required"
       }
     },
     {
@@ -264,17 +269,20 @@
         "state": "pending-review"
       },
       "verification": {
-        "state": "untested"
+        "state": "source-evidence-passed",
+        "verifiedAt": "2026-08-14T12:49:27.083Z",
+        "evidence": "intake/evidence/almanac-mcp@0.1.0-rc.2.json"
       },
       "tests": {
         "static": {
           "required": true,
           "status": "passed",
-          "evidence": "submission manifest validation"
+          "evidence": "package.json#dshWorkshop passed the public manifest contract | artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/toybox/plugins/almanac-mcp/.dsh-plugin/server.json | server.json and package ownership conform to the official MCP Registry contract | adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6 | reviewed 0 declared permission scope(s)"
         },
         "supplyChain": {
           "required": true,
-          "status": "pending"
+          "status": "passed",
+          "evidence": "no package lifecycle scripts; installation is forced to ignore scripts"
         },
         "officialBaseline": {
           "required": false,
@@ -391,17 +399,20 @@
         "state": "pending-review"
       },
       "verification": {
-        "state": "untested"
+        "state": "source-evidence-passed",
+        "verifiedAt": "2026-08-14T12:49:23.022Z",
+        "evidence": "intake/evidence/bug-tamer@0.1.0-rc.2.json"
       },
       "tests": {
         "static": {
           "required": true,
           "status": "passed",
-          "evidence": "submission manifest validation"
+          "evidence": "package.json#dshWorkshop passed the public manifest contract | artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/toybox/plugins/bug-tamer/.dsh-plugin/skills/bug-tamer/SKILL.md | Skill matches the RC.6 one-level filesystem provider contract | adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6 | reviewed 2 declared permission scope(s)"
         },
         "supplyChain": {
           "required": true,
-          "status": "pending"
+          "status": "passed",
+          "evidence": "no package lifecycle scripts; installation is forced to ignore scripts"
         },
         "officialBaseline": {
           "required": false,
@@ -528,17 +539,20 @@
         "state": "pending-review"
       },
       "verification": {
-        "state": "untested"
+        "state": "source-evidence-passed",
+        "verifiedAt": "2026-08-14T12:49:27.951Z",
+        "evidence": "intake/evidence/chinese-colors-mcp@0.1.0-rc.2.json"
       },
       "tests": {
         "static": {
           "required": true,
           "status": "passed",
-          "evidence": "submission manifest validation"
+          "evidence": "package.json#dshWorkshop passed the public manifest contract | artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/toybox/plugins/chinese-colors-mcp/.dsh-plugin/server.json | server.json and package ownership conform to the official MCP Registry contract | adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6 | reviewed 0 declared permission scope(s)"
         },
         "supplyChain": {
           "required": true,
-          "status": "pending"
+          "status": "passed",
+          "evidence": "no package lifecycle scripts; installation is forced to ignore scripts"
         },
         "officialBaseline": {
           "required": false,
@@ -654,17 +668,20 @@
         "state": "pending-review"
       },
       "verification": {
-        "state": "untested"
+        "state": "source-evidence-passed",
+        "verifiedAt": "2026-08-14T12:49:23.102Z",
+        "evidence": "intake/evidence/code-archaeologist@0.1.0-rc.2.json"
       },
       "tests": {
         "static": {
           "required": true,
           "status": "passed",
-          "evidence": "submission manifest validation"
+          "evidence": "package.json#dshWorkshop passed the public manifest contract | artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/toybox/plugins/code-archaeologist/.dsh-plugin/skills/code-archaeologist/SKILL.md | Skill matches the RC.6 one-level filesystem provider contract | adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6 | reviewed 1 declared permission scope(s)"
         },
         "supplyChain": {
           "required": true,
-          "status": "pending"
+          "status": "passed",
+          "evidence": "no package lifecycle scripts; installation is forced to ignore scripts"
         },
         "officialBaseline": {
           "required": false,
@@ -780,17 +797,20 @@
         "state": "pending-review"
       },
       "verification": {
-        "state": "untested"
+        "state": "source-evidence-passed",
+        "verifiedAt": "2026-08-14T12:49:23.164Z",
+        "evidence": "intake/evidence/code-talent-scout@0.1.0-rc.2.json"
       },
       "tests": {
         "static": {
           "required": true,
           "status": "passed",
-          "evidence": "submission manifest validation"
+          "evidence": "package.json#dshWorkshop passed the public manifest contract | artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/toybox/plugins/code-talent-scout/.dsh-plugin/skills/code-talent-scout/SKILL.md | Skill matches the RC.6 one-level filesystem provider contract | adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6 | reviewed 1 declared permission scope(s)"
         },
         "supplyChain": {
           "required": true,
-          "status": "pending"
+          "status": "passed",
+          "evidence": "no package lifecycle scripts; installation is forced to ignore scripts"
         },
         "officialBaseline": {
           "required": false,
@@ -917,17 +937,20 @@
         "state": "pending-review"
       },
       "verification": {
-        "state": "untested"
+        "state": "source-evidence-passed",
+        "verifiedAt": "2026-08-14T12:49:28.784Z",
+        "evidence": "intake/evidence/decision-dice-mcp@0.1.0-rc.2.json"
       },
       "tests": {
         "static": {
           "required": true,
           "status": "passed",
-          "evidence": "submission manifest validation"
+          "evidence": "package.json#dshWorkshop passed the public manifest contract | artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/toybox/plugins/decision-dice-mcp/.dsh-plugin/server.json | server.json and package ownership conform to the official MCP Registry contract | adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6 | reviewed 0 declared permission scope(s)"
         },
         "supplyChain": {
           "required": true,
-          "status": "pending"
+          "status": "passed",
+          "evidence": "no package lifecycle scripts; installation is forced to ignore scripts"
         },
         "officialBaseline": {
           "required": false,
@@ -1044,17 +1067,20 @@
         "state": "pending-review"
       },
       "verification": {
-        "state": "untested"
+        "state": "source-evidence-passed",
+        "verifiedAt": "2026-08-14T12:49:23.226Z",
+        "evidence": "intake/evidence/github-integration@0.1.0-rc.2.json"
       },
       "tests": {
         "static": {
           "required": true,
           "status": "passed",
-          "evidence": "submission manifest validation"
+          "evidence": "package.json#dshWorkshop passed the public manifest contract | artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/dsh-github-integration/plugins/github-integration/.dsh-plugin/skills/github-issue-pr/SKILL.md | Skill matches the RC.6 one-level filesystem provider contract | adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6 | reviewed 2 declared permission scope(s)"
         },
         "supplyChain": {
           "required": true,
-          "status": "pending"
+          "status": "passed",
+          "evidence": "no package lifecycle scripts; installation is forced to ignore scripts"
         },
         "officialBaseline": {
           "required": false,
@@ -1181,17 +1207,20 @@
         "state": "pending-review"
       },
       "verification": {
-        "state": "untested"
+        "state": "source-evidence-passed",
+        "verifiedAt": "2026-08-14T12:49:29.644Z",
+        "evidence": "intake/evidence/naming-master-mcp@0.1.0-rc.2.json"
       },
       "tests": {
         "static": {
           "required": true,
           "status": "passed",
-          "evidence": "submission manifest validation"
+          "evidence": "package.json#dshWorkshop passed the public manifest contract | artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/toybox/plugins/naming-master-mcp/.dsh-plugin/server.json | server.json and package ownership conform to the official MCP Registry contract | adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6 | reviewed 0 declared permission scope(s)"
         },
         "supplyChain": {
           "required": true,
-          "status": "pending"
+          "status": "passed",
+          "evidence": "no package lifecycle scripts; installation is forced to ignore scripts"
         },
         "officialBaseline": {
           "required": false,
@@ -1322,7 +1351,9 @@
         "state": "pending-review"
       },
       "verification": {
-        "state": "untested"
+        "state": "blocked",
+        "verifiedAt": "2026-08-14T12:38:08.141Z",
+        "evidence": "intake/reports/session-teleport@0.6.0-rc.2.profile.json"
       },
       "tests": {
         "static": {
@@ -1332,20 +1363,23 @@
         },
         "supplyChain": {
           "required": true,
-          "status": "pending"
+          "status": "passed",
+          "evidence": "no package lifecycle scripts; installation is forced to ignore scripts"
         },
         "officialBaseline": {
           "required": true,
-          "status": "pending"
+          "status": "blocked",
+          "evidence": "PostgreSQL runtime validation blocked: POSTGRES_TEST_URL is unset; no local postgres or psql binaries are installed; the Docker daemon is unavailable. The database-backed /health check is required before DSH_TELEPORT_ENABLE=1."
         },
         "lifecycle": {
           "required": true,
-          "status": "pending"
+          "status": "blocked",
+          "evidence": "lifecycle steps did not run after the blocking required step"
         }
       },
       "registry": {
         "state": "ineligible",
-        "reason": "current-baseline-verification-required"
+        "reason": "current-baseline-verification-blocked"
       }
     },
     {
@@ -1459,17 +1493,20 @@
         "state": "pending-review"
       },
       "verification": {
-        "state": "untested"
+        "state": "source-evidence-passed",
+        "verifiedAt": "2026-08-14T12:49:30.488Z",
+        "evidence": "intake/evidence/time-capsule-mcp@0.1.0-rc.2.json"
       },
       "tests": {
         "static": {
           "required": true,
           "status": "passed",
-          "evidence": "submission manifest validation"
+          "evidence": "package.json#dshWorkshop passed the public manifest contract | artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/toybox/plugins/time-capsule-mcp/.dsh-plugin/server.json | server.json and package ownership conform to the official MCP Registry contract | adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6 | reviewed 1 declared permission scope(s)"
         },
         "supplyChain": {
           "required": true,
-          "status": "pending"
+          "status": "passed",
+          "evidence": "no package lifecycle scripts; installation is forced to ignore scripts"
         },
         "officialBaseline": {
           "required": false,

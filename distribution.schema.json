@@ -13,6 +13,7 @@
     "translations",
     "maintainer",
     "compatibility",
+    "agentPreset",
     "useCases",
     "items",
     "application"
@@ -53,6 +54,15 @@
         "declared": { "type": "string", "minLength": 12 }
       }
     },
+    "agentPreset": {
+      "type": "object",
+      "required": ["mode", "id"],
+      "additionalProperties": false,
+      "properties": {
+        "mode": { "const": "builtin" },
+        "id": { "enum": ["code", "cordis", "minimal", "standard"] }
+      }
+    },
     "useCases": {
       "type": "array",
       "minItems": 1,
@@ -62,16 +72,7 @@
     "items": {
       "type": "array",
       "minItems": 1,
-      "items": {
-        "type": "object",
-        "required": ["projectId", "releaseId", "enabled"],
-        "additionalProperties": false,
-        "properties": {
-          "projectId": { "type": "string", "minLength": 1 },
-          "releaseId": { "type": "string", "minLength": 1 },
-          "enabled": { "type": "boolean" }
-        }
-      }
+      "items": { "oneOf": [{ "$ref": "#/$defs/registryItem" }, { "$ref": "#/$defs/fixedSourceItem" }] }
     },
     "application": {
       "type": "object",
@@ -86,6 +87,56 @@
     }
   },
   "$defs": {
+    "registryItem": {
+      "type": "object",
+      "required": ["projectId", "releaseId", "enabled"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "registry" },
+        "projectId": { "type": "string", "minLength": 1 },
+        "releaseId": { "type": "string", "minLength": 1 },
+        "enabled": { "type": "boolean" }
+      }
+    },
+    "fixedSourceItem": {
+      "type": "object",
+      "required": ["type", "id", "packageName", "version", "enabled", "license", "source", "install"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "source" },
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+        "packageName": { "type": "string", "pattern": "^(?:@[a-z0-9._-]+/)?[a-z0-9._-]+$" },
+        "version": { "type": "string", "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(-[0-9A-Za-z.-]+)?$" },
+        "enabled": { "type": "boolean" },
+        "license": {
+          "type": "object",
+          "required": ["expression", "source"],
+          "additionalProperties": false,
+          "properties": {
+            "expression": { "type": "string", "minLength": 1, "maxLength": 256 },
+            "source": { "enum": ["package-manifest", "author-declared"] }
+          }
+        },
+        "source": {
+          "type": "object",
+          "required": ["repository", "ref"],
+          "additionalProperties": false,
+          "properties": {
+            "repository": { "type": "string", "pattern": "^https://github\\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/?$" },
+            "ref": { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+          }
+        },
+        "install": {
+          "type": "object",
+          "required": ["mode", "spec"],
+          "additionalProperties": false,
+          "properties": {
+            "mode": { "const": "profile-bundle" },
+            "spec": { "type": "string", "pattern": "^github:[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+#[0-9a-f]{40}$" }
+          }
+        }
+      }
+    },
     "localizedText": {
       "type": "object",
       "required": ["title", "summary"],

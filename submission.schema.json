@@ -170,7 +170,11 @@
     },
     {
       "if": {
-        "properties": { "management": { "properties": { "method": { "enum": ["profile-bundle", "repository-plugin"] } } } }
+        "properties": {
+          "operation": { "const": "add-release" },
+          "management": { "properties": { "method": { "enum": ["profile-bundle", "repository-plugin"] } } }
+        },
+        "required": ["operation", "management"]
       },
       "then": {
         "properties": {

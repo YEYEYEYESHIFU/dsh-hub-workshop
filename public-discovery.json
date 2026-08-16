@@ -1,6 +1,6 @@
 {
   "schema": "omdsh-public-discovery/v1",
-  "generatedAt": "2026-08-15T00:18:51.934Z",
+  "generatedAt": "2026-08-16T02:45:55.252Z",
   "policy": {
     "visibility": "Public repository visibility supports discovery only.",
     "authority": "A repository appears in the install Registry only after Workshop review and immutable source admission.",
@@ -332,65 +332,39 @@
   "topic": {
     "name": "dsh-plugin",
     "source": "https://github.com/topics/dsh-plugin",
-    "observedRepositoryCount": 2474,
-    "observedPages": 29,
+    "observedRepositoryCount": 4174,
+    "observedPages": 52,
     "status": "discovery-only",
     "collection": {
-      "method": "authenticated-recursive-partitioned-github-search",
-      "authenticatedAccount": "mattheliu",
-      "creationTimeUpperBoundExclusive": "2026-08-15T00:15:56Z",
-      "transactionalSnapshot": false,
-      "internallyReconciled": true,
-      "stableConsecutiveRounds": 1,
-      "roundsAttempted": 2,
-      "acceptedFingerprint": "350bc6bd6a0b2e51b280bb43bfe111f7fdc1cc2567a5462fe0ae540a68d12bda",
-      "searchCapHandled": true,
+      "method": "anonymous-partitioned-github-search",
       "partitions": [
-        {
-          "query": "topic:dsh-plugin created:<2026-07-31T00:00:00Z",
-          "count": 128,
-          "pages": 2
-        },
-        {
-          "query": "topic:dsh-plugin created:2026-07-31T00:00:00Z..2026-08-07T12:07:57Z",
-          "count": 63,
-          "pages": 1
-        },
-        {
-          "query": "topic:dsh-plugin created:2026-08-07T12:07:58Z..2026-08-11T06:11:56Z",
-          "count": 90,
-          "pages": 1
-        },
-        {
-          "query": "topic:dsh-plugin created:2026-08-11T06:11:57Z..2026-08-13T03:13:56Z",
-          "count": 65,
-          "pages": 1
-        },
-        {
-          "query": "topic:dsh-plugin created:2026-08-13T03:13:57Z..2026-08-14T01:44:56Z",
-          "count": 674,
-          "pages": 7
-        },
-        {
-          "query": "topic:dsh-plugin created:2026-08-14T01:44:57Z..2026-08-14T07:22:41Z",
-          "count": 501,
-          "pages": 6
-        },
-        {
-          "query": "topic:dsh-plugin created:2026-08-14T07:22:42Z..2026-08-14T13:00:26Z",
-          "count": 516,
-          "pages": 6
-        },
-        {
-          "query": "topic:dsh-plugin created:2026-08-14T13:00:27Z..2026-08-15T00:15:55Z",
-          "count": 495,
-          "pages": 5
-        }
+        "topic:dsh-plugin created:2008-01-01T00:00:00Z..2017-04-24T11:59:59Z",
+        "topic:dsh-plugin created:2017-04-24T12:00:00Z..2021-12-20T05:59:59Z",
+        "topic:dsh-plugin created:2021-12-20T06:00:00Z..2024-04-18T14:59:59Z",
+        "topic:dsh-plugin created:2024-04-18T15:00:00Z..2025-06-17T19:29:59Z",
+        "topic:dsh-plugin created:2025-06-17T19:30:00Z..2026-01-16T09:44:59Z",
+        "topic:dsh-plugin created:2026-01-16T09:45:00Z..2026-05-02T16:52:29Z",
+        "topic:dsh-plugin created:2026-05-02T16:52:30Z..2026-06-24T20:26:14Z",
+        "topic:dsh-plugin created:2026-06-24T20:26:15Z..2026-07-21T10:13:07Z",
+        "topic:dsh-plugin created:2026-07-21T10:13:08Z..2026-08-03T17:06:33Z",
+        "topic:dsh-plugin created:2026-08-03T17:06:34Z..2026-08-10T08:33:16Z",
+        "topic:dsh-plugin created:2026-08-10T08:33:17Z..2026-08-13T16:16:38Z",
+        "topic:dsh-plugin created:2026-08-13T16:16:39Z..2026-08-14T02:14:34Z",
+        "topic:dsh-plugin created:2026-08-14T02:14:35Z..2026-08-14T07:13:32Z",
+        "topic:dsh-plugin created:2026-08-14T07:13:33Z..2026-08-14T12:12:29Z",
+        "topic:dsh-plugin created:2026-08-14T12:12:30Z..2026-08-14T22:10:24Z",
+        "topic:dsh-plugin created:2026-08-14T22:10:25Z..2026-08-15T08:08:19Z",
+        "topic:dsh-plugin created:2026-08-15T08:08:20Z..2026-08-16T23:59:59Z"
       ],
-      "rawObservedRepositoryCount": 2532,
+      "searchCapHandled": true,
+      "pluginCreationPolicy": {
+        "communityCreatedAtCutoff": "2026-07-31T00:00:00.000Z",
+        "officialOwnerExemptions": [
+          "deepseek-ai"
+        ]
+      },
       "retiredOwnerExclusionsApplied": true,
-      "excludedRepositoryCount": 58,
-      "requestCount": 72
+      "excludedRepositoryCount": 0
     }
   }
 }

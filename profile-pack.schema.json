@@ -1,0 +1,264 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hub.0.org.cn/profile-pack.schema.json",
+  "title": "OMDSH Portable Profile Pack",
+  "type": "object",
+  "required": [
+    "schema",
+    "id",
+    "version",
+    "createdAt",
+    "runtime",
+    "registry",
+    "profile",
+    "distribution",
+    "plugins",
+    "sourcePlugins",
+    "agentPreset",
+    "omitted",
+    "policy",
+    "digest"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "omdsh-profile-pack/v1" },
+    "id": { "$ref": "#/$defs/id" },
+    "version": { "$ref": "#/$defs/semver" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "runtime": {
+      "type": "object",
+      "required": ["package", "version", "integrity", "binding"],
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "properties": {
+            "integrity": { "type": "null" },
+            "binding": { "const": "not-verified" }
+          }
+        },
+        {
+          "properties": {
+            "integrity": { "type": "string", "pattern": "^sha512-[A-Za-z0-9+/]+={0,2}$" },
+            "binding": { "const": "local-install-and-lock" }
+          }
+        }
+      ],
+      "properties": {
+        "package": { "const": "@deepseek-ai/dsh" },
+        "version": { "$ref": "#/$defs/semver" },
+        "integrity": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "string", "pattern": "^sha512-[A-Za-z0-9+/]+={0,2}$" }
+          ]
+        },
+        "binding": { "enum": ["not-verified", "local-install-and-lock"] }
+      }
+    },
+    "registry": {
+      "type": "object",
+      "required": ["schema", "snapshotId", "revision", "origins"],
+      "additionalProperties": false,
+      "properties": {
+        "schema": { "const": "omdsh-registry/v1" },
+        "snapshotId": { "$ref": "#/$defs/digest" },
+        "revision": { "type": "integer", "minimum": 0 },
+        "origins": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "format": "uri", "pattern": "^https://" }
+        }
+      }
+    },
+    "profile": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["logicalName", "sourceGeneration"],
+          "additionalProperties": false,
+          "properties": {
+            "logicalName": { "type": "string", "minLength": 1 },
+            "sourceGeneration": { "type": "string", "minLength": 1 }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["logicalName", "sourceGeneration"],
+          "additionalProperties": false,
+          "properties": {
+            "logicalName": { "type": "null" },
+            "sourceGeneration": { "type": "null" }
+          }
+        }
+      ]
+    },
+    "distribution": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "required": ["id", "version"],
+          "additionalProperties": false,
+          "properties": {
+            "id": { "$ref": "#/$defs/id" },
+            "version": { "$ref": "#/$defs/semver" }
+          }
+        }
+      ]
+    },
+    "plugins": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["projectId", "releaseId", "enabled", "license"],
+        "additionalProperties": false,
+        "properties": {
+          "projectId": { "type": "string", "minLength": 1 },
+          "releaseId": { "type": "string", "minLength": 1 },
+          "enabled": { "type": "boolean" },
+          "license": { "$ref": "#/$defs/licenseFacts" }
+        }
+      }
+    },
+    "sourcePlugins": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "packageName", "version", "enabled", "license", "source", "install", "trust"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "packageName": { "type": "string", "pattern": "^(?:@[a-z0-9._-]+/)?[a-z0-9._-]+$" },
+          "version": { "$ref": "#/$defs/semver" },
+          "enabled": { "type": "boolean" },
+          "license": { "$ref": "#/$defs/licenseFacts" },
+          "source": {
+            "type": "object",
+            "required": ["repository", "ref"],
+            "additionalProperties": false,
+            "properties": {
+              "repository": { "type": "string", "pattern": "^https://github\\.com/" },
+              "ref": { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+            }
+          },
+          "install": {
+            "type": "object",
+            "required": ["mode", "spec"],
+            "additionalProperties": false,
+            "properties": {
+              "mode": { "const": "profile-bundle" },
+              "spec": { "type": "string", "pattern": "^github:[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+#[0-9a-f]{40}$" }
+            }
+          },
+          "trust": { "const": "author-fixed-source" }
+        }
+      }
+    },
+    "agentPreset": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["mode", "id", "sha256", "files"],
+          "additionalProperties": false,
+          "properties": {
+            "mode": { "const": "builtin" },
+            "id": { "enum": ["code", "cordis", "minimal", "standard"] },
+            "sha256": { "type": "null" },
+            "files": { "type": "array", "maxItems": 0 }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["mode", "id", "sha256", "files"],
+          "additionalProperties": false,
+          "properties": {
+            "mode": { "const": "embedded" },
+            "id": { "$ref": "#/$defs/id" },
+            "sha256": { "$ref": "#/$defs/digest" },
+            "files": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 256,
+              "items": {
+                "type": "object",
+                "required": ["path", "sha256", "content"],
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*\\\\).+$"
+                  },
+                  "sha256": { "$ref": "#/$defs/digest" },
+                  "content": { "type": "string", "maxLength": 524288 }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "omitted": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["identity", "reason"],
+        "additionalProperties": false,
+        "properties": {
+          "identity": { "type": "string", "minLength": 1 },
+          "reason": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "required": [
+        "pluginPayloads",
+        "registryManagedPlugins",
+        "fixedSourcePlugins",
+        "untrackedPackages",
+        "credentials",
+        "sessions",
+        "localPaths",
+        "activation",
+        "presetRollback"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "pluginPayloads": { "const": "registry-references-and-fixed-source" },
+        "registryManagedPlugins": { "const": "replace" },
+        "fixedSourcePlugins": { "const": "explicit-trust" },
+        "untrackedPackages": { "const": "preserve" },
+        "credentials": { "const": "excluded" },
+        "sessions": { "const": "excluded" },
+        "localPaths": { "const": "excluded" },
+        "activation": { "const": "candidate-and-confirm" },
+        "presetRollback": { "const": "outside-profile-generation" }
+      }
+    },
+    "digest": { "$ref": "#/$defs/digest" }
+  },
+  "anyOf": [
+    { "properties": { "profile": { "properties": { "logicalName": { "type": "string" } } } } },
+    { "properties": { "distribution": { "type": "object" } } }
+  ],
+  "$defs": {
+    "licenseFacts": {
+      "type": "object",
+      "required": ["expression", "family", "review", "source", "url"],
+      "additionalProperties": false,
+      "properties": {
+        "expression": { "type": "string", "minLength": 1 },
+        "family": { "enum": ["permissive", "public-domain", "weak-copyleft", "copyleft", "custom", "unknown", "other"] },
+        "review": { "enum": ["notice", "required"] },
+        "source": { "type": "string", "minLength": 1 },
+        "url": { "type": "string", "format": "uri" }
+      }
+    },
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "semver": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(-[0-9A-Za-z.-]+)?(\\+[0-9A-Za-z.-]+)?$"
+    },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  }
+}

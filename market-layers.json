@@ -1,7 +1,7 @@
 {
   "$schema": "./market-layers.schema.json",
   "schema": "omdsh-market-layers/v2",
-  "generatedAt": "2026-08-15T00:18:51.934Z",
+  "generatedAt": "2026-08-16T02:45:55.252Z",
   "policy": {
     "pluginCatalog": "catalog.json remains the leaf-plugin authority",
     "installationRegistry": "registry-v1.json remains the only installation authority",
@@ -10,8 +10,8 @@
     "excluded": "Awesome/documentation, templates/placeholders, and Topic-only traffic matches without a DSH work claim remain outside the market."
   },
   "totals": {
-    "projects": 35,
-    "infrastructure": 34,
+    "projects": 32,
+    "infrastructure": 31,
     "distribution": 1
   },
   "projects": [
@@ -227,94 +227,6 @@
       }
     },
     {
-      "id": "ccch1mneyyy/dsh-tui",
-      "layer": "infrastructure",
-      "name": "dsh-TUI",
-      "description": "解决DSH 官方尚无终端 TUI 痛点的补位之作，献给偏爱cli的各位极客：Claude Code 风格全屏交互终端插件——像素鲸鱼顶栏、实时工作状态行、思考流式展开、双击 Esc 回滚、上下文进度条 + TPS 仪表。npm 一键安装。",
-      "kind": "application",
-      "category": "infrastructure",
-      "tags": [
-        "dsh",
-        "ecosystem-infrastructure"
-      ],
-      "author": {
-        "name": "ccch1mneyyy",
-        "url": "https://github.com/ccch1mneyyy"
-      },
-      "source": {
-        "repository": "https://github.com/ccch1mneyyy/dsh-TUI",
-        "ref": "main",
-        "path": null
-      },
-      "updatedAt": "2026-08-14T21:17:03Z",
-      "version": null,
-      "license": "未声明",
-      "featured": false,
-      "discovery": {
-        "stars": 901,
-        "createdAt": "2026-08-13T12:49:31Z",
-        "commitUpdatedAt": "2026-08-14T21:17:03Z",
-        "metadataUpdatedAt": "2026-08-15T00:16:40Z",
-        "archived": false
-      },
-      "review": {
-        "state": "pending-review",
-        "reason": "ecosystem-infrastructure"
-      },
-      "verification": {
-        "state": "unverified",
-        "evidence": "GitHub Topic metadata and explicit DSH project claim; source review pending"
-      },
-      "registry": {
-        "state": "ineligible",
-        "reason": "market-layer-not-plugin-install"
-      }
-    },
-    {
-      "id": "huiliyi37/dsh-tianshu-tui",
-      "layer": "infrastructure",
-      "name": "dsh-tianshu-tui",
-      "description": "dsh-tianshu-tui — DeepSeek Harness terminal UI +harness workflow。是官方 DeepSeek Harness 上的交互式终端 UI 插件。渲染核心从本仓库自研的harness agent  Tianshu-Tui 演进而来，在官方的基础上增加了TDD、证据门、视觉图像模块等工作流。",
-      "kind": "application",
-      "category": "infrastructure",
-      "tags": [
-        "dsh",
-        "ecosystem-infrastructure"
-      ],
-      "author": {
-        "name": "huiliyi37",
-        "url": "https://github.com/huiliyi37"
-      },
-      "source": {
-        "repository": "https://github.com/huiliyi37/dsh-tianshu-tui",
-        "ref": "main",
-        "path": null
-      },
-      "updatedAt": "2026-08-14T16:01:07Z",
-      "version": null,
-      "license": "未声明",
-      "featured": false,
-      "discovery": {
-        "stars": 133,
-        "createdAt": "2026-08-13T04:20:37Z",
-        "commitUpdatedAt": "2026-08-14T16:01:07Z",
-        "metadataUpdatedAt": "2026-08-14T18:58:54Z",
-        "archived": false
-      },
-      "review": {
-        "state": "pending-review",
-        "reason": "ecosystem-infrastructure"
-      },
-      "verification": {
-        "state": "unverified",
-        "evidence": "GitHub Topic metadata and explicit DSH project claim; source review pending"
-      },
-      "registry": {
-        "state": "ineligible",
-        "reason": "market-layer-not-plugin-install"
-      }
-    },
-    {
       "id": "awesome-dsh-plugin/dsh-find-plugin",
       "layer": "infrastructure",
       "name": "dsh-find-plugin",
@@ -339,274 +251,10 @@
       "license": "未声明",
       "featured": false,
       "discovery": {
-        "stars": 14,
+        "stars": 28,
         "createdAt": "2026-08-14T01:46:59Z",
         "commitUpdatedAt": "2026-08-14T13:17:47Z",
-        "metadataUpdatedAt": "2026-08-14T22:37:03Z",
-        "archived": false
-      },
-      "review": {
-        "state": "pending-review",
-        "reason": "ecosystem-infrastructure"
-      },
-      "verification": {
-        "state": "unverified",
-        "evidence": "GitHub Topic metadata and explicit DSH project claim; source review pending"
-      },
-      "registry": {
-        "state": "ineligible",
-        "reason": "market-layer-not-plugin-install"
-      }
-    },
-    {
-      "id": "chyra-moon/deepseek-harness-desktop",
-      "layer": "infrastructure",
-      "name": "deepseek-harness-desktop",
-      "description": "DeepSeek Harness desktop shell: 1:1 replica of the official web UI as a Windows desktop app (community project)",
-      "kind": "application",
-      "category": "infrastructure",
-      "tags": [
-        "dsh",
-        "ecosystem-infrastructure"
-      ],
-      "author": {
-        "name": "chyra-moon",
-        "url": "https://github.com/chyra-moon"
-      },
-      "source": {
-        "repository": "https://github.com/chyra-moon/deepseek-harness-desktop",
-        "ref": "main",
-        "path": null
-      },
-      "updatedAt": "2026-08-14T16:56:02Z",
-      "version": null,
-      "license": "未声明",
-      "featured": false,
-      "discovery": {
-        "stars": 10,
-        "createdAt": "2026-08-13T15:44:29Z",
-        "commitUpdatedAt": "2026-08-14T16:56:02Z",
-        "metadataUpdatedAt": "2026-08-14T16:56:57Z",
-        "archived": false
-      },
-      "review": {
-        "state": "pending-review",
-        "reason": "ecosystem-infrastructure"
-      },
-      "verification": {
-        "state": "unverified",
-        "evidence": "GitHub Topic metadata and explicit DSH project claim; source review pending"
-      },
-      "registry": {
-        "state": "ineligible",
-        "reason": "market-layer-not-plugin-install"
-      }
-    },
-    {
-      "id": "chen-001/dsh-grok-tui",
-      "layer": "infrastructure",
-      "name": "dsh-grok-tui",
-      "description": "Use dsh via grok-build's TUI.",
-      "kind": "application",
-      "category": "infrastructure",
-      "tags": [
-        "dsh",
-        "ecosystem-infrastructure"
-      ],
-      "author": {
-        "name": "chen-001",
-        "url": "https://github.com/chen-001"
-      },
-      "source": {
-        "repository": "https://github.com/chen-001/dsh-grok-tui",
-        "ref": "main",
-        "path": null
-      },
-      "updatedAt": "2026-08-14T18:10:06Z",
-      "version": null,
-      "license": "未声明",
-      "featured": false,
-      "discovery": {
-        "stars": 8,
-        "createdAt": "2026-08-12T16:28:42Z",
-        "commitUpdatedAt": "2026-08-14T18:10:06Z",
-        "metadataUpdatedAt": "2026-08-14T18:13:47Z",
-        "archived": false
-      },
-      "review": {
-        "state": "pending-review",
-        "reason": "ecosystem-infrastructure"
-      },
-      "verification": {
-        "state": "unverified",
-        "evidence": "GitHub Topic metadata and explicit DSH project claim; source review pending"
-      },
-      "registry": {
-        "state": "ineligible",
-        "reason": "market-layer-not-plugin-install"
-      }
-    },
-    {
-      "id": "omdsh-dev/dsh-plugin-skills",
-      "layer": "infrastructure",
-      "name": "dsh-plugin-skills",
-      "description": "Agent skills for building and testing DeepSeek Harness plugins — from scaffolding a new plugin package to choosing the right test tiers, entirely inside an agent session.",
-      "kind": "manager",
-      "category": "infrastructure",
-      "tags": [
-        "dsh",
-        "ecosystem-infrastructure"
-      ],
-      "author": {
-        "name": "omdsh-dev",
-        "url": "https://github.com/omdsh-dev"
-      },
-      "source": {
-        "repository": "https://github.com/omdsh-dev/dsh-plugin-skills",
-        "ref": "main",
-        "path": null
-      },
-      "updatedAt": "2026-08-11T06:39:42Z",
-      "version": null,
-      "license": "未声明",
-      "featured": false,
-      "discovery": {
-        "stars": 7,
-        "createdAt": "2026-08-11T06:26:39Z",
-        "commitUpdatedAt": "2026-08-11T06:39:42Z",
-        "metadataUpdatedAt": "2026-08-14T11:47:54Z",
-        "archived": false
-      },
-      "review": {
-        "state": "pending-review",
-        "reason": "ecosystem-infrastructure"
-      },
-      "verification": {
-        "state": "unverified",
-        "evidence": "GitHub Topic metadata and explicit DSH project claim; source review pending"
-      },
-      "registry": {
-        "state": "ineligible",
-        "reason": "market-layer-not-plugin-install"
-      }
-    },
-    {
-      "id": "hotsteel2901/dsh-client-ui-mobile-adapt",
-      "layer": "infrastructure",
-      "name": "dsh-client-ui-mobile-adapt",
-      "description": "Your DeepSeek Harness web UI, rebuilt for the phone in your hand. Built for developers who code in Termux on Android: single-column layout, sidebar drawer, one-line composer, fullscreen scrollable settings & trajectory details, tap-to-open session stats. Desktop untouched.",
-      "kind": "application",
-      "category": "infrastructure",
-      "tags": [
-        "dsh",
-        "ecosystem-infrastructure"
-      ],
-      "author": {
-        "name": "Hotsteel2901",
-        "url": "https://github.com/Hotsteel2901"
-      },
-      "source": {
-        "repository": "https://github.com/Hotsteel2901/dsh-client-ui-mobile-adapt",
-        "ref": "main",
-        "path": null
-      },
-      "updatedAt": "2026-08-14T11:34:58Z",
-      "version": null,
-      "license": "未声明",
-      "featured": false,
-      "discovery": {
-        "stars": 6,
-        "createdAt": "2026-08-14T10:54:08Z",
-        "commitUpdatedAt": "2026-08-14T11:34:58Z",
-        "metadataUpdatedAt": "2026-08-15T00:06:27Z",
-        "archived": false
-      },
-      "review": {
-        "state": "pending-review",
-        "reason": "ecosystem-infrastructure"
-      },
-      "verification": {
-        "state": "unverified",
-        "evidence": "GitHub Topic metadata and explicit DSH project claim; source review pending"
-      },
-      "registry": {
-        "state": "ineligible",
-        "reason": "market-layer-not-plugin-install"
-      }
-    },
-    {
-      "id": "liguobao/dsh-desktop",
-      "layer": "infrastructure",
-      "name": "dsh-desktop",
-      "description": "An independent, open-source desktop wrapper for DeepSeek Harness. It starts the bundled @deepseek-ai/dsh Web UI locally and loads it in a hardened Electron window on Linux, macOS, and Windows.",
-      "kind": "application",
-      "category": "infrastructure",
-      "tags": [
-        "dsh",
-        "ecosystem-infrastructure"
-      ],
-      "author": {
-        "name": "liguobao",
-        "url": "https://github.com/liguobao"
-      },
-      "source": {
-        "repository": "https://github.com/liguobao/dsh-desktop",
-        "ref": "master",
-        "path": null
-      },
-      "updatedAt": "2026-08-15T00:14:54Z",
-      "version": null,
-      "license": "未声明",
-      "featured": false,
-      "discovery": {
-        "stars": 5,
-        "createdAt": "2026-08-14T00:23:44Z",
-        "commitUpdatedAt": "2026-08-15T00:14:54Z",
-        "metadataUpdatedAt": "2026-08-15T00:15:00Z",
-        "archived": false
-      },
-      "review": {
-        "state": "pending-review",
-        "reason": "ecosystem-infrastructure"
-      },
-      "verification": {
-        "state": "unverified",
-        "evidence": "GitHub Topic metadata and explicit DSH project claim; source review pending"
-      },
-      "registry": {
-        "state": "ineligible",
-        "reason": "market-layer-not-plugin-install"
-      }
-    },
-    {
-      "id": "yelebai/dsh-plugin-marketplace",
-      "layer": "infrastructure",
-      "name": "dsh-plugin-marketplace",
-      "description": "Verified plugin marketplace and autonomous registry for DeepSeek Harness",
-      "kind": "manager",
-      "category": "infrastructure",
-      "tags": [
-        "dsh",
-        "ecosystem-infrastructure"
-      ],
-      "author": {
-        "name": "YELEBAI",
-        "url": "https://github.com/YELEBAI"
-      },
-      "source": {
-        "repository": "https://github.com/YELEBAI/dsh-plugin-marketplace",
-        "ref": "main",
-        "path": null
-      },
-      "updatedAt": "2026-08-14T23:57:59Z",
-      "version": null,
-      "license": "未声明",
-      "featured": false,
-      "discovery": {
-        "stars": 5,
-        "createdAt": "2026-08-13T22:30:42Z",
-        "commitUpdatedAt": "2026-08-14T23:57:59Z",
-        "metadataUpdatedAt": "2026-08-14T23:58:07Z",
+        "metadataUpdatedAt": "2026-08-16T02:01:33Z",
         "archived": false
       },
       "review": {
@@ -647,10 +295,274 @@
       "license": "未声明",
       "featured": false,
       "discovery": {
-        "stars": 4,
+        "stars": 9,
         "createdAt": "2026-08-13T16:29:22Z",
         "commitUpdatedAt": "2026-08-14T08:07:39Z",
-        "metadataUpdatedAt": "2026-08-14T16:06:33Z",
+        "metadataUpdatedAt": "2026-08-16T01:39:15Z",
+        "archived": false
+      },
+      "review": {
+        "state": "pending-review",
+        "reason": "ecosystem-infrastructure"
+      },
+      "verification": {
+        "state": "unverified",
+        "evidence": "GitHub Topic metadata and explicit DSH project claim; source review pending"
+      },
+      "registry": {
+        "state": "ineligible",
+        "reason": "market-layer-not-plugin-install"
+      }
+    },
+    {
+      "id": "hotsteel2901/dsh-client-ui-mobile-adapt",
+      "layer": "infrastructure",
+      "name": "dsh-client-ui-mobile-adapt",
+      "description": "Your DeepSeek Harness web UI, rebuilt for the phone in your hand. Built for developers who code in Termux on Android: single-column layout, sidebar drawer, one-line composer, fullscreen scrollable settings & trajectory details, tap-to-open session stats. Desktop untouched.",
+      "kind": "application",
+      "category": "infrastructure",
+      "tags": [
+        "dsh",
+        "ecosystem-infrastructure"
+      ],
+      "author": {
+        "name": "Hotsteel2901",
+        "url": "https://github.com/Hotsteel2901"
+      },
+      "source": {
+        "repository": "https://github.com/Hotsteel2901/dsh-client-ui-mobile-adapt",
+        "ref": "main",
+        "path": null
+      },
+      "updatedAt": "2026-08-14T11:34:58Z",
+      "version": null,
+      "license": "未声明",
+      "featured": false,
+      "discovery": {
+        "stars": 8,
+        "createdAt": "2026-08-14T10:54:08Z",
+        "commitUpdatedAt": "2026-08-14T11:34:58Z",
+        "metadataUpdatedAt": "2026-08-15T07:59:25Z",
+        "archived": false
+      },
+      "review": {
+        "state": "pending-review",
+        "reason": "ecosystem-infrastructure"
+      },
+      "verification": {
+        "state": "unverified",
+        "evidence": "GitHub Topic metadata and explicit DSH project claim; source review pending"
+      },
+      "registry": {
+        "state": "ineligible",
+        "reason": "market-layer-not-plugin-install"
+      }
+    },
+    {
+      "id": "omdsh-dev/dsh-plugin-skills",
+      "layer": "infrastructure",
+      "name": "dsh-plugin-skills",
+      "description": "Agent skills for building and testing DeepSeek Harness plugins — from scaffolding a new plugin package to choosing the right test tiers, entirely inside an agent session.",
+      "kind": "manager",
+      "category": "infrastructure",
+      "tags": [
+        "dsh",
+        "ecosystem-infrastructure"
+      ],
+      "author": {
+        "name": "omdsh-dev",
+        "url": "https://github.com/omdsh-dev"
+      },
+      "source": {
+        "repository": "https://github.com/omdsh-dev/dsh-plugin-skills",
+        "ref": "main",
+        "path": null
+      },
+      "updatedAt": "2026-08-11T06:39:42Z",
+      "version": null,
+      "license": "未声明",
+      "featured": false,
+      "discovery": {
+        "stars": 8,
+        "createdAt": "2026-08-11T06:26:39Z",
+        "commitUpdatedAt": "2026-08-11T06:39:42Z",
+        "metadataUpdatedAt": "2026-08-15T15:48:17Z",
+        "archived": false
+      },
+      "review": {
+        "state": "pending-review",
+        "reason": "ecosystem-infrastructure"
+      },
+      "verification": {
+        "state": "unverified",
+        "evidence": "GitHub Topic metadata and explicit DSH project claim; source review pending"
+      },
+      "registry": {
+        "state": "ineligible",
+        "reason": "market-layer-not-plugin-install"
+      }
+    },
+    {
+      "id": "errorcode7/dsh-prompt-manager",
+      "layer": "infrastructure",
+      "name": "dsh-prompt-manager",
+      "description": "DeepSeekHarness的提示词管理器插件",
+      "kind": "manager",
+      "category": "infrastructure",
+      "tags": [
+        "dsh",
+        "ecosystem-infrastructure"
+      ],
+      "author": {
+        "name": "errorcode7",
+        "url": "https://github.com/errorcode7"
+      },
+      "source": {
+        "repository": "https://github.com/errorcode7/dsh-prompt-manager",
+        "ref": "main",
+        "path": null
+      },
+      "updatedAt": "2026-08-14T19:27:51Z",
+      "version": null,
+      "license": "未声明",
+      "featured": false,
+      "discovery": {
+        "stars": 5,
+        "createdAt": "2026-08-14T19:27:07Z",
+        "commitUpdatedAt": "2026-08-14T19:27:51Z",
+        "metadataUpdatedAt": "2026-08-16T02:19:57Z",
+        "archived": false
+      },
+      "review": {
+        "state": "pending-review",
+        "reason": "ecosystem-infrastructure"
+      },
+      "verification": {
+        "state": "unverified",
+        "evidence": "GitHub Topic metadata and explicit DSH project claim; source review pending"
+      },
+      "registry": {
+        "state": "ineligible",
+        "reason": "market-layer-not-plugin-install"
+      }
+    },
+    {
+      "id": "ouyangyipeng/dsh-marketplace",
+      "layer": "infrastructure",
+      "name": "dsh-marketplace",
+      "description": "A safe, live plugin marketplace for DeepSeek Harness",
+      "kind": "manager",
+      "category": "infrastructure",
+      "tags": [
+        "dsh",
+        "ecosystem-infrastructure"
+      ],
+      "author": {
+        "name": "ouyangyipeng",
+        "url": "https://github.com/ouyangyipeng"
+      },
+      "source": {
+        "repository": "https://github.com/ouyangyipeng/dsh-marketplace",
+        "ref": "main",
+        "path": null
+      },
+      "updatedAt": "2026-08-14T11:07:41Z",
+      "version": null,
+      "license": "未声明",
+      "featured": false,
+      "discovery": {
+        "stars": 3,
+        "createdAt": "2026-08-14T10:07:59Z",
+        "commitUpdatedAt": "2026-08-14T11:07:41Z",
+        "metadataUpdatedAt": "2026-08-15T00:59:49Z",
+        "archived": false
+      },
+      "review": {
+        "state": "pending-review",
+        "reason": "ecosystem-infrastructure"
+      },
+      "verification": {
+        "state": "unverified",
+        "evidence": "GitHub Topic metadata and explicit DSH project claim; source review pending"
+      },
+      "registry": {
+        "state": "ineligible",
+        "reason": "market-layer-not-plugin-install"
+      }
+    },
+    {
+      "id": "caoyiwei850/dsh-client-ui-skins",
+      "layer": "infrastructure",
+      "name": "dsh-client-ui-skins",
+      "description": "DSH Web skin plugin with built-in themes and custom image skins",
+      "kind": "application",
+      "category": "infrastructure",
+      "tags": [
+        "dsh",
+        "ecosystem-infrastructure"
+      ],
+      "author": {
+        "name": "caoyiwei850",
+        "url": "https://github.com/caoyiwei850"
+      },
+      "source": {
+        "repository": "https://github.com/caoyiwei850/dsh-client-ui-skins",
+        "ref": "main",
+        "path": null
+      },
+      "updatedAt": "2026-08-15T08:27:58Z",
+      "version": null,
+      "license": "未声明",
+      "featured": false,
+      "discovery": {
+        "stars": 2,
+        "createdAt": "2026-08-15T02:12:33Z",
+        "commitUpdatedAt": "2026-08-15T08:27:58Z",
+        "metadataUpdatedAt": "2026-08-15T16:20:58Z",
+        "archived": false
+      },
+      "review": {
+        "state": "pending-review",
+        "reason": "ecosystem-infrastructure"
+      },
+      "verification": {
+        "state": "unverified",
+        "evidence": "GitHub Topic metadata and explicit DSH project claim; source review pending"
+      },
+      "registry": {
+        "state": "ineligible",
+        "reason": "market-layer-not-plugin-install"
+      }
+    },
+    {
+      "id": "fishlikewater/dsh-mcp-manager",
+      "layer": "infrastructure",
+      "name": "dsh-mcp-manager",
+      "description": "fishlikewater/dsh-mcp-manager 是一个 DSH 生态项目。",
+      "kind": "manager",
+      "category": "infrastructure",
+      "tags": [
+        "dsh",
+        "ecosystem-infrastructure"
+      ],
+      "author": {
+        "name": "fishlikewater",
+        "url": "https://github.com/fishlikewater"
+      },
+      "source": {
+        "repository": "https://github.com/fishlikewater/dsh-mcp-manager",
+        "ref": "master",
+        "path": null
+      },
+      "updatedAt": "2026-08-14T15:19:54Z",
+      "version": null,
+      "license": "未声明",
+      "featured": false,
+      "discovery": {
+        "stars": 2,
+        "createdAt": "2026-08-14T02:54:52Z",
+        "commitUpdatedAt": "2026-08-14T15:19:54Z",
+        "metadataUpdatedAt": "2026-08-15T00:59:34Z",
         "archived": false
       },
       "review": {
@@ -711,34 +623,34 @@
       }
     },
     {
-      "id": "kyorakuyk/dsh-hotreload-plugin-manager",
+      "id": "liguobao/deepseek-harness-remote",
       "layer": "infrastructure",
-      "name": "dsh-hotreload-plugin-manager",
-      "description": "DeepSeek Harness plugin: hot install / uninstall / update / enable-disable of profile plugin bundles from the running dsh web — no restart, Web UI included.",
-      "kind": "manager",
+      "name": "deepseek-harness-remote",
+      "description": "基于 DeepSeek Harness 插件机制的多端远程访问方案，让桌面端与 Android 端安全连接并操作远程 Harness。（A multi-device remote access solution built on the DeepSeek Harness plugin system, enabling desktop and Android clients to securely connect to and operate a remote Harness.）",
+      "kind": "application",
       "category": "infrastructure",
       "tags": [
         "dsh",
         "ecosystem-infrastructure"
       ],
       "author": {
-        "name": "kyorakuyk",
-        "url": "https://github.com/kyorakuyk"
+        "name": "liguobao",
+        "url": "https://github.com/liguobao"
       },
       "source": {
-        "repository": "https://github.com/kyorakuyk/dsh-hotreload-plugin-manager",
+        "repository": "https://github.com/liguobao/deepseek-harness-remote",
         "ref": "main",
         "path": null
       },
-      "updatedAt": "2026-08-14T18:09:29Z",
+      "updatedAt": "2026-08-16T00:00:06Z",
       "version": null,
       "license": "未声明",
       "featured": false,
       "discovery": {
         "stars": 2,
-        "createdAt": "2026-08-14T13:17:41Z",
-        "commitUpdatedAt": "2026-08-14T18:09:29Z",
-        "metadataUpdatedAt": "2026-08-14T18:13:47Z",
+        "createdAt": "2026-08-14T15:33:53Z",
+        "commitUpdatedAt": "2026-08-16T00:00:06Z",
+        "metadataUpdatedAt": "2026-08-15T23:55:22Z",
         "archived": false
       },
       "review": {
@@ -755,10 +667,54 @@
       }
     },
     {
-      "id": "ouyangyipeng/dsh-marketplace",
+      "id": "liuyun847/dsh-client-ui-peak-valley",
       "layer": "infrastructure",
-      "name": "dsh-marketplace",
-      "description": "A safe, live plugin marketplace for DeepSeek Harness",
+      "name": "dsh-client-ui-peak-valley",
+      "description": "DSH Web 客户端插件:模型选择按钮左侧显示 DeepSeek API 峰/谷价状态(绿=谷,橙=峰)",
+      "kind": "application",
+      "category": "infrastructure",
+      "tags": [
+        "dsh",
+        "ecosystem-infrastructure"
+      ],
+      "author": {
+        "name": "liuyun847",
+        "url": "https://github.com/liuyun847"
+      },
+      "source": {
+        "repository": "https://github.com/liuyun847/dsh-client-ui-peak-valley",
+        "ref": "main",
+        "path": null
+      },
+      "updatedAt": "2026-08-14T09:13:30Z",
+      "version": null,
+      "license": "未声明",
+      "featured": false,
+      "discovery": {
+        "stars": 2,
+        "createdAt": "2026-08-14T08:35:00Z",
+        "commitUpdatedAt": "2026-08-14T09:13:30Z",
+        "metadataUpdatedAt": "2026-08-15T00:59:44Z",
+        "archived": false
+      },
+      "review": {
+        "state": "pending-review",
+        "reason": "ecosystem-infrastructure"
+      },
+      "verification": {
+        "state": "unverified",
+        "evidence": "GitHub Topic metadata and explicit DSH project claim; source review pending"
+      },
+      "registry": {
+        "state": "ineligible",
+        "reason": "market-layer-not-plugin-install"
+      }
+    },
+    {
+      "id": "scorp1o117/dsh-plugin-marketplace",
+      "layer": "infrastructure",
+      "name": "dsh-plugin-marketplace",
+      "description": "Plugin marketplace for DeepSeek Harness | DeepSeek Harness 插件市场",
       "kind": "manager",
       "category": "infrastructure",
       "tags": [
@@ -766,23 +722,23 @@
         "ecosystem-infrastructure"
       ],
       "author": {
-        "name": "ouyangyipeng",
-        "url": "https://github.com/ouyangyipeng"
+        "name": "Scorp1o117",
+        "url": "https://github.com/Scorp1o117"
       },
       "source": {
-        "repository": "https://github.com/ouyangyipeng/dsh-marketplace",
+        "repository": "https://github.com/Scorp1o117/dsh-plugin-marketplace",
         "ref": "main",
         "path": null
       },
-      "updatedAt": "2026-08-14T11:07:41Z",
+      "updatedAt": "2026-08-16T00:08:46Z",
       "version": null,
       "license": "未声明",
       "featured": false,
       "discovery": {
         "stars": 2,
-        "createdAt": "2026-08-14T10:07:59Z",
-        "commitUpdatedAt": "2026-08-14T11:07:41Z",
-        "metadataUpdatedAt": "2026-08-14T13:05:03Z",
+        "createdAt": "2026-08-13T16:20:23Z",
+        "commitUpdatedAt": "2026-08-16T00:08:46Z",
+        "metadataUpdatedAt": "2026-08-16T00:08:29Z",
         "archived": false
       },
       "review": {
@@ -843,10 +799,10 @@
       }
     },
     {
-      "id": "w769721503/dsh-plugin-store",
+      "id": "w2112515/dsh-plugin-marketplace",
       "layer": "infrastructure",
-      "name": "dsh-plugin-store",
-      "description": "DeepSeek Harness 插件商店：浏览、搜索、筛选并一键安装 dsh-plugin 生态插件",
+      "name": "dsh-plugin-marketplace",
+      "description": "Out-of-tree installable plugin marketplace bundle for DeepSeek Harness",
       "kind": "manager",
       "category": "infrastructure",
       "tags": [
@@ -854,23 +810,67 @@
         "ecosystem-infrastructure"
       ],
       "author": {
-        "name": "w769721503",
-        "url": "https://github.com/w769721503"
+        "name": "w2112515",
+        "url": "https://github.com/w2112515"
       },
       "source": {
-        "repository": "https://github.com/w769721503/dsh-plugin-store",
+        "repository": "https://github.com/w2112515/dsh-plugin-marketplace",
         "ref": "main",
         "path": null
       },
-      "updatedAt": "2026-08-14T14:58:39Z",
+      "updatedAt": "2026-08-15T21:33:27Z",
       "version": null,
       "license": "未声明",
       "featured": false,
       "discovery": {
         "stars": 2,
-        "createdAt": "2026-08-14T09:11:59Z",
-        "commitUpdatedAt": "2026-08-14T14:58:39Z",
-        "metadataUpdatedAt": "2026-08-14T14:59:49Z",
+        "createdAt": "2026-08-15T04:15:00Z",
+        "commitUpdatedAt": "2026-08-15T21:33:27Z",
+        "metadataUpdatedAt": "2026-08-16T02:33:42Z",
+        "archived": false
+      },
+      "review": {
+        "state": "pending-review",
+        "reason": "ecosystem-infrastructure"
+      },
+      "verification": {
+        "state": "unverified",
+        "evidence": "GitHub Topic metadata and explicit DSH project claim; source review pending"
+      },
+      "registry": {
+        "state": "ineligible",
+        "reason": "market-layer-not-plugin-install"
+      }
+    },
+    {
+      "id": "why913/dshx",
+      "layer": "infrastructure",
+      "name": "dshx",
+      "description": "The missing companion CLI for DeepSeek Harness (dsh): manage MCP servers with dry-run checks, migrate from Claude Code / Codex in one command | dsh 的 MCP 管理与迁移工具",
+      "kind": "toolkit",
+      "category": "infrastructure",
+      "tags": [
+        "dsh",
+        "ecosystem-infrastructure"
+      ],
+      "author": {
+        "name": "why913",
+        "url": "https://github.com/why913"
+      },
+      "source": {
+        "repository": "https://github.com/why913/dshx",
+        "ref": "main",
+        "path": null
+      },
+      "updatedAt": "2026-08-14T03:11:05Z",
+      "version": null,
+      "license": "未声明",
+      "featured": false,
+      "discovery": {
+        "stars": 2,
+        "createdAt": "2026-08-13T17:22:38Z",
+        "commitUpdatedAt": "2026-08-14T03:11:05Z",
+        "metadataUpdatedAt": "2026-08-15T00:59:57Z",
         "archived": false
       },
       "review": {
@@ -975,50 +975,6 @@
       }
     },
     {
-      "id": "errorcode7/dsh-prompt-manager",
-      "layer": "infrastructure",
-      "name": "dsh-prompt-manager",
-      "description": "DeepSeekHarness的提示词管理器插件",
-      "kind": "manager",
-      "category": "infrastructure",
-      "tags": [
-        "dsh",
-        "ecosystem-infrastructure"
-      ],
-      "author": {
-        "name": "errorcode7",
-        "url": "https://github.com/errorcode7"
-      },
-      "source": {
-        "repository": "https://github.com/errorcode7/dsh-prompt-manager",
-        "ref": "main",
-        "path": null
-      },
-      "updatedAt": "2026-08-14T19:27:51Z",
-      "version": null,
-      "license": "未声明",
-      "featured": false,
-      "discovery": {
-        "stars": 1,
-        "createdAt": "2026-08-14T19:27:07Z",
-        "commitUpdatedAt": "2026-08-14T19:27:51Z",
-        "metadataUpdatedAt": "2026-08-14T19:54:53Z",
-        "archived": false
-      },
-      "review": {
-        "state": "pending-review",
-        "reason": "ecosystem-infrastructure"
-      },
-      "verification": {
-        "state": "unverified",
-        "evidence": "GitHub Topic metadata and explicit DSH project claim; source review pending"
-      },
-      "registry": {
-        "state": "ineligible",
-        "reason": "market-layer-not-plugin-install"
-      }
-    },
-    {
       "id": "fengzhiyushui/dsh-desktop-window",
       "layer": "infrastructure",
       "name": "dsh-desktop-window",
@@ -1047,50 +1003,6 @@
         "createdAt": "2026-08-13T16:03:47Z",
         "commitUpdatedAt": "2026-08-13T16:07:01Z",
         "metadataUpdatedAt": "2026-08-13T16:44:22Z",
-        "archived": false
-      },
-      "review": {
-        "state": "pending-review",
-        "reason": "ecosystem-infrastructure"
-      },
-      "verification": {
-        "state": "unverified",
-        "evidence": "GitHub Topic metadata and explicit DSH project claim; source review pending"
-      },
-      "registry": {
-        "state": "ineligible",
-        "reason": "market-layer-not-plugin-install"
-      }
-    },
-    {
-      "id": "fishlikewater/dsh-mcp-manager",
-      "layer": "infrastructure",
-      "name": "dsh-mcp-manager",
-      "description": "fishlikewater/dsh-mcp-manager 是一个 DSH 生态项目。",
-      "kind": "manager",
-      "category": "infrastructure",
-      "tags": [
-        "dsh",
-        "ecosystem-infrastructure"
-      ],
-      "author": {
-        "name": "fishlikewater",
-        "url": "https://github.com/fishlikewater"
-      },
-      "source": {
-        "repository": "https://github.com/fishlikewater/dsh-mcp-manager",
-        "ref": "master",
-        "path": null
-      },
-      "updatedAt": "2026-08-14T15:19:54Z",
-      "version": null,
-      "license": "未声明",
-      "featured": false,
-      "discovery": {
-        "stars": 1,
-        "createdAt": "2026-08-14T02:54:52Z",
-        "commitUpdatedAt": "2026-08-14T15:19:54Z",
-        "metadataUpdatedAt": "2026-08-14T16:59:41Z",
         "archived": false
       },
       "review": {
@@ -1151,50 +1063,6 @@
       }
     },
     {
-      "id": "liguobao/deepseek-harness-remote",
-      "layer": "infrastructure",
-      "name": "deepseek-harness-remote",
-      "description": "基于 DeepSeek Harness 插件机制的多端远程访问方案，让桌面端与 Android 端安全连接并操作远程 Harness。（A multi-device remote access solution built on the DeepSeek Harness plugin system, enabling desktop and Android clients to securely connect to and operate a remote Harness.）",
-      "kind": "application",
-      "category": "infrastructure",
-      "tags": [
-        "dsh",
-        "ecosystem-infrastructure"
-      ],
-      "author": {
-        "name": "liguobao",
-        "url": "https://github.com/liguobao"
-      },
-      "source": {
-        "repository": "https://github.com/liguobao/deepseek-harness-remote",
-        "ref": "main",
-        "path": null
-      },
-      "updatedAt": "2026-08-15T00:13:50Z",
-      "version": null,
-      "license": "未声明",
-      "featured": false,
-      "discovery": {
-        "stars": 1,
-        "createdAt": "2026-08-14T15:33:53Z",
-        "commitUpdatedAt": "2026-08-15T00:13:50Z",
-        "metadataUpdatedAt": "2026-08-15T00:13:56Z",
-        "archived": false
-      },
-      "review": {
-        "state": "pending-review",
-        "reason": "ecosystem-infrastructure"
-      },
-      "verification": {
-        "state": "unverified",
-        "evidence": "GitHub Topic metadata and explicit DSH project claim; source review pending"
-      },
-      "registry": {
-        "state": "ineligible",
-        "reason": "market-layer-not-plugin-install"
-      }
-    },
-    {
       "id": "lin-cheng-lab/dsh-plugin-doctor",
       "layer": "infrastructure",
       "name": "dsh-plugin-doctor",
@@ -1223,50 +1091,6 @@
         "createdAt": "2026-08-13T15:35:54Z",
         "commitUpdatedAt": "2026-08-13T15:36:01Z",
         "metadataUpdatedAt": "2026-08-13T16:46:19Z",
-        "archived": false
-      },
-      "review": {
-        "state": "pending-review",
-        "reason": "ecosystem-infrastructure"
-      },
-      "verification": {
-        "state": "unverified",
-        "evidence": "GitHub Topic metadata and explicit DSH project claim; source review pending"
-      },
-      "registry": {
-        "state": "ineligible",
-        "reason": "market-layer-not-plugin-install"
-      }
-    },
-    {
-      "id": "liuyun847/dsh-client-ui-peak-valley",
-      "layer": "infrastructure",
-      "name": "dsh-client-ui-peak-valley",
-      "description": "DSH Web 客户端插件:模型选择按钮左侧显示 DeepSeek API 峰/谷价状态(绿=谷,橙=峰)",
-      "kind": "application",
-      "category": "infrastructure",
-      "tags": [
-        "dsh",
-        "ecosystem-infrastructure"
-      ],
-      "author": {
-        "name": "liuyun847",
-        "url": "https://github.com/liuyun847"
-      },
-      "source": {
-        "repository": "https://github.com/liuyun847/dsh-client-ui-peak-valley",
-        "ref": "main",
-        "path": null
-      },
-      "updatedAt": "2026-08-14T09:13:30Z",
-      "version": null,
-      "license": "未声明",
-      "featured": false,
-      "discovery": {
-        "stars": 1,
-        "createdAt": "2026-08-14T08:35:00Z",
-        "commitUpdatedAt": "2026-08-14T09:13:30Z",
-        "metadataUpdatedAt": "2026-08-14T09:13:42Z",
         "archived": false
       },
       "review": {
@@ -1327,182 +1151,6 @@
       }
     },
     {
-      "id": "tuanmaoovo/dsh-memory-manager",
-      "layer": "infrastructure",
-      "name": "dsh-memory-manager",
-      "description": "dsh的记忆管理",
-      "kind": "manager",
-      "category": "infrastructure",
-      "tags": [
-        "dsh",
-        "ecosystem-infrastructure"
-      ],
-      "author": {
-        "name": "tuanmaoOVO",
-        "url": "https://github.com/tuanmaoOVO"
-      },
-      "source": {
-        "repository": "https://github.com/tuanmaoOVO/dsh-memory-manager",
-        "ref": "main",
-        "path": null
-      },
-      "updatedAt": "2026-08-14T20:03:53Z",
-      "version": null,
-      "license": "未声明",
-      "featured": false,
-      "discovery": {
-        "stars": 1,
-        "createdAt": "2026-08-14T17:48:13Z",
-        "commitUpdatedAt": "2026-08-14T20:03:53Z",
-        "metadataUpdatedAt": "2026-08-14T20:04:05Z",
-        "archived": false
-      },
-      "review": {
-        "state": "pending-review",
-        "reason": "ecosystem-infrastructure"
-      },
-      "verification": {
-        "state": "unverified",
-        "evidence": "GitHub Topic metadata and explicit DSH project claim; source review pending"
-      },
-      "registry": {
-        "state": "ineligible",
-        "reason": "market-layer-not-plugin-install"
-      }
-    },
-    {
-      "id": "whning0513/deepseek-protocol-doctor",
-      "layer": "infrastructure",
-      "name": "deepseek-protocol-doctor",
-      "description": "Checks DeepSeek tool loops, reasoning_content, strict schemas, and captured SSE. Also works as a DSH plugin.",
-      "kind": "toolkit",
-      "category": "infrastructure",
-      "tags": [
-        "dsh",
-        "ecosystem-infrastructure"
-      ],
-      "author": {
-        "name": "Whning0513",
-        "url": "https://github.com/Whning0513"
-      },
-      "source": {
-        "repository": "https://github.com/Whning0513/deepseek-protocol-doctor",
-        "ref": "main",
-        "path": null
-      },
-      "updatedAt": "2026-08-14T22:02:37Z",
-      "version": null,
-      "license": "未声明",
-      "featured": false,
-      "discovery": {
-        "stars": 1,
-        "createdAt": "2026-08-14T10:29:23Z",
-        "commitUpdatedAt": "2026-08-14T22:02:37Z",
-        "metadataUpdatedAt": "2026-08-14T22:03:49Z",
-        "archived": false
-      },
-      "review": {
-        "state": "pending-review",
-        "reason": "ecosystem-infrastructure"
-      },
-      "verification": {
-        "state": "unverified",
-        "evidence": "GitHub Topic metadata and explicit DSH project claim; source review pending"
-      },
-      "registry": {
-        "state": "ineligible",
-        "reason": "market-layer-not-plugin-install"
-      }
-    },
-    {
-      "id": "why913/dshx",
-      "layer": "infrastructure",
-      "name": "dshx",
-      "description": "The missing companion CLI for DeepSeek Harness (dsh): manage MCP servers with dry-run checks, migrate from Claude Code / Codex in one command | dsh 的 MCP 管理与迁移工具",
-      "kind": "toolkit",
-      "category": "infrastructure",
-      "tags": [
-        "dsh",
-        "ecosystem-infrastructure"
-      ],
-      "author": {
-        "name": "why913",
-        "url": "https://github.com/why913"
-      },
-      "source": {
-        "repository": "https://github.com/why913/dshx",
-        "ref": "main",
-        "path": null
-      },
-      "updatedAt": "2026-08-14T03:11:05Z",
-      "version": null,
-      "license": "未声明",
-      "featured": false,
-      "discovery": {
-        "stars": 1,
-        "createdAt": "2026-08-13T17:22:38Z",
-        "commitUpdatedAt": "2026-08-14T03:11:05Z",
-        "metadataUpdatedAt": "2026-08-14T03:11:12Z",
-        "archived": false
-      },
-      "review": {
-        "state": "pending-review",
-        "reason": "ecosystem-infrastructure"
-      },
-      "verification": {
-        "state": "unverified",
-        "evidence": "GitHub Topic metadata and explicit DSH project claim; source review pending"
-      },
-      "registry": {
-        "state": "ineligible",
-        "reason": "market-layer-not-plugin-install"
-      }
-    },
-    {
-      "id": "easyhoov/deepseek-harness-desktop-windows",
-      "layer": "infrastructure",
-      "name": "deepseek-harness-desktop-windows",
-      "description": "Unofficial in-process desktop app for DeepSeek Harness: the host composition boots inside the Electron main process with zero ports and an IPC bridge. Not affiliated with DeepSeek.",
-      "kind": "application",
-      "category": "infrastructure",
-      "tags": [
-        "dsh",
-        "ecosystem-infrastructure"
-      ],
-      "author": {
-        "name": "Easyhoov",
-        "url": "https://github.com/Easyhoov"
-      },
-      "source": {
-        "repository": "https://github.com/Easyhoov/deepseek-harness-desktop-windows",
-        "ref": "main",
-        "path": null
-      },
-      "updatedAt": "2026-08-14T17:59:37Z",
-      "version": null,
-      "license": "未声明",
-      "featured": false,
-      "discovery": {
-        "stars": 0,
-        "createdAt": "2026-08-13T17:24:11Z",
-        "commitUpdatedAt": "2026-08-14T17:59:37Z",
-        "metadataUpdatedAt": "2026-08-14T17:59:51Z",
-        "archived": false
-      },
-      "review": {
-        "state": "pending-review",
-        "reason": "ecosystem-infrastructure"
-      },
-      "verification": {
-        "state": "unverified",
-        "evidence": "GitHub Topic metadata and explicit DSH project claim; source review pending"
-      },
-      "registry": {
-        "state": "ineligible",
-        "reason": "market-layer-not-plugin-install"
-      }
-    },
-    {
       "id": "xiangshangya/deepseek-harness-desktop",
       "layer": "infrastructure",
       "name": "deepseek-harness-desktop",
@@ -1527,10 +1175,230 @@
       "license": "未声明",
       "featured": false,
       "discovery": {
-        "stars": 0,
+        "stars": 1,
         "createdAt": "2026-08-13T18:27:59Z",
         "commitUpdatedAt": "2026-08-13T18:42:42Z",
-        "metadataUpdatedAt": "2026-08-13T18:44:47Z",
+        "metadataUpdatedAt": "2026-08-15T00:59:59Z",
+        "archived": false
+      },
+      "review": {
+        "state": "pending-review",
+        "reason": "ecosystem-infrastructure"
+      },
+      "verification": {
+        "state": "unverified",
+        "evidence": "GitHub Topic metadata and explicit DSH project claim; source review pending"
+      },
+      "registry": {
+        "state": "ineligible",
+        "reason": "market-layer-not-plugin-install"
+      }
+    },
+    {
+      "id": "xiaoyangcheng84-svg/dsh-skin-manager",
+      "layer": "infrastructure",
+      "name": "dsh-skin-manager",
+      "description": "一个可以管理皮肤的dsh插件",
+      "kind": "manager",
+      "category": "infrastructure",
+      "tags": [
+        "dsh",
+        "ecosystem-infrastructure"
+      ],
+      "author": {
+        "name": "xiaoyangcheng84-svg",
+        "url": "https://github.com/xiaoyangcheng84-svg"
+      },
+      "source": {
+        "repository": "https://github.com/xiaoyangcheng84-svg/dsh-skin-manager",
+        "ref": "main",
+        "path": null
+      },
+      "updatedAt": "2026-08-15T09:26:44Z",
+      "version": null,
+      "license": "未声明",
+      "featured": false,
+      "discovery": {
+        "stars": 1,
+        "createdAt": "2026-08-15T09:18:52Z",
+        "commitUpdatedAt": "2026-08-15T09:26:44Z",
+        "metadataUpdatedAt": "2026-08-15T13:31:22Z",
+        "archived": false
+      },
+      "review": {
+        "state": "pending-review",
+        "reason": "ecosystem-infrastructure"
+      },
+      "verification": {
+        "state": "unverified",
+        "evidence": "GitHub Topic metadata and explicit DSH project claim; source review pending"
+      },
+      "registry": {
+        "state": "ineligible",
+        "reason": "market-layer-not-plugin-install"
+      }
+    },
+    {
+      "id": "doiiarx/dsh-settings-search-plugin",
+      "layer": "infrastructure",
+      "name": "dsh-settings-search-plugin",
+      "description": "Search field for the DSH Web Settings panel: independent candidate list, click to navigate to the owning section and focus the setting",
+      "kind": "manager",
+      "category": "infrastructure",
+      "tags": [
+        "dsh",
+        "ecosystem-infrastructure"
+      ],
+      "author": {
+        "name": "DoiiarX",
+        "url": "https://github.com/DoiiarX"
+      },
+      "source": {
+        "repository": "https://github.com/DoiiarX/dsh-settings-search-plugin",
+        "ref": "main",
+        "path": null
+      },
+      "updatedAt": "2026-08-15T21:22:10Z",
+      "version": null,
+      "license": "未声明",
+      "featured": false,
+      "discovery": {
+        "stars": 0,
+        "createdAt": "2026-08-15T17:06:54Z",
+        "commitUpdatedAt": "2026-08-15T21:22:10Z",
+        "metadataUpdatedAt": "2026-08-15T21:22:32Z",
+        "archived": false
+      },
+      "review": {
+        "state": "pending-review",
+        "reason": "ecosystem-infrastructure"
+      },
+      "verification": {
+        "state": "unverified",
+        "evidence": "GitHub Topic metadata and explicit DSH project claim; source review pending"
+      },
+      "registry": {
+        "state": "ineligible",
+        "reason": "market-layer-not-plugin-install"
+      }
+    },
+    {
+      "id": "luumod/dsh-desktop-lifecycle",
+      "layer": "infrastructure",
+      "name": "dsh-desktop-lifecycle",
+      "description": "为 DeepSeek Harness Desktop 与 Web 提供关闭和重启控制按钮。",
+      "kind": "application",
+      "category": "infrastructure",
+      "tags": [
+        "dsh",
+        "ecosystem-infrastructure"
+      ],
+      "author": {
+        "name": "luumod",
+        "url": "https://github.com/luumod"
+      },
+      "source": {
+        "repository": "https://github.com/luumod/dsh-desktop-lifecycle",
+        "ref": "main",
+        "path": null
+      },
+      "updatedAt": "2026-08-16T01:41:13Z",
+      "version": null,
+      "license": "未声明",
+      "featured": false,
+      "discovery": {
+        "stars": 0,
+        "createdAt": "2026-08-15T09:53:17Z",
+        "commitUpdatedAt": "2026-08-16T01:41:13Z",
+        "metadataUpdatedAt": "2026-08-16T01:41:17Z",
+        "archived": false
+      },
+      "review": {
+        "state": "pending-review",
+        "reason": "ecosystem-infrastructure"
+      },
+      "verification": {
+        "state": "unverified",
+        "evidence": "GitHub Topic metadata and explicit DSH project claim; source review pending"
+      },
+      "registry": {
+        "state": "ineligible",
+        "reason": "market-layer-not-plugin-install"
+      }
+    },
+    {
+      "id": "reimu-create/uiopt",
+      "layer": "infrastructure",
+      "name": "uiopt",
+      "description": "uiopt - DSH WebUI display enhancer: realtime balance, context ring, cache hit rate, provider icons, extra-plugin manager",
+      "kind": "manager",
+      "category": "infrastructure",
+      "tags": [
+        "dsh",
+        "ecosystem-infrastructure"
+      ],
+      "author": {
+        "name": "reimu-create",
+        "url": "https://github.com/reimu-create"
+      },
+      "source": {
+        "repository": "https://github.com/reimu-create/uiopt",
+        "ref": "master",
+        "path": null
+      },
+      "updatedAt": "2026-08-15T08:04:08Z",
+      "version": null,
+      "license": "未声明",
+      "featured": false,
+      "discovery": {
+        "stars": 0,
+        "createdAt": "2026-08-14T05:00:36Z",
+        "commitUpdatedAt": "2026-08-15T08:04:08Z",
+        "metadataUpdatedAt": "2026-08-15T08:14:34Z",
+        "archived": false
+      },
+      "review": {
+        "state": "pending-review",
+        "reason": "ecosystem-infrastructure"
+      },
+      "verification": {
+        "state": "unverified",
+        "evidence": "GitHub Topic metadata and explicit DSH project claim; source review pending"
+      },
+      "registry": {
+        "state": "ineligible",
+        "reason": "market-layer-not-plugin-install"
+      }
+    },
+    {
+      "id": "yi-wei-h/dsh-skill-manager",
+      "layer": "infrastructure",
+      "name": "dsh-skill-manager",
+      "description": "管理DSH中的skill",
+      "kind": "manager",
+      "category": "infrastructure",
+      "tags": [
+        "dsh",
+        "ecosystem-infrastructure"
+      ],
+      "author": {
+        "name": "Yi-Wei-H",
+        "url": "https://github.com/Yi-Wei-H"
+      },
+      "source": {
+        "repository": "https://github.com/Yi-Wei-H/dsh-skill-manager",
+        "ref": "main",
+        "path": null
+      },
+      "updatedAt": "2026-08-15T07:30:48Z",
+      "version": null,
+      "license": "未声明",
+      "featured": false,
+      "discovery": {
+        "stars": 0,
+        "createdAt": "2026-08-15T06:05:31Z",
+        "commitUpdatedAt": "2026-08-15T07:30:48Z",
+        "metadataUpdatedAt": "2026-08-15T07:30:55Z",
         "archived": false
       },
       "review": {

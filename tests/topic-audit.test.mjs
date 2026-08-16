@@ -47,7 +47,8 @@ test('topic audit stats match decisions and dsh-mygo cannot leak into plugin sur
   const core = audit.repositories.find((entry) => entry.owner === 'deepseek-ai' && entry.name === 'deepseek-harness')
   assert.equal(core.decision, 'exclude')
 
-  const qualified = new Map(audit.repositories.filter((entry) => entry.decision === 'include').map((entry) => [entry.url, entry]))
+  const repositoryKey = (url) => new URL(url).pathname.split('/').filter(Boolean).slice(0, 2).join('/').toLocaleLowerCase('en-US')
+  const qualified = new Map(audit.repositories.filter((entry) => entry.decision === 'include').map((entry) => [repositoryKey(entry.url), entry]))
   for (const entry of audit.repositories) {
     assert.ok(entry.evidence.creation)
     assert.equal(entry.evidence.creation.createdAt === null || Number.isFinite(Date.parse(entry.evidence.creation.createdAt)), true)
@@ -64,7 +65,7 @@ test('topic audit stats match decisions and dsh-mygo cannot leak into plugin sur
   assert.equal(audit.repositories.some((entry) => entry.decision === 'include'
     && ['missing-production-harness-dependency', 'unbounded-production-harness-dependency', 'unlinked-production-harness-dependency', 'static-extension-needs-workshop-manifest'].includes(entry.reasonCode)), false)
   for (const entry of catalog.packages.filter((entry) => entry.status === 'discovery')) {
-    const evidence = qualified.get(entry.repository)
+    const evidence = qualified.get(repositoryKey(entry.repository))
     assert.equal(evidence?.qualification, 'verified')
     assert.ok(evidence.evidence.strongSignals.length > 0)
     assert.equal(entry.discovery.creationEligibility === 'community-repository-created-in-window'

@@ -45,41 +45,69 @@ async function search(query, page) {
   return value
 }
 
-function utcDate(offsetDays = 0) {
-  const date = new Date()
-  date.setUTCDate(date.getUTCDate() + offsetDays)
-  return date.toISOString().slice(0, 10)
+function searchInstant(milliseconds) {
+  return new Date(Math.floor(milliseconds / 1_000) * 1_000).toISOString().replace('.000Z', 'Z')
 }
 
-const yesterday = utcDate(-1)
-const today = utcDate(0)
-const partitions = [
-  `topic:${TOPIC} created:<${yesterday}`,
-  `topic:${TOPIC} created:${yesterday}`,
-  `topic:${TOPIC} created:${today}T00:00:00Z..${today}T05:59:59Z`,
-  `topic:${TOPIC} created:${today}T06:00:00Z..${today}T11:59:59Z`,
-  `topic:${TOPIC} created:${today}T12:00:00Z..${today}T17:59:59Z`,
-  `topic:${TOPIC} created:>=${today}T18:00:00Z`,
-]
+function lastSecondBeforeNextUtcMidnight() {
+  const now = new Date()
+  return Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1) - 1_000
+}
+
+function rangeQuery(start, end) {
+  return `topic:${TOPIC} created:${searchInstant(start)}..${searchInstant(end)}`
+}
+
+// GitHub Search exposes at most 1,000 results for any one query. The Topic can
+// grow past that limit in hours, so fixed "yesterday/today" buckets are not a
+// completeness guarantee. Probe a half-open creation-time range and bisect it
+// until every leaf query is independently below the cap. GitHub supports one
+// inclusive range qualifier, so adjacent partitions advance by one second to
+// remain non-overlapping without dropping a boundary timestamp.
+const partitions = []
 const repositoriesByName = new Map()
 let observed = 0
 let observedPages = 0
-for (const query of partitions) {
+async function captureRange(start, end, attempt = 1) {
+  const query = rangeQuery(start, end)
   const first = await search(query, 1)
-  if (first.total_count > 1_000) throw new Error(`partition exceeds the GitHub Search 1,000-result cap: ${query} (${first.total_count})`)
-  observed += first.total_count
+  if (first.total_count > 1_000) {
+    const midpoint = Math.floor((start + end) / 2_000) * 1_000
+    if (midpoint < start || midpoint >= end) {
+      throw new Error(`one-second partition exceeds the GitHub Search 1,000-result cap: ${query} (${first.total_count})`)
+    }
+    await captureRange(start, midpoint)
+    await captureRange(midpoint + 1_000, end)
+    return
+  }
   const pages = Math.ceil(first.total_count / 100)
-  observedPages += pages
+  const partitionRepositories = new Map()
   for (let page = 1; page <= pages; page += 1) {
     const value = page === 1 ? first : await search(query, page)
     for (const repository of value.items) {
       const key = repository.full_name.toLocaleLowerCase('en-US')
-      const previous = repositoriesByName.get(key)
-      if (!previous || String(repository.updated_at) > String(previous.updated_at)) repositoriesByName.set(key, repository)
+      const previous = partitionRepositories.get(key)
+      if (!previous || String(repository.updated_at) > String(previous.updated_at)) partitionRepositories.set(key, repository)
     }
     process.stderr.write(`captured ${query} page ${page}/${pages}\n`)
   }
+  if (partitionRepositories.size !== first.total_count) {
+    if (attempt >= 4) {
+      throw new Error(`unstable GitHub Search partition after ${attempt} attempts: ${query} (${partitionRepositories.size}/${first.total_count} unique)`)
+    }
+    process.stderr.write(`retrying unstable partition ${query}: ${partitionRepositories.size}/${first.total_count} unique on attempt ${attempt}\n`)
+    await captureRange(start, end, attempt + 1)
+    return
+  }
+  partitions.push(query)
+  observed += first.total_count
+  observedPages += pages
+  for (const [key, repository] of partitionRepositories) {
+    const previous = repositoriesByName.get(key)
+    if (!previous || String(repository.updated_at) > String(previous.updated_at)) repositoriesByName.set(key, repository)
+  }
 }
+await captureRange(Date.UTC(2008, 0, 1), lastSecondBeforeNextUtcMidnight())
 if (repositoriesByName.size !== observed) {
   throw new Error(`partitioned Topic snapshot mismatch: received ${repositoriesByName.size} unique repositories, expected ${observed}`)
 }

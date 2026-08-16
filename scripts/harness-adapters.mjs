@@ -14,7 +14,7 @@ import {
   writeFile,
 } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
-import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path'
+import { delimiter, dirname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 
 import { Client } from '@modelcontextprotocol/client'
 import { StdioClientTransport } from '@modelcontextprotocol/client/stdio'
@@ -28,6 +28,10 @@ const MAX_SKILL_BYTES = 5 * 1024 * 1024
 const SKILL_NAME_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const SECRET_RE = /(?:github_pat_|\bgh[opusr]_[A-Za-z0-9_]{16,}|\bnpm_[A-Za-z0-9]{20,}|-----BEGIN(?: [A-Z]+)? PRIVATE KEY-----|\bAKIA[0-9A-Z]{16}\b)/i
 const DANGEROUS_COMMAND_RE = /(?:\bcurl\b[^\n|]*\|\s*(?:sudo\s+)?(?:sh|bash|zsh)\b|\bwget\b[^\n|]*\|\s*(?:sudo\s+)?(?:sh|bash|zsh)\b|\brm\s+-[^\n]*r[^\n]*f[^\n]*(?:\s\/\s|\s~(?:\/|\s|$)|\$HOME)|\bsudo\b|\bnpm\s+publish\b|\bchmod\s+777\b|\b(?:security|defaults)\s+delete\b)/i
+const HARNESS_PNPM = Object.freeze({
+  version: '10.34.5',
+  integrity: 'sha512-pO4F8vc2WCVb1qiYWcBlpFwopX2u+uLIk6Fo7itzFow3uR6D5X6mdlStA/AwMXRkMOi84442LgQmBfuKvIAZLg==',
+})
 
 function contained(root, target) {
   const child = relative(resolve(root), resolve(target))
@@ -481,6 +485,7 @@ export async function createRc6ProfileAdapter({
     return commandResult(wrapped.command, wrapped.args, {
       cwd: workspace,
       env: childEnvironment(workspace, {
+        PATH: `${join(runtimeRoot, 'node_modules', '.bin')}${delimiter}${process.env.PATH || '/usr/bin:/bin'}`,
         DSH_HOME: dshHome,
         OMDSH_HARNESS_PROBE_DIR: probeRoot,
         npm_config_ignore_scripts: 'true',
@@ -627,6 +632,7 @@ export async function createRc6ProfileAdapter({
         await commandResult('npm', [
           'install',
           `${plan.baseline.package}@${plan.baseline.version}`,
+          `pnpm@${HARNESS_PNPM.version}`,
           ...sourceRuntimeDependencies.map(({ name, version }) => `${name}@${version}`),
           '--save-exact',
           '--ignore-scripts',
@@ -644,6 +650,11 @@ export async function createRc6ProfileAdapter({
         const integrity = lock.packages?.['node_modules/@deepseek-ai/dsh']?.integrity
         if (installed.version !== plan.baseline.version || integrity !== plan.baseline.integrity) {
           return failed(`installed runtime binding mismatch: ${installed.version} ${integrity}`, { runtimeExact: false })
+        }
+        const installedPnpm = await readJson(join(runtimeRoot, 'node_modules', 'pnpm', 'package.json'))
+        const pnpmIntegrity = lock.packages?.['node_modules/pnpm']?.integrity
+        if (installedPnpm.version !== HARNESS_PNPM.version || pnpmIntegrity !== HARNESS_PNPM.integrity) {
+          return failed(`installed pnpm binding mismatch: ${installedPnpm.version} ${pnpmIntegrity}`, { runtimeExact: true, toolchainExact: false })
         }
         for (const binding of profileBase.exactPackages) {
           const packagePath = join(runtimeRoot, 'node_modules', ...binding.package.split('/'), 'package.json')
@@ -665,7 +676,7 @@ export async function createRc6ProfileAdapter({
         const sourceDependencyEvidence = sourceRuntimeDependencies.length > 0
           ? `; prebound source runtime dependencies ${sourceRuntimeDependencies.map(({ name, version }) => `${name}@${version}`).join(', ')}`
           : ''
-        return passed(`installed exact ${plan.baseline.package}@${installed.version} and ${profileBase.template} Profile base with matching sha512 integrities${sourceDependencyEvidence}`, { runtimeExact: true, profileBaseExact: true })
+        return passed(`installed exact ${plan.baseline.package}@${installed.version}, pnpm@${installedPnpm.version}, and ${profileBase.template} Profile base with matching sha512 integrities${sourceDependencyEvidence}`, { runtimeExact: true, profileBaseExact: true, toolchainExact: true })
       }
       if (item.id === 'candidate.create') {
         await initProfile('current')

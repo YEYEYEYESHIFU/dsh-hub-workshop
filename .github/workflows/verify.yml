@@ -10,6 +10,9 @@ on:
       - 'automation-policy.json'
       - 'scripts/typed-harness-lib.mjs'
       - 'scripts/automation-policy-lib.mjs'
+      - 'scripts/harness-adapters.mjs'
+      - 'scripts/loader-adapter-lib.mjs'
+      - 'scripts/loader-adapters/*.mjs'
   workflow_dispatch:
     inputs:
       release_id:

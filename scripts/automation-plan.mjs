@@ -3,7 +3,7 @@
 import { appendFile, readFile, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 
-import { buildAutomationPlan } from './automation-policy-lib.mjs'
+import { automationPlanExitCode, buildAutomationPlan } from './automation-policy-lib.mjs'
 
 function option(name) {
   const index = process.argv.indexOf(`--${name}`)
@@ -41,4 +41,4 @@ if (process.env.GITHUB_OUTPUT) {
   ].map((line) => `${line}\n`).join(''))
 }
 console.log(JSON.stringify(plan, null, 2))
-if (plan.blocked.length > 0) process.exitCode = 2
+process.exitCode = automationPlanExitCode(plan, { explicitSingleRelease: Boolean(option('release')) })

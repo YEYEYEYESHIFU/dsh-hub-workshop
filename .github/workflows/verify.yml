@@ -94,6 +94,7 @@ jobs:
         run: node scripts/checkout-intake-source.mjs --release "${{ matrix.releaseId }}" --output "$RUNNER_TEMP/source" --previous-output "$RUNNER_TEMP/previous"
       - run: node scripts/run-automation-verification.mjs --release "${{ matrix.releaseId }}" --runtime "${{ matrix.runtimeVersion }}" --source "${{ steps.source.outputs.source_root }}" --previous-source "${{ steps.source.outputs.previous_source_root }}"
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: verification-${{ matrix.key }}
           path: |
@@ -121,6 +122,7 @@ jobs:
         run: node scripts/checkout-intake-source.mjs --release "${{ matrix.releaseId }}" --output "$RUNNER_TEMP/source" --previous-output "$RUNNER_TEMP/previous"
       - run: node scripts/run-automation-verification.mjs --release "${{ matrix.releaseId }}" --runtime "${{ matrix.runtimeVersion }}" --source "${{ steps.source.outputs.source_root }}" --previous-source "${{ steps.source.outputs.previous_source_root }}" --trust-source-execution --pnpm-store "$RUNNER_TEMP/pnpm-store"
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: verification-${{ matrix.key }}
           path: |

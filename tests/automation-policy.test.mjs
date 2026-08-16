@@ -34,6 +34,7 @@ test('automation policy retains the two trust boundaries', () => {
 
 test('verification finalization preserves independent evidence without implicit Admission', () => {
   assert.match(verificationWorkflow, /merge-multiple: true\n\s+path: intake/)
+  assert.match(verificationWorkflow, /runnable_release_ids/)
   assert.match(verificationWorkflow, /inputs\.risk_level != 'unknown'/)
 })
 

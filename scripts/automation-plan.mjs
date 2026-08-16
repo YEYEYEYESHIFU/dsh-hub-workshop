@@ -28,6 +28,7 @@ const output = option('output')
 if (output) await writeFile(resolve(output), `${JSON.stringify(plan, null, 2)}\n`)
 const staticJobs = plan.jobs.filter((job) => !job.requiresTrust)
 const trustedJobs = plan.jobs.filter((job) => job.requiresTrust)
+const runnableReleaseIds = [...new Set(plan.jobs.map((job) => job.releaseId))]
 if (process.env.GITHUB_OUTPUT) {
   await appendFile(process.env.GITHUB_OUTPUT, [
     `static_matrix=${JSON.stringify({ include: staticJobs })}`,
@@ -36,6 +37,7 @@ if (process.env.GITHUB_OUTPUT) {
     `trusted_count=${trustedJobs.length}`,
     `admission_eligible=${plan.summary.admissionEligible}`,
     `release_ids=${JSON.stringify(plan.releaseIds)}`,
+    `runnable_release_ids=${JSON.stringify(runnableReleaseIds)}`,
     `selected_count=${plan.summary.releases}`,
     `blocked_count=${plan.blocked.length}`
   ].map((line) => `${line}\n`).join(''))

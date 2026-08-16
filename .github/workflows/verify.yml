@@ -50,6 +50,7 @@ jobs:
       trusted_count: ${{ steps.plan.outputs.trusted_count }}
       admission_eligible: ${{ steps.plan.outputs.admission_eligible }}
       release_ids: ${{ steps.plan.outputs.release_ids }}
+      runnable_release_ids: ${{ steps.plan.outputs.runnable_release_ids }}
       selected_count: ${{ steps.plan.outputs.selected_count }}
     steps:
       - uses: actions/checkout@v4
@@ -158,7 +159,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node scripts/github-environment-review.mjs
       - name: Synchronize current-baseline evidence
-        run: npm run intake:sync-evidence
+        env:
+          RUNNABLE_RELEASE_IDS: ${{ needs.prepare.outputs.runnable_release_ids }}
+        run: node scripts/sync-harness-evidence.mjs --releases-json "$RUNNABLE_RELEASE_IDS"
       - name: Apply the contingent Admission decision
         if: github.event_name == 'workflow_dispatch' && needs.prepare.outputs.admission_eligible == 'true' && inputs.risk_level != 'unknown'
         env:

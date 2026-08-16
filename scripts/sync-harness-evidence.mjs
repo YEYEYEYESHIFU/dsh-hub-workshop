@@ -29,7 +29,8 @@ function exclusionState(record) {
   return null
 }
 
-export async function syncHarnessEvidence({ root = ROOT } = {}) {
+export async function syncHarnessEvidence({ root = ROOT, releaseIds = null } = {}) {
+  const selected = releaseIds === null ? null : new Set(releaseIds)
   const [baseline, admissions, names] = await Promise.all([
     json('official-baseline.json', root),
     json('registry-admissions.json', root),
@@ -40,6 +41,7 @@ export async function syncHarnessEvidence({ root = ROOT } = {}) {
   const skipped = []
   for (const name of names.filter((value) => value.endsWith('.json')).sort()) {
     const record = await json(`intake/records/${name}`, root)
+    if (selected && !selected.has(record.id)) continue
     const reportPath = reportFileForRecord(record)
     const planPath = planFileForRecord(record)
     let report
@@ -101,7 +103,12 @@ export async function syncHarnessEvidence({ root = ROOT } = {}) {
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const result = await syncHarnessEvidence()
+  const releasesIndex = process.argv.indexOf('--releases-json')
+  const releaseIds = releasesIndex < 0 ? null : JSON.parse(process.argv[releasesIndex + 1] || 'null')
+  if (releaseIds !== null && (!Array.isArray(releaseIds) || releaseIds.some((id) => typeof id !== 'string' || !id))) {
+    throw new Error('--releases-json must contain an array of release IDs')
+  }
+  const result = await syncHarnessEvidence({ releaseIds })
   console.log(`synchronized ${result.synchronized.length} passed Harness report(s); recorded ${result.blocked.length} blocked report(s); skipped ${result.skipped.length}`)
   for (const item of result.skipped) console.log(`- ${item.id}: ${item.reason}`)
 }

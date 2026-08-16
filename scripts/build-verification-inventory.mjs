@@ -3,24 +3,36 @@
 import { readFile, rename, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 
+import { githubRepository, validateExternalEvidence } from './external-evidence-lib.mjs'
+
 const ROOT = resolve(import.meta.dirname, '..')
 const json = async (path) => JSON.parse(await readFile(resolve(ROOT, path), 'utf8'))
-const [catalog, admissions, baseline, queue] = await Promise.all([
+const [catalog, admissions, baseline, queue, topicSnapshot, externalEvidence] = await Promise.all([
   json('catalog.json'),
   json('registry-admissions.json'),
   json('official-baseline.json'),
   json('intake-queue.json'),
+  json('topic-repositories.json'),
+  json('external-evidence.json'),
 ])
+const externalErrors = validateExternalEvidence(externalEvidence)
+if (externalErrors.length) throw new Error(externalErrors.join('; '))
 const baselineId = `${baseline.runtime.package}@${baseline.runtime.version}`
 const blocked = new Map(admissions.blocked.map((record) => [record.id, record]))
 const admitted = new Map(admissions.admissions.map((record) => [record.id, record]))
 const intake = new Map(queue.records.map((record) => [record.submission.manifest.project.id, record]))
+const topicByRepository = new Map(topicSnapshot.repositories.map((repository) => [`${repository.owner}/${repository.name}`.toLocaleLowerCase('en-US'), repository]))
+const externalByRepository = new Map(externalEvidence.observations.map((observation) => [observation.repository.fullName.toLocaleLowerCase('en-US'), observation]))
 
 const projects = catalog.packages.map((project) => {
   const blockedRecord = blocked.get(project.id)
   const admission = admitted.get(project.id)
   const intakeRecord = intake.get(project.id)
   const exactIntake = intakeRecord?.submission?.manifest?.release?.version === project.version ? intakeRecord : null
+  const repository = githubRepository(project.repository)
+  if (!repository) throw new Error(`${project.id}: invalid catalog repository identity`)
+  const topic = topicByRepository.get(repository.key)
+  const external = externalByRepository.get(repository.key)
   const requestedMode = admission?.mode || blockedRecord?.mode || 'guided'
   const management = requestedMode === 'profile-bundle'
     ? 'transactional'
@@ -32,6 +44,12 @@ const projects = catalog.packages.map((project) => {
     repository: project.repository,
     ref: project.ref,
     path: project.repositoryPath || null,
+    identity: {
+      repositoryId: Number.isSafeInteger(topic?.repositoryId) ? topic.repositoryId : null,
+      fullName: repository.fullName,
+      repository: repository.url,
+      path: project.repositoryPath || null,
+    },
     management: exactIntake?.classification?.management || management,
     review: {
       state: exactIntake?.review?.state || (admission ? 'approved' : 'pending-review'),
@@ -53,6 +71,15 @@ const projects = catalog.packages.map((project) => {
     registry: {
       state: exactIntake?.registry?.state || (admission ? 'admitted' : 'ineligible'),
     },
+    externalEvidence: external ? [{
+      provider: external.provider,
+      scope: external.scope.type,
+      status: external.probe.status,
+      observedAt: external.observedAt,
+      runtime: structuredClone(external.runtime),
+      authority: external.authority,
+      source: structuredClone(external.source),
+    }] : [],
     capabilities: project.workshop,
   }
 }).sort((left, right) => left.id.localeCompare(right.id))
@@ -89,6 +116,7 @@ const output = {
     catalogDoesNotGrantInstallAuthority: true,
     historicalEvidenceDoesNotSatisfyCurrentBaseline: true,
     unknownProjectsUseGuidedPublicHandling: true,
+    externalEvidenceIsSupplemental: true,
     failClosed: true,
   },
   summary: {
@@ -102,6 +130,11 @@ const output = {
     hotReload: capabilityCounts((capabilities) => capabilities.lifecycle.hotReload.state),
     integrationProtocols: capabilityCounts((capabilities) => capabilities.integration.protocol),
     admissionRoutes: capabilityCounts((capabilities) => capabilities.admission.route),
+    externalEvidence: {
+      matchedProjects: projects.filter((project) => project.externalEvidence.length > 0).length,
+      reportedPass: projects.filter((project) => project.externalEvidence.some((evidence) => evidence.status === 'reported-pass')).length,
+      reportedFail: projects.filter((project) => project.externalEvidence.some((evidence) => evidence.status === 'reported-fail')).length,
+    },
   },
   projects,
 }

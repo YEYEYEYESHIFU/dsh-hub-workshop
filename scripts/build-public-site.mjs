@@ -6,6 +6,8 @@ import { dirname, resolve } from 'node:path'
 const ROOT = resolve(import.meta.dirname, '..')
 const TARGET = resolve(ROOT, '.public-site')
 const FILES = [
+  'automation-policy.json',
+  'automation-policy.schema.json',
   'api/v1/ecosystem.json',
   'api/v1/market.json',
   'api/v1/plugin-types.json',
@@ -39,6 +41,8 @@ const FILES = [
   'distributions-v1.json',
   'distributions-v1.schema.json',
   'ecosystem-repositories.json',
+  'external-evidence.json',
+  'external-evidence.schema.json',
   'harness-plan.schema.json',
   'harness-report.schema.json',
   'index.html',
@@ -48,6 +52,8 @@ const FILES = [
   'intake.schema.json',
   'market-layers.json',
   'market-layers.schema.json',
+  'loader-adapter.schema.json',
+  'loader-adapters.json',
   'official-baseline.json',
   'package-manifest.schema.json',
   'plugins.html',
@@ -59,6 +65,8 @@ const FILES = [
   'recipes-v1.json',
   'recipes.schema.json',
   'registry-v1.json',
+  'registry-trust-roots.json',
+  'registry-trust-roots.schema.json',
   'registry.html',
   'run-records.json',
   'run-records.schema.json',
@@ -66,6 +74,8 @@ const FILES = [
   'topic-repositories.json',
   'topic-plugin-audit.json',
   'verification-inventory.json',
+  'verification-priority.json',
+  'verification-priority.schema.json',
   'workshop-v1.json',
 ]
 

@@ -132,6 +132,7 @@ const snapshot = {
   collection: {
     method: `${GITHUB_TOKEN ? 'authenticated' : 'anonymous'}-partitioned-github-search`,
     partitions,
+    authenticated: Boolean(GITHUB_TOKEN),
     searchCapHandled: true,
     pluginCreationPolicy: {
       communityCreatedAtCutoff: COMMUNITY_PLUGIN_CREATED_AT_CUTOFF,
@@ -141,6 +142,7 @@ const snapshot = {
     excludedRepositoryCount: discoveredRepositories.length - repositories.length,
   },
   repositories: repositories.map((repository) => ({
+    repositoryId: repository.id,
     owner: repository.owner.login,
     name: repository.name,
     url: repository.html_url,

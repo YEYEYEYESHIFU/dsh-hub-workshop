@@ -8,29 +8,24 @@ OMDSH 生态的公开市场、插件目录、审核投影和不可变 Feed 权�
 
 这套架构把生产分散给作者、把信任事实集中到 Workshop：源码、Issue 与 Release 仍由作者仓库持有；Workshop 只记录不可变来源、分类、审核状态和验证证据。市场可见、插件资格、当前基线验证、Registry 准入是四个独立状态。
 
-`dsh-plugin` Topic 只是候选发现源，不等于 Catalog。`topic-plugin-audit.json` 要求文件级插件证据，并从插件层排除主产品、生态基础设施、发行版、awesome 清单、文档、模板、独立应用、占位仓、不可用的私有来源以及只有 Topic 没有插件契约的仓库。运行 `npm run topic:audit` 刷新证据报告，运行 `npm run topic:apply` 把结果应用到现有 Catalog 快照。
+`dsh-plugin` Topic 只是候选发现源，不等于 Catalog。`topic-plugin-audit.json` 要求文件级插件证据，并从插件层排除主产品、生态基础设施、发行版、awesome 清单、文档、模板、独立应用、占位仓、不可用的私有来源以及只有 Topic 没有插件契约的仓库。审计中的 `static-evidence-passed` 只表示静态插件证据成立，不表示运行验证或 Admission。运行 `npm run topic:audit` 刷新证据报告，运行 `npm run topic:apply` 把结果应用到现有 Catalog 快照。
 
-`registry-admissions.json` 是审核源。`npm run intake:sync-evidence` 只把已通过的 typed Harness 报告同步到 Intake，不代替人工批准。维护者先用 `npm run registry:approve -- inspect <project@version>` 查看精确 Release，再用 `npm run registry:approve -- approve <project@version> --reviewer <identity>` 记录唯一一次人工决定；合格的 Profile Admission 和全部下游 Feed 随后自动生成。引导协议始终只进 Catalog，Harness 阻塞的版本保持不可安装。
+`external-evidence.json` 固定外部雷达公开快照的 commit 与摘要，只作补充证据；`verification-priority.json` 将它与本地库存组合成下一步队列。外部 verdict 不会直接进入 Registry，也不会替代固定 Release 在其声明 DSH 版本与当前官方基线上的 typed Harness。
 
-Builder 明确分成两条路径。本地 `omdsh-pack-source/v1` 实验包可以组合 Registry Release 和作者自己的 Profile Bundle；自有插件必须固定到公开 GitHub 仓库与完整 commit，并记录每个组件的 SPDX 许可证和来源，但应用时需要显式本地信任，也不会获得公开安装权限。可信社区发行仍然只能引用 Registry Release。
-
-可信社区整合包使用一条独立、成本更低的组合审核链路。`[Distribution]` Issue 自动化只从公开仓库的精确 commit 读取 `omdsh-distribution/v1` 清单，不执行作者代码；只要有一个组件不在当前 Registry 快照中，就直接拒绝。Builder 和生成的 Feed 会列出每个已解析组件的许可证及声明来源，但不会替作者作法律兼容性判断。维护者先运行 `npm run distribution:approve -- inspect <distribution@version>`，再运行 `npm run distribution:approve -- approve <distribution@version> --reviewer <identity>` 完成唯一一次人工组合审核。生成的 `distributions-v1.json` 与 `registry-v1.json` 分离，只解析已存在的 Release ID，绝不会提升组件的信任或安装权限。
-
-`npm run feeds:build` 会核对每份证据摘要，并确定性地重新生成 Catalog、Registry、Workshop、Run Record、Recipe、Collection 和 Agent 生态投影。仓库中的 `registry-v1.json` 保持无签名、可复现；生产部署只使用 `OMDSH_REGISTRY_SIGNING_KEY_B64` 和 `OMDSH_REGISTRY_SIGNING_KEY_ID` 对 `.public-site/registry-v1.json` 做 Ed25519 签名。远端消费端必须校验该签名，只有随消费端锁定的内置快照才可显式接受无签名构建产物。
+`registry-admissions.json` 是审核源。`npm run feeds:build` 会核对每份证据的摘要，并确定性地重新生成 Catalog、Registry、Workshop、Run Record、Recipe、Collection 和 Agent 生态投影。公开 Registry 构建产物可复现但不带签名；远端消费端必须使用 `registry-trust-roots.json` 校验生产 Ed25519 签名，只有随消费端一起锁定的内置快照才可显式接受无签名构建产物。生产签名只接受与当前公开信任根匹配的私钥。
 
 ## 验证
 
 ```sh
 npm ci
 npm run feeds:build
-npm run distributions:build
 npm run validate
 npm run deploy:dry-run
 ```
 
 ## 部署
 
-生产部署会同时替换两个域名使用的 `dsh-hub` Cloudflare Worker 版本。部署需要 Cloudflare 部署令牌、账号 ID，以及 Ed25519 Registry 签名私钥和 key ID；Worker 不读取访客 GitHub 身份或 OAuth Secret。
+生产部署会同时替换两个域名使用的 `dsh-hub` Cloudflare Worker 版本。部署只需要 Cloudflare 部署令牌和账号 ID；Worker 不读取访客 GitHub 身份或 OAuth Secret。
 
 ```sh
 npm run deploy

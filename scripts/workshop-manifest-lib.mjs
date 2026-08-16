@@ -3,9 +3,7 @@ export const MCP_PROTOCOL_CURRENT = '2026-07-28'
 export const MCP_PROTOCOL_LEGACY = '2025-11-25'
 export const MCP_REGISTRY_SCHEMA = 'https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json'
 
-const PROTOCOLS = new Set(['harness-profile', 'harness-repository', 'harness-cordis', 'mcp', 'skill', 'third-party'])
 const MODES = new Set(['transactional', 'isolated-trial', 'guided'])
-const ADAPTERS = new Set(['profile-bundle', 'repository-plugin', 'mcp-server', 'skill', 'third-party'])
 const FAILURE_POLICIES = new Set(['generation-rollback', 'discard-candidate', 'discard-process', 'manual'])
 const ACTIVATIONS = new Set(['immediate', 'hot-reload', 'restart-plugin', 'restart-profile', 'restart-host'])
 const DISPOSE = new Set(['supported', 'unsupported', 'unknown'])
@@ -14,7 +12,18 @@ const PERMISSION_RE = /^[a-z][a-z0-9-]*:[a-z][a-z0-9-]*$/
 const MCP_VERSION_RE = /^20[0-9]{2}-[0-9]{2}-[0-9]{2}$/
 const CAPABILITY_ID_RE = /^[a-z0-9][a-z0-9._-]*$/
 const CAPABILITY_KINDS = new Set(['tool', 'command', 'service', 'ui', 'event', 'provider', 'other'])
-const EXECUTABLE_PROTOCOLS = new Set(['harness-profile', 'harness-repository', 'harness-cordis', 'mcp'])
+const SEMVER_RE = /^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?$/
+const EXTENSION_ID_RE = /^[a-z0-9][a-z0-9.-]{0,127}$/
+const BUILTIN_PROTOCOL_ADAPTERS = {
+  'harness-profile': ['profile-bundle'],
+  'harness-repository': ['repository-plugin'],
+  'harness-cordis': ['third-party'],
+  mcp: ['mcp-server'],
+  skill: ['skill'],
+  'third-party': ['third-party'],
+}
+const BUILTIN_ADAPTERS = new Set(Object.values(BUILTIN_PROTOCOL_ADAPTERS).flat())
+const STATIC_PROTOCOLS = new Set(['skill', 'third-party'])
 
 const object = (value) => value && typeof value === 'object' && !Array.isArray(value)
 const uniqueStrings = (value) => Array.isArray(value) && value.every((item) => typeof item === 'string') && new Set(value).size === value.length
@@ -33,17 +42,25 @@ export function validateWorkshopManifest(manifest) {
   const lifecycle = manifest.lifecycle || {}
   const evidence = manifest.evidence || {}
   require(object(integration), 'integration must be an object')
-  require(PROTOCOLS.has(integration.protocol), 'unsupported integration protocol')
+  require(typeof integration.protocol === 'string' && EXTENSION_ID_RE.test(integration.protocol), 'integration protocol id is invalid')
   require(typeof integration.artifact === 'string' && PATH_RE.test(integration.artifact), 'integration.artifact must be a safe repository path')
   require(object(install), 'install must be an object')
   require(MODES.has(install.mode), 'unsupported install mode')
-  require(ADAPTERS.has(install.adapter), 'unsupported install adapter')
+  require(typeof install.adapter === 'string' && EXTENSION_ID_RE.test(install.adapter), 'install adapter id is invalid')
   require(FAILURE_POLICIES.has(install.failurePolicy), 'unsupported failure policy')
   require(typeof install.touchesCurrentBeforeActivation === 'boolean', 'touchesCurrentBeforeActivation must be boolean')
   require(object(lifecycle), 'lifecycle must be an object')
   require(ACTIVATIONS.has(lifecycle.activation), 'unsupported lifecycle activation')
   require(DISPOSE.has(lifecycle.dispose), 'unsupported lifecycle dispose fact')
   require(uniqueStrings(manifest.permissions) && manifest.permissions.every((value) => PERMISSION_RE.test(value)), 'permissions must be unique scope:access values')
+  if (manifest.compatibility !== undefined) {
+    require(object(manifest.compatibility), 'compatibility must be an object')
+    require(uniqueStrings(manifest.compatibility?.dshVersions)
+      && manifest.compatibility.dshVersions.length > 0
+      && manifest.compatibility.dshVersions.every((value) => SEMVER_RE.test(value)), 'compatibility.dshVersions must contain unique exact versions')
+    require(object(manifest.compatibility)
+      && Object.keys(manifest.compatibility).every((key) => key === 'dshVersions'), 'compatibility contains unsupported fields')
+  }
   if (manifest.capability !== undefined) {
     const capability = manifest.capability || {}
     require(object(capability), 'capability must be an object')
@@ -52,7 +69,7 @@ export function validateWorkshopManifest(manifest) {
     require(typeof capability.invocation === 'string' && capability.invocation.length > 0, 'capability.invocation is required')
     require(typeof capability.expected === 'string' && capability.expected.length > 0, 'capability.expected is required')
   }
-  if (EXECUTABLE_PROTOCOLS.has(integration.protocol)) require(object(manifest.capability), `${integration.protocol} requires a named capability target`)
+  if (!STATIC_PROTOCOLS.has(integration.protocol)) require(object(manifest.capability), `${integration.protocol} requires a named capability target`)
   else require(manifest.capability === undefined, `${integration.protocol} cannot declare a runtime capability target`)
   require(object(evidence), 'evidence must be an object')
   for (const name of ['install', 'failureIsolation', 'hotReload', 'remove']) {
@@ -60,7 +77,6 @@ export function validateWorkshopManifest(manifest) {
   }
 
   if (install.mode === 'transactional') {
-    require(install.adapter === 'profile-bundle', 'transactional mode requires profile-bundle adapter')
     require(install.failurePolicy === 'generation-rollback', 'transactional mode requires generation-rollback')
     require(install.touchesCurrentBeforeActivation === false, 'transactional mode must not touch current before activation')
   }
@@ -70,15 +86,9 @@ export function validateWorkshopManifest(manifest) {
   }
   if (install.mode === 'guided') require(install.failurePolicy === 'manual', 'guided mode requires manual failure policy')
   if (lifecycle.activation === 'hot-reload') require(lifecycle.dispose === 'supported', 'hot-reload requires a dispose hook')
-  const protocolAdapters = {
-    'harness-profile': ['profile-bundle'],
-    'harness-repository': ['repository-plugin'],
-    'harness-cordis': ['third-party'],
-    mcp: ['mcp-server'],
-    skill: ['skill'],
-    'third-party': ['third-party'],
-  }
-  require(protocolAdapters[integration.protocol]?.includes(install.adapter), 'install adapter does not match the integration protocol')
+  const builtinPair = BUILTIN_PROTOCOL_ADAPTERS[integration.protocol]
+  if (builtinPair) require(builtinPair.includes(install.adapter), 'install adapter does not match the integration protocol')
+  else require(!BUILTIN_ADAPTERS.has(install.adapter), 'a custom protocol cannot repurpose a built-in install adapter')
 
   if (integration.protocol === 'mcp') {
     const mcp = integration.mcp || {}
@@ -88,8 +98,17 @@ export function validateWorkshopManifest(manifest) {
     require(typeof mcp.serverManifest === 'string' && PATH_RE.test(mcp.serverManifest), 'MCP serverManifest must be a safe repository path')
     require(mcp.serverManifest === integration.artifact, 'MCP artifact must be the official server manifest')
     require(mcp.registrySchema === MCP_REGISTRY_SCHEMA, 'MCP Registry schema is not current')
+    if (manifest.testing !== undefined) {
+      const testing = manifest.testing || {}
+      require(object(testing), 'testing must be an object')
+      require(typeof testing.entry === 'string' && PATH_RE.test(testing.entry) && /\.m?js$/.test(testing.entry), 'testing.entry must be a safe JavaScript module path')
+      require(object(testing.arguments), 'testing.arguments must be an object')
+      require(typeof testing.failureTool === 'string' && CAPABILITY_ID_RE.test(testing.failureTool), 'testing.failureTool is invalid')
+      require(Object.keys(testing).every((key) => ['entry', 'arguments', 'failureTool'].includes(key)), 'testing contains unsupported fields')
+    }
   } else {
     require(integration.mcp === undefined, 'integration.mcp is only valid for MCP')
+    require(manifest.testing === undefined, 'testing is currently supported only for MCP')
   }
   return [...new Set(errors)]
 }

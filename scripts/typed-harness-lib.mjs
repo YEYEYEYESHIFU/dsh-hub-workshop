@@ -1,16 +1,33 @@
+import { createHash } from 'node:crypto'
+
 import { managementMode, validateSubmission } from './intake-lib.mjs'
 import { MCP_PROTOCOL_CURRENT, MCP_REGISTRY_SCHEMA } from './workshop-manifest-lib.mjs'
 
 export const HARNESS_PLAN_SCHEMA = 'omdsh-workshop-harness-plan/v1'
 export const HARNESS_REPORT_SCHEMA = 'omdsh-workshop-harness-report/v1'
 export const HARNESS_EVIDENCE_SCHEMA = 'omdsh-workshop-intake-evidence/v2'
+export const HARNESS_ENGINE_VERSION = '1.1.0'
 
-const EXECUTORS = new Set(['static', 'profile', 'repository', 'mcp', 'cordis', 'skill', 'third-party'])
+const EXECUTORS = new Set(['static', 'profile', 'repository', 'mcp', 'cordis', 'skill', 'third-party', 'loader'])
 const PHASES = new Set(['static', 'supply-chain', 'sandbox', 'install', 'ready', 'functional', 'failure', 'lifecycle', 'update', 'disable', 'remove', 'recovery'])
 const SCOPES = new Set(['source-only', 'ephemeral-workspace', 'candidate-profile', 'isolated-process', 'current-profile-controlled'])
 const RESULT_STATUSES = new Set(['passed', 'failed', 'blocked', 'not-applicable'])
 const CAPABILITY_KINDS = new Set(['tool', 'command', 'service', 'ui', 'event', 'provider', 'other'])
 const SECRET_RE = /(?:github_pat_|\bgh[opusr]_[A-Za-z0-9_]{16,}|\bnpm_[A-Za-z0-9]{20,}|-----BEGIN(?: [A-Z]+)? PRIVATE KEY-----|\bAKIA[0-9A-Z]{16}\b)/i
+
+function canonicalJson(value) {
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`
+  if (value && typeof value === 'object') {
+    return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${canonicalJson(value[key])}`).join(',')}}`
+  }
+  return JSON.stringify(value)
+}
+
+export function harnessEvidenceKey(plan) {
+  const input = structuredClone(plan)
+  delete input.evidenceKey
+  return `sha256:${createHash('sha256').update(canonicalJson(input)).digest('hex')}`
+}
 
 function requireCondition(condition, message, errors) {
   if (!condition) errors.push(message)
@@ -145,7 +162,34 @@ function thirdPartySteps() {
   ]
 }
 
-function plannedClaims(declaration, baseline, management) {
+function loaderSteps(declaration, descriptor, hasPreviousRelease) {
+  const phases = new Set(descriptor.lifecycle)
+  const scope = declaration.install.failurePolicy === 'discard-process' ? 'isolated-process' : 'candidate-profile'
+  return [
+    ...(descriptor.execution === 'trusted-ephemeral'
+      ? [step('sandbox.policy', 'sandbox', 'loader', 'ephemeral-workspace', { workspaceEphemeral: true, networkDeniedByDefault: true, installScriptsDisabled: true, currentProtected: true })]
+      : []),
+    ...(phases.has('install-candidate') ? [
+      step('candidate.create', 'sandbox', 'loader', scope, { candidateCreated: true, currentUntouched: true }),
+      step('install.apply', 'install', 'loader', scope, { installed: true, currentUntouched: true }),
+    ] : []),
+    ...(phases.has('ready') ? [step('ready.probe', 'ready', 'loader', scope, { ready: true })] : []),
+    ...(phases.has('invoke') ? [step('capability.invoke', 'functional', 'loader', scope, { capabilityObserved: true })] : []),
+    ...(phases.has('inject-failure') ? [
+      step('failure.inject-adapter', 'failure', 'loader', scope, { failureInjected: true }),
+      step('failure.current-unchanged', 'failure', 'loader', 'current-profile-controlled', { currentUnchanged: true }),
+      step('failure.discard-adapter', 'failure', 'loader', scope, { failureDiscarded: true }),
+    ] : []),
+    ...(phases.has('activate') ? [step('activation.switch', 'lifecycle', 'loader', 'current-profile-controlled', { activated: true })] : []),
+    ...lifecycleSteps(declaration, 'loader', scope),
+    ...(hasPreviousRelease && phases.has('update') ? [step('update.apply', 'update', 'loader', scope, { updatePassed: true })] : []),
+    ...(phases.has('disable') ? [step('disable.apply', 'disable', 'loader', scope, { disablePassed: true })] : []),
+    ...(phases.has('remove') ? [step('remove.apply', 'remove', 'loader', scope, { removePassed: true })] : []),
+    ...(phases.has('rollback') ? [step('recovery.adapter', 'recovery', 'loader', scope, { recoveryPassed: true })] : []),
+  ]
+}
+
+function plannedClaims(declaration, baseline, management, loaderDescriptor = null) {
   const install = declaration.install
   const protocol = declaration.integration.protocol
   const repositoryBlocked = install.adapter === 'repository-plugin' && baseline.contracts?.repositoryPlugin?.status !== 'available'
@@ -160,9 +204,13 @@ function plannedClaims(declaration, baseline, management) {
       ? { state: 'candidate', reason: 'requires dispose, reactivation, and capability observation' }
       : { state: 'not-declared', reason: `declared activation is ${declaration.lifecycle.activation}` },
     protocolCompatibility: { state: 'candidate', reason: `requires ${protocol} contract checks at the fixed source` },
-    registryReadiness: repositoryBlocked
-      ? { state: 'blocked', reason: 'official Repository Plugin contract is unavailable in the current baseline' }
-      : ['transactional', 'managed'].includes(management)
+    registryReadiness: loaderDescriptor?.authority === 'blocked' || repositoryBlocked
+      ? { state: 'blocked', reason: repositoryBlocked
+          ? 'official Repository Plugin contract is unavailable in the current baseline'
+          : 'the selected Loader Adapter authority is blocked' }
+      : loaderDescriptor?.authority === 'catalog-only'
+        ? { state: 'catalog-only', reason: 'the selected Loader Adapter does not grant Registry installation authority' }
+        : loaderDescriptor?.authority === 'registry-eligible-after-evidence' || ['transactional', 'managed'].includes(management)
         ? { state: 'candidate', reason: 'Harness evidence can proceed to independent maintainer review' }
         : { state: 'catalog-only', reason: 'this protocol has no current Workshop Registry install authority' },
   }
@@ -177,7 +225,7 @@ function profileBase(declaration, baseline) {
   return { template, ...structuredClone(configured) }
 }
 
-export function createHarnessPlan(submission, baseline) {
+export function createHarnessPlan(submission, baseline, loaderDescriptor = null) {
   const errors = validateSubmission(submission)
   if (submission?.schema !== 'omdsh-workshop-submission/v2') errors.push('typed Harness requires a v2 submission with package.json#dshWorkshop')
   if (errors.length > 0) throw new Error(errors.join('; '))
@@ -185,6 +233,13 @@ export function createHarnessPlan(submission, baseline) {
   const declaration = submission.packageManifest
   const management = managementMode(submission.management.method)
   const protocol = declaration.integration.protocol
+  const builtInAdapters = new Set(['profile-bundle', 'repository-plugin', 'mcp-server', 'skill', 'third-party'])
+  if (!builtInAdapters.has(declaration.install.adapter) && !loaderDescriptor) {
+    throw new Error(`custom loader ${declaration.install.adapter}/${protocol} requires a trusted Adapter Registry descriptor`)
+  }
+  if (loaderDescriptor && (loaderDescriptor.match.installAdapter !== declaration.install.adapter || loaderDescriptor.match.protocol !== protocol)) {
+    throw new Error('Loader Adapter descriptor does not match the package manifest binding')
+  }
   const blockedReasons = []
   if (declaration.install.adapter === 'repository-plugin' && baseline.contracts?.repositoryPlugin?.status !== 'available') {
     blockedReasons.push('official-repository-plugin-contract-unavailable')
@@ -201,10 +256,12 @@ export function createHarnessPlan(submission, baseline) {
   else if (declaration.install.adapter === 'mcp-server') typedSteps = mcpSteps(declaration)
   else if (protocol === 'harness-cordis') typedSteps = cordisSteps(declaration)
   else if (declaration.install.adapter === 'skill') typedSteps = skillSteps()
+  else if (loaderDescriptor) typedSteps = loaderSteps(declaration, loaderDescriptor, hasPreviousRelease)
   else typedSteps = thirdPartySteps()
 
   const plan = {
     schema: HARNESS_PLAN_SCHEMA,
+    engineVersion: HARNESS_ENGINE_VERSION,
     id: `${submission.project.id}@${submission.release.version}:${baseline.runtime.version}:${protocol}`,
     projectId: submission.project.id,
     releaseId: `${submission.project.id}@${submission.release.version}`,
@@ -225,6 +282,12 @@ export function createHarnessPlan(submission, baseline) {
       integrity: baseline.runtime.integrity,
     },
     profileBase: profileBase(declaration, baseline),
+    loaderAdapter: loaderDescriptor ? {
+      id: loaderDescriptor.id,
+      version: loaderDescriptor.version,
+      execution: loaderDescriptor.execution,
+      authority: loaderDescriptor.authority,
+    } : null,
     classification: {
       management,
       installMode: declaration.install.mode,
@@ -242,10 +305,11 @@ export function createHarnessPlan(submission, baseline) {
       currentProfile: 'read-only-until-controlled-activation',
       cleanup: 'mandatory',
     },
-    claims: plannedClaims(declaration, baseline, management),
+    claims: plannedClaims(declaration, baseline, management, loaderDescriptor),
     blockedReasons,
     steps: [...commonSteps(protocol), ...typedSteps],
   }
+  plan.evidenceKey = harnessEvidenceKey(plan)
   const planErrors = validateHarnessPlan(plan)
   if (planErrors.length > 0) throw new Error(planErrors.join('; '))
   return plan
@@ -254,10 +318,20 @@ export function createHarnessPlan(submission, baseline) {
 export function validateHarnessPlan(plan) {
   const errors = []
   requireCondition(plan?.schema === HARNESS_PLAN_SCHEMA, 'unsupported Harness plan schema', errors)
+  requireCondition(plan?.engineVersion === HARNESS_ENGINE_VERSION, 'unsupported Harness engine version', errors)
+  requireCondition(/^sha256:[0-9a-f]{64}$/.test(plan?.evidenceKey || ''), 'Harness evidence key is invalid', errors)
+  requireCondition(plan?.evidenceKey === harnessEvidenceKey(plan), 'Harness evidence key does not match the plan', errors)
   requireCondition(typeof plan?.id === 'string' && plan.id.length > 2, 'Harness plan id is required', errors)
   requireCondition(/^[0-9a-f]{40}$/.test(plan?.source?.ref || ''), 'Harness source must use a fixed commit', errors)
   requireCondition(plan?.baseline?.package === '@deepseek-ai/dsh', 'Harness baseline package is invalid', errors)
   requireCondition(/^sha512-/.test(plan?.baseline?.integrity || ''), 'Harness baseline integrity is required', errors)
+  requireCondition(plan?.loaderAdapter === null || typeof plan?.loaderAdapter === 'object', 'Harness Loader Adapter binding is invalid', errors)
+  if (plan?.loaderAdapter) {
+    requireCondition(/^[a-z0-9][a-z0-9.-]*$/.test(plan.loaderAdapter.id || ''), 'Harness Loader Adapter id is invalid', errors)
+    requireCondition(/^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$/.test(plan.loaderAdapter.version || ''), 'Harness Loader Adapter version must be exact semver', errors)
+    requireCondition(['static', 'trusted-ephemeral'].includes(plan.loaderAdapter.execution), 'Harness Loader Adapter execution boundary is invalid', errors)
+    requireCondition(['registry-eligible-after-evidence', 'catalog-only', 'blocked'].includes(plan.loaderAdapter.authority), 'Harness Loader Adapter authority is invalid', errors)
+  }
   if (plan?.classification?.adapter === 'profile-bundle') {
     requireCondition(['base', 'web'].includes(plan?.profileBase?.template), 'Profile Harness requires a fixed base template', errors)
     requireCondition(Array.isArray(plan?.profileBase?.bundles) && plan.profileBase.bundles[0] === '@deepseek-ai/dsh-base', 'Profile base must start with @deepseek-ai/dsh-base', errors)
@@ -305,9 +379,10 @@ export function validateHarnessPlan(plan) {
     requireCondition(plan?.updateFrom === null, 'Harness plan without an update step cannot bind an update source', errors)
   }
   if (plan?.classification?.installMode === 'transactional') {
-    for (const id of ['candidate.create', 'install.apply', 'failure.current-unchanged', 'activation.switch', 'recovery.generation']) {
+    for (const id of ['candidate.create', 'install.apply', 'failure.current-unchanged', 'activation.switch']) {
       requireCondition(ids.has(id), `transactional Harness requires ${id}`, errors)
     }
+    requireCondition(ids.has('recovery.generation') || ids.has('recovery.adapter'), 'transactional Harness requires recovery', errors)
   }
   if (plan?.classification?.installMode === 'isolated-trial') {
     requireCondition(ids.has('failure.current-unchanged'), 'isolated Harness requires current protection evidence', errors)
@@ -398,6 +473,8 @@ export async function runHarnessPlan(plan, adapter, { verifiedAt = new Date().to
 
   const report = {
     schema: HARNESS_REPORT_SCHEMA,
+    engineVersion: plan.engineVersion,
+    evidenceKey: plan.evidenceKey,
     planId: plan.id,
     projectId: plan.projectId,
     releaseId: plan.releaseId,
@@ -405,6 +482,7 @@ export async function runHarnessPlan(plan, adapter, { verifiedAt = new Date().to
     updateFrom: structuredClone(plan.updateFrom),
     baseline: structuredClone(plan.baseline),
     profileBase: structuredClone(plan.profileBase),
+    loaderAdapter: structuredClone(plan.loaderAdapter),
     classification: structuredClone(plan.classification),
     status: terminalStatus,
     execution: {
@@ -426,12 +504,15 @@ export async function runHarnessPlan(plan, adapter, { verifiedAt = new Date().to
 export function validateHarnessReport(report, plan) {
   const errors = []
   requireCondition(report?.schema === HARNESS_REPORT_SCHEMA, 'unsupported Harness report schema', errors)
+  requireCondition(report?.engineVersion === plan?.engineVersion, 'Harness report engine binding mismatch', errors)
+  requireCondition(report?.evidenceKey === plan?.evidenceKey, 'Harness report evidence-key binding mismatch', errors)
   requireCondition(report?.planId === plan?.id, 'Harness report plan binding mismatch', errors)
   requireCondition(report?.projectId === plan?.projectId && report?.releaseId === plan?.releaseId, 'Harness report release binding mismatch', errors)
   requireCondition(JSON.stringify(report?.source) === JSON.stringify(plan?.source), 'Harness report source binding mismatch', errors)
   requireCondition(JSON.stringify(report?.updateFrom) === JSON.stringify(plan?.updateFrom), 'Harness report update-source binding mismatch', errors)
   requireCondition(JSON.stringify(report?.baseline) === JSON.stringify(plan?.baseline), 'Harness report baseline binding mismatch', errors)
   requireCondition(JSON.stringify(report?.profileBase) === JSON.stringify(plan?.profileBase), 'Harness report Profile base binding mismatch', errors)
+  requireCondition(JSON.stringify(report?.loaderAdapter) === JSON.stringify(plan?.loaderAdapter), 'Harness report Loader Adapter binding mismatch', errors)
   requireCondition(['passed', 'failed', 'blocked'].includes(report?.status), 'Harness report status is invalid', errors)
   requireCondition(report?.execution?.trustedSourceExecution === true, 'Harness report must record explicit source trust', errors)
   requireCondition(report?.execution?.workspace === 'ephemeral', 'Harness report must use an ephemeral workspace', errors)
@@ -481,7 +562,9 @@ export function harnessReportToEvidence({ record, report, baseline, environment,
   const byId = new Map(report.steps.map((result) => [result.id, result]))
   const capabilityResult = report.steps.find((result) => result.capability)
   const installId = report.classification.adapter === 'repository-plugin' ? 'repository.install' : 'install.apply'
-  const recoveryId = report.classification.adapter === 'repository-plugin' ? 'recovery.candidate' : 'recovery.generation'
+  const recoveryId = report.classification.adapter === 'repository-plugin'
+    ? 'recovery.candidate'
+    : byId.has('recovery.adapter') ? 'recovery.adapter' : 'recovery.generation'
   const runtimeStatus = guided ? 'not-applicable' : 'passed'
   const runtimeCheck = (id) => guided ? { status: 'not-applicable', evidence: `${id}: protocol is Catalog-only in the current DSH Registry` } : evidenceCheck(byId, id)
   const hotReloadDeclared = record.submission.manifest.packageManifest?.lifecycle?.activation === 'hot-reload'

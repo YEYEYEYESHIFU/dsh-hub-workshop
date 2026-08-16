@@ -88,11 +88,15 @@ function workshopFacts(classification, project = null) {
   return profile
 }
 
+function hasStaticQualification(classification) {
+  return classification?.decision === 'include'
+    && ['verified', 'static-evidence-passed'].includes(classification.qualification)
+}
+
 const reviewedEntries = catalog.packages.filter((entry) => {
   if (entry.status === 'discovery' || entry.id === 'dsh-tool-browser') return false
   const classification = auditByRepository.get(repositoryKey(entry.repository))
-  return classification?.decision === 'include'
-    && classification.qualification === 'verified'
+  return hasStaticQualification(classification)
     && classification.evidence?.creation?.eligible === true
 })
   .map((entry) => {
@@ -108,8 +112,7 @@ const reviewedEntries = catalog.packages.filter((entry) => {
 const retainedDiscoveryEntries = catalog.packages.filter((entry) => {
   if (entry.status !== 'discovery') return false
   const classification = auditByRepository.get(repositoryKey(entry.repository))
-  return classification?.decision === 'include'
-    && classification.qualification === 'verified'
+  return hasStaticQualification(classification)
     && (classification.evidence?.strongSignals || []).length > 0
 })
   .map((entry) => {
@@ -133,8 +136,7 @@ const retainedDiscoveryEntries = catalog.packages.filter((entry) => {
 
 const representedRepositories = new Set([...retainedDiscoveryEntries, ...reviewedEntries].map((entry) => repositoryKey(entry.repository)))
 const generatedEntries = audit.repositories
-  .filter((entry) => entry.decision === 'include'
-    && entry.qualification === 'verified'
+  .filter((entry) => hasStaticQualification(entry)
     && (entry.evidence?.strongSignals || []).length > 0
     && !representedRepositories.has(`${entry.owner}/${entry.name}`.toLocaleLowerCase('en-US')))
   .map((entry) => {

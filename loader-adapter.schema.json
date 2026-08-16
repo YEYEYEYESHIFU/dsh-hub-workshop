@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hub.omdsh.dev/loader-adapter.schema.json",
+  "type": "object",
+  "required": ["schema", "adapters"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "omdsh-loader-adapter-registry/v1" },
+    "adapters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "version", "match", "implementation", "execution", "authority", "lifecycle"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]*$" },
+          "version": { "type": "string", "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$" },
+          "match": {
+            "type": "object",
+            "required": ["installAdapter", "protocol"],
+            "additionalProperties": false,
+            "properties": {
+              "installAdapter": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-z0-9][a-z0-9.-]*$" },
+              "protocol": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-z0-9][a-z0-9.-]*$" }
+            }
+          },
+          "implementation": {
+            "oneOf": [
+              {
+                "type": "object",
+                "required": ["type", "module", "export"],
+                "additionalProperties": false,
+                "properties": {
+                  "type": { "const": "bundled-module" },
+                  "module": { "type": "string", "pattern": "^scripts/loader-adapters/[a-z0-9-]+\\.mjs$" },
+                  "export": { "const": "createAdapter" }
+                }
+              },
+              {
+                "type": "object",
+                "required": ["type", "reason"],
+                "additionalProperties": false,
+                "properties": {
+                  "type": { "const": "unavailable" },
+                  "reason": { "type": "string", "minLength": 1 }
+                }
+              }
+            ]
+          },
+          "execution": {
+            "enum": ["static", "trusted-ephemeral"]
+          },
+          "authority": {
+            "enum": ["registry-eligible-after-evidence", "catalog-only", "blocked"]
+          },
+          "lifecycle": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "enum": ["inspect", "install-candidate", "ready", "invoke", "inject-failure", "activate", "update", "disable", "remove", "rollback", "cleanup"]
+            }
+          }
+        }
+      }
+    }
+  }
+}

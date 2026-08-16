@@ -346,8 +346,12 @@ async function commonAdapterStep(item, context) {
     return present ? passed(`artifact present at ${artifactPath}`, { artifactPresent: true }) : failed(`artifact missing at ${artifactPath}`, { artifactPresent: false })
   }
   if (item.id === 'compatibility.baseline') {
-    const compatible = plan.baseline.package === '@deepseek-ai/dsh' && plan.baseline.version === '0.1.0-rc.6'
-    return compatible ? passed('adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6', { compatibilityPassed: true }) : failed('adapter baseline is not RC.6', { compatibilityPassed: false })
+    const compatible = plan.baseline.package === '@deepseek-ai/dsh'
+      && /^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?$/.test(plan.baseline.version)
+      && String(plan.baseline.integrity || '').startsWith('sha512-')
+    return compatible
+      ? passed(`adapter is pinned to ${plan.baseline.package}@${plan.baseline.version} with sha512 integrity`, { compatibilityPassed: true })
+      : failed('adapter baseline is not an exact integrity-bound DSH release', { compatibilityPassed: false })
   }
   if (item.id === 'permissions.review') {
     const permissions = packageJson?.dshWorkshop?.permissions || []
@@ -433,9 +437,9 @@ export async function createRc6ProfileAdapter({
   await mkdir(runtimeRoot, { recursive: true })
   await mkdir(probeRoot, { recursive: true })
   await mkdir(packageRoot, { recursive: true })
-  if (!plan.updateFrom || !previousSourceRoot || !previousSourceCommit) throw new Error('Profile update test requires a fixed previous release checkout')
+  if (plan.updateFrom && (!previousSourceRoot || !previousSourceCommit)) throw new Error('Profile update test requires a fixed previous release checkout')
   const packageJson = await readJson(join(sourceRoot, 'package.json'))
-  const previousPackageJson = await readJson(join(previousSourceRoot, 'package.json'))
+  const previousPackageJson = plan.updateFrom ? await readJson(join(previousSourceRoot, 'package.json')) : null
   const sourceDependencyNames = Object.keys(packageJson.dependencies || {}).sort()
   const sourceLock = sourceDependencyNames.length > 0
     ? parseDocument(await readFile(join(sourceRoot, 'pnpm-lock.yaml'), 'utf8')).toJS()

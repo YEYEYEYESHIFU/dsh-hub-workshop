@@ -3,10 +3,12 @@
   "$id": "https://hub.omdsh.dev/harness-report.schema.json",
   "title": "OMDSH Workshop typed test Harness report",
   "type": "object",
-  "required": ["schema", "planId", "projectId", "releaseId", "source", "updateFrom", "baseline", "profileBase", "classification", "status", "execution", "steps", "cleanup", "claims", "verifiedAt", "verifier"],
+  "required": ["schema", "engineVersion", "evidenceKey", "planId", "projectId", "releaseId", "source", "updateFrom", "baseline", "profileBase", "loaderAdapter", "classification", "status", "execution", "steps", "cleanup", "claims", "verifiedAt", "verifier"],
   "additionalProperties": false,
   "properties": {
     "schema": { "const": "omdsh-workshop-harness-report/v1" },
+    "engineVersion": { "const": "1.1.0" },
+    "evidenceKey": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
     "planId": { "type": "string", "minLength": 3 },
     "projectId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
     "releaseId": { "type": "string", "minLength": 3 },
@@ -21,6 +23,12 @@
     "profileBase": {
       "oneOf": [
         { "$ref": "harness-plan.schema.json#/$defs/profileBase" },
+        { "type": "null" }
+      ]
+    },
+    "loaderAdapter": {
+      "oneOf": [
+        { "$ref": "harness-plan.schema.json#/$defs/loaderAdapter" },
         { "type": "null" }
       ]
     },

@@ -13,7 +13,38 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  signed-staging:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run validate
+      - name: Sign the exact Registry staging artifact
+        env:
+          OMDSH_REGISTRY_SIGNING_KEY_B64: ${{ secrets.OMDSH_REGISTRY_SIGNING_KEY_B64 }}
+          OMDSH_REGISTRY_SIGNING_KEY_ID: ${{ vars.OMDSH_REGISTRY_SIGNING_KEY_ID }}
+        run: npm run registry:sign
+      - name: Dry-run the exact signed artifact
+        run: npx wrangler deploy -c wrangler.public.jsonc --dry-run --outdir dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: signed-hub-${{ github.sha }}
+          path: |
+            .public-site
+            worker/public.js
+            wrangler.public.jsonc
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14
+
+  production:
+    needs: signed-staging
     runs-on: ubuntu-24.04
     environment: production
     steps:
@@ -25,9 +56,14 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci --ignore-scripts
-      - run: npm run deploy
+      - uses: actions/download-artifact@v4
+        with:
+          name: signed-hub-${{ github.sha }}
+          path: .
+      - name: Promote the same signed bytes to production
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          OMDSH_REGISTRY_SIGNING_KEY_B64: ${{ secrets.OMDSH_REGISTRY_SIGNING_KEY_B64 }}
-          OMDSH_REGISTRY_SIGNING_KEY_ID: ${{ vars.OMDSH_REGISTRY_SIGNING_KEY_ID }}
+        run: npx wrangler deploy -c wrangler.public.jsonc
+      - name: Verify the live signed feeds
+        run: node scripts/check-live-deployment.mjs https://hub.omdsh.dev

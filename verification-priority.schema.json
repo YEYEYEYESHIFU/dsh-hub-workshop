@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hub.omdsh.dev/verification-priority.schema.json",
+  "type": "object",
+  "required": ["$schema", "schema", "generatedAt", "policy", "summary", "queue", "externalCandidates"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "const": "./verification-priority.schema.json" },
+    "schema": { "const": "omdsh-verification-priority/v1" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "policy": {
+      "type": "object",
+      "required": ["externalEvidenceIsSupplemental", "priorityDoesNotGrantVerification", "priorityDoesNotGrantAdmission", "exactReleaseRequiredBeforeExecution"],
+      "additionalProperties": false,
+      "properties": {
+        "externalEvidenceIsSupplemental": { "const": true },
+        "priorityDoesNotGrantVerification": { "const": true },
+        "priorityDoesNotGrantAdmission": { "const": true },
+        "exactReleaseRequiredBeforeExecution": { "const": true }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["catalogProjects", "catalogRepositories", "externalObservations", "externalOnlyRepositories", "matchedRepositories", "priorities", "actions"],
+      "additionalProperties": false,
+      "properties": {
+        "catalogProjects": { "type": "integer", "minimum": 0 },
+        "catalogRepositories": { "type": "integer", "minimum": 0 },
+        "externalObservations": { "type": "integer", "minimum": 0 },
+        "externalOnlyRepositories": { "type": "integer", "minimum": 0 },
+        "matchedRepositories": { "type": "integer", "minimum": 0 },
+        "priorities": { "$ref": "#/$defs/counts" },
+        "actions": { "$ref": "#/$defs/counts" }
+      }
+    },
+    "queue": { "type": "array", "items": { "$ref": "#/$defs/queueEntry" } },
+    "externalCandidates": { "type": "array", "items": { "$ref": "#/$defs/externalEntry" } }
+  },
+  "$defs": {
+    "counts": {
+      "type": "object",
+      "propertyNames": { "pattern": "^[a-z][a-z0-9-]*$" },
+      "additionalProperties": { "type": "integer", "minimum": 0 }
+    },
+    "repositoryIdentity": {
+      "type": "object",
+      "required": ["id", "fullName", "url"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "null" },
+        "fullName": { "type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$" },
+        "url": { "type": "string", "pattern": "^https://github\\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$" }
+      }
+    },
+    "catalogIdentity": {
+      "type": "object",
+      "required": ["repositoryId", "fullName", "repository", "path", "packageName"],
+      "additionalProperties": false,
+      "properties": {
+        "repositoryId": { "type": ["integer", "null"], "minimum": 1 },
+        "fullName": { "type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$" },
+        "repository": { "type": "string", "pattern": "^https://github\\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$" },
+        "path": { "type": ["string", "null"] },
+        "packageName": { "type": ["string", "null"] }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "required": ["package", "version", "channel"],
+      "additionalProperties": false,
+      "properties": {
+        "package": { "const": "@deepseek-ai/dsh" },
+        "version": { "type": "null" },
+        "channel": { "const": "latest-at-observation" }
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": ["providerCommit", "artifactPath", "artifactDigest", "entryIndexes"],
+      "additionalProperties": false,
+      "properties": {
+        "providerCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "artifactPath": { "type": "string", "minLength": 1 },
+        "artifactDigest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "entryIndexes": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "integer", "minimum": 0 } }
+      }
+    },
+    "externalEvidence": {
+      "type": ["object", "null"],
+      "required": ["provider", "scope", "status", "observedAt", "runtime", "authority", "source"],
+      "additionalProperties": false,
+      "properties": {
+        "provider": { "type": "string", "minLength": 1 },
+        "scope": { "const": "repository" },
+        "status": { "enum": ["reported-pass", "reported-fail", "inconclusive", "not-run"] },
+        "observedAt": { "type": "string", "format": "date-time" },
+        "runtime": { "$ref": "#/$defs/runtime" },
+        "authority": { "const": "supplemental-only" },
+        "source": { "$ref": "#/$defs/source" }
+      }
+    },
+    "rank": {
+      "type": "object",
+      "required": ["score", "priority", "nextAction", "externalEvidence"],
+      "properties": {
+        "score": { "type": "integer", "minimum": 0 },
+        "priority": { "enum": ["urgent", "high", "normal", "backlog"] },
+        "nextAction": { "enum": ["monitor-release", "admission-review", "resolve-local-blocker", "deep-verify", "external-failure-triage", "probe-retry", "fixed-release-intake", "static-discovery-review"] },
+        "externalEvidence": { "$ref": "#/$defs/externalEvidence" }
+      }
+    },
+    "queueEntry": {
+      "allOf": [
+        { "$ref": "#/$defs/rank" },
+        {
+          "type": "object",
+          "required": ["projectId", "identity", "score", "priority", "nextAction", "local", "externalEvidence", "authority"],
+          "additionalProperties": false,
+          "properties": {
+            "projectId": { "type": "string", "minLength": 1 },
+            "identity": { "$ref": "#/$defs/catalogIdentity" },
+            "score": true,
+            "priority": true,
+            "nextAction": true,
+            "local": {
+              "type": "object",
+              "required": ["management", "review", "verification", "registry"],
+              "additionalProperties": false,
+              "properties": {
+                "management": { "enum": ["transactional", "managed", "guided"] },
+                "review": { "type": "string", "minLength": 1 },
+                "verification": { "type": "string", "minLength": 1 },
+                "registry": { "type": "string", "minLength": 1 }
+              }
+            },
+            "externalEvidence": true,
+            "authority": { "const": "none-until-admission" }
+          }
+        }
+      ]
+    },
+    "externalEntry": {
+      "allOf": [
+        { "$ref": "#/$defs/rank" },
+        {
+          "type": "object",
+          "required": ["identity", "score", "priority", "nextAction", "externalEvidence", "authority"],
+          "additionalProperties": false,
+          "properties": {
+            "identity": { "$ref": "#/$defs/repositoryIdentity" },
+            "score": true,
+            "priority": true,
+            "nextAction": { "const": "static-discovery-review" },
+            "externalEvidence": true,
+            "authority": { "const": "none-until-intake-and-admission" }
+          }
+        }
+      ]
+    }
+  }
+}

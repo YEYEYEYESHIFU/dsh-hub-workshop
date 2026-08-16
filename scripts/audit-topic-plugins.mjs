@@ -13,6 +13,7 @@ import {
   packageDependencyEvidence,
   repositoryCreationPolicy,
 } from './topic-admission-policy.mjs'
+import { repositoryFingerprint } from './topic-delta-lib.mjs'
 
 const ROOT = resolve(import.meta.dirname, '..')
 const snapshotPath = process.argv[2] ? resolve(process.argv[2]) : resolve(ROOT, 'topic-repositories.json')
@@ -37,6 +38,7 @@ for (const project of currentCatalog.packages || []) {
 }
 const currentCatalogRepositories = new Set(currentCatalogByRepository.keys())
 const USER_AGENT = 'omdsh-workshop-topic-audit/3.0'
+const ENGINE_VERSION = '5.0.0'
 const decoder = new TextDecoder()
 const FETCH_TIMEOUT_MS = Number.parseInt(process.env.OMDSH_TOPIC_FETCH_TIMEOUT_MS || '5000', 10)
 const AUDIT_CONCURRENCY = Number.parseInt(process.env.OMDSH_TOPIC_AUDIT_CONCURRENCY || '48', 10)
@@ -466,13 +468,17 @@ let reused = 0
 const audits = await mapLimit(snapshot.repositories, AUDIT_CONCURRENCY, async (repository) => {
   const key = repositoryKey(repository)
   const previous = previousByRepository.get(key)
+  const sourceFingerprint = repositoryFingerprint(repository)
+  const fingerprintUnchanged = previous?.sourceFingerprint
+    ? previous.sourceFingerprint === sourceFingerprint
+    : Number.isFinite(Date.parse(repository.commitUpdatedAt))
+      && Date.parse(repository.commitUpdatedAt) <= Date.parse(previousGeneratedAt)
   const sourceUnchanged = previousGeneratedAt !== null
     && previous !== undefined
     && previous.defaultBranch === repository.defaultBranch
     && previous.archived === repository.archived
     && (previous.reasonCode !== 'source-scan-unavailable' || !currentCatalogRepositories.has(key))
-    && Number.isFinite(Date.parse(repository.commitUpdatedAt))
-    && Date.parse(repository.commitUpdatedAt) <= Date.parse(previousGeneratedAt)
+    && fingerprintUnchanged
     && !MANUAL_DECISIONS.has(key)
   let classification
   if (sourceUnchanged) {
@@ -512,11 +518,13 @@ const audits = await mapLimit(snapshot.repositories, AUDIT_CONCURRENCY, async (r
     process.stderr.write(`audited ${completed}/${snapshot.repositories.length}\n`)
   }
   return {
+    repositoryId: Number.isSafeInteger(repository.repositoryId) ? repository.repositoryId : null,
     owner: repository.owner,
     name: repository.name,
     url: repository.url,
     defaultBranch: repository.defaultBranch,
     archived: repository.archived,
+    sourceFingerprint,
     ...classification,
     evidence: {
       ...classification.evidence,
@@ -543,6 +551,7 @@ function countBy(field) {
 
 const report = {
   schema: 'omdsh-topic-plugin-audit/v3',
+  engineVersion: ENGINE_VERSION,
   generatedAt: snapshot.generatedAt,
   topic: snapshot.topic,
   sourceSnapshotGeneratedAt: snapshot.generatedAt,

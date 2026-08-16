@@ -164,6 +164,8 @@ const plugins = {
     next: {
       taxonomy: '/api/v1/plugin-types.json',
       verification: '/verification-inventory.json',
+      externalEvidence: '/external-evidence.json',
+      priorityQueue: '/verification-priority.json',
       installAuthority: '/registry-v1.json',
     },
   },
@@ -176,6 +178,7 @@ const plugins = {
     const status = componentStatuses.length === 1
       ? componentStatuses[0]
       : {
+          identity: componentStatuses[0].identity,
           management: componentStatuses.every((component) => component.management === componentStatuses[0].management)
             ? componentStatuses[0].management
             : 'guided',
@@ -189,6 +192,7 @@ const plugins = {
           registry: {
             state: componentStatuses.every((component) => component.registry.state === 'admitted') ? 'admitted' : 'ineligible',
           },
+          externalEvidence: componentStatuses[0].externalEvidence,
           capabilities: project.workshop,
         }
     return {
@@ -215,10 +219,12 @@ const plugins = {
           developmentOnlyHarness: [],
         },
       } : null,
+      identity: status.identity,
       management: status.management,
       review: status.review,
       verification: status.verification,
       registry: status.registry,
+      externalEvidence: status.externalEvidence,
       capabilities: status.capabilities,
       presentation: project.presentationGroup ? {
         type: 'repository-suite',

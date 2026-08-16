@@ -3,10 +3,12 @@
   "$id": "https://hub.omdsh.dev/harness-plan.schema.json",
   "title": "OMDSH Workshop typed test Harness plan",
   "type": "object",
-  "required": ["schema", "id", "projectId", "releaseId", "source", "updateFrom", "baseline", "profileBase", "classification", "capability", "policy", "claims", "blockedReasons", "steps"],
+  "required": ["schema", "engineVersion", "evidenceKey", "id", "projectId", "releaseId", "source", "updateFrom", "baseline", "profileBase", "loaderAdapter", "classification", "capability", "policy", "claims", "blockedReasons", "steps"],
   "additionalProperties": false,
   "properties": {
     "schema": { "const": "omdsh-workshop-harness-plan/v1" },
+    "engineVersion": { "const": "1.1.0" },
+    "evidenceKey": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
     "id": { "type": "string", "minLength": 3 },
     "projectId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
     "releaseId": { "type": "string", "minLength": 3 },
@@ -24,6 +26,12 @@
         { "type": "null" }
       ]
     },
+    "loaderAdapter": {
+      "oneOf": [
+        { "$ref": "#/$defs/loaderAdapter" },
+        { "type": "null" }
+      ]
+    },
     "classification": {
       "type": "object",
       "required": ["management", "installMode", "adapter", "protocol", "failurePolicy", "activation"],
@@ -31,8 +39,8 @@
       "properties": {
         "management": { "enum": ["transactional", "managed", "guided"] },
         "installMode": { "enum": ["transactional", "isolated-trial", "guided"] },
-        "adapter": { "enum": ["profile-bundle", "repository-plugin", "mcp-server", "skill", "third-party"] },
-        "protocol": { "enum": ["harness-profile", "harness-repository", "harness-cordis", "mcp", "skill", "third-party"] },
+        "adapter": { "$ref": "#/$defs/extensionId" },
+        "protocol": { "$ref": "#/$defs/extensionId" },
         "failurePolicy": { "enum": ["generation-rollback", "discard-candidate", "discard-process", "manual"] },
         "activation": { "enum": ["immediate", "hot-reload", "restart-plugin", "restart-profile", "restart-host"] }
       }
@@ -80,6 +88,23 @@
     }
   },
   "$defs": {
+    "extensionId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-z0-9][a-z0-9.-]*$"
+    },
+    "loaderAdapter": {
+      "type": "object",
+      "required": ["id", "version", "execution", "authority"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/extensionId" },
+        "version": { "type": "string", "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$" },
+        "execution": { "enum": ["static", "trusted-ephemeral"] },
+        "authority": { "enum": ["registry-eligible-after-evidence", "catalog-only", "blocked"] }
+      }
+    },
     "source": {
       "type": "object",
       "required": ["repository", "ref", "path"],
@@ -166,7 +191,7 @@
       "properties": {
         "id": { "type": "string", "pattern": "^[a-z][a-z0-9.-]*$" },
         "phase": { "enum": ["static", "supply-chain", "sandbox", "install", "ready", "functional", "failure", "lifecycle", "update", "disable", "remove", "recovery"] },
-        "executor": { "enum": ["static", "profile", "repository", "mcp", "cordis", "skill", "third-party"] },
+        "executor": { "enum": ["static", "profile", "repository", "mcp", "cordis", "skill", "third-party", "loader"] },
         "required": { "type": "boolean" },
         "scope": { "enum": ["source-only", "ephemeral-workspace", "candidate-profile", "isolated-process", "current-profile-controlled"] },
         "expectedFacts": {

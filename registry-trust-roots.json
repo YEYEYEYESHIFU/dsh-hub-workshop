@@ -1,0 +1,13 @@
+{
+  "$schema": "./registry-trust-roots.schema.json",
+  "schema": "omdsh-registry-trust-roots/v1",
+  "keys": [
+    {
+      "keyId": "omdsh-registry-2026-08",
+      "algorithm": "Ed25519",
+      "publicKeySpkiBase64": "MCowBQYDK2VwAyEAZfDiuNS/Kvhew+3VF9uKZZ2rJ2wyH4Dvn5J92xEeflg=",
+      "status": "active",
+      "validFrom": "2026-08-15T00:00:00.000Z"
+    }
+  ]
+}

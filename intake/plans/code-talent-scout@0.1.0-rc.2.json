@@ -1,5 +1,6 @@
 {
   "schema": "omdsh-workshop-harness-plan/v1",
+  "engineVersion": "1.1.0",
   "id": "code-talent-scout@0.1.0-rc.2:0.1.0-rc.6:skill",
   "projectId": "code-talent-scout",
   "releaseId": "code-talent-scout@0.1.0-rc.2",
@@ -15,6 +16,7 @@
     "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
   },
   "profileBase": null,
+  "loaderAdapter": null,
   "classification": {
     "management": "guided",
     "installMode": "guided",
@@ -158,5 +160,6 @@
         "executableIntentReviewed": true
       }
     }
-  ]
+  ],
+  "evidenceKey": "sha256:4a43b07ffabebc078bc750ebbd167e18e1501f3028a84157f60c61cb064a6e0c"
 }

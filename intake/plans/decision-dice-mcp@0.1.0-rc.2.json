@@ -1,5 +1,6 @@
 {
   "schema": "omdsh-workshop-harness-plan/v1",
+  "engineVersion": "1.1.0",
   "id": "decision-dice-mcp@0.1.0-rc.2:0.1.0-rc.6:mcp",
   "projectId": "decision-dice-mcp",
   "releaseId": "decision-dice-mcp@0.1.0-rc.2",
@@ -15,6 +16,7 @@
     "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
   },
   "profileBase": null,
+  "loaderAdapter": null,
   "classification": {
     "management": "guided",
     "installMode": "isolated-trial",
@@ -262,5 +264,6 @@
         "processRemoved": true
       }
     }
-  ]
+  ],
+  "evidenceKey": "sha256:50ed8298a260242fe05c72a816f82c9fd934f1cba3ccce4cc94536154f790a8e"
 }

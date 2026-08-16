@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hub.omdsh.dev/automation-policy.schema.json",
+  "type": "object",
+  "required": ["schema", "discovery", "verification", "trust", "release"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "schema": { "const": "omdsh-hub-automation-policy/v1" },
+    "discovery": {
+      "type": "object",
+      "required": ["topic", "mode", "schedule", "autoAdmission"],
+      "additionalProperties": false,
+      "properties": {
+        "topic": { "const": "dsh-plugin" },
+        "mode": { "const": "incremental-pull-request" },
+        "schedule": { "type": "string", "minLength": 1 },
+        "autoAdmission": { "const": false }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "required": ["declaredVersions", "currentBaseline", "unexpectedSkips", "network", "installScripts", "adapters"],
+      "additionalProperties": false,
+      "properties": {
+        "declaredVersions": { "const": true },
+        "currentBaseline": { "const": true },
+        "unexpectedSkips": { "const": "fail" },
+        "network": { "const": "deny-during-execution" },
+        "installScripts": { "const": "disabled" },
+        "adapters": {
+          "type": "object",
+          "required": ["profile-bundle", "mcp-server", "skill", "repository-plugin", "third-party"],
+          "additionalProperties": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "trust": {
+      "type": "object",
+      "required": ["environment", "sourceExecutionRequiresApproval", "staticSkillApproval", "approvalScope"],
+      "additionalProperties": false,
+      "properties": {
+        "environment": { "const": "admission" },
+        "sourceExecutionRequiresApproval": {
+          "type": "array",
+          "const": ["profile-bundle", "mcp-server"]
+        },
+        "staticSkillApproval": { "const": "automated" },
+        "approvalScope": { "const": "exact-release-and-risk-facts" }
+      }
+    },
+    "release": {
+      "type": "object",
+      "required": ["registrySignature", "staging", "productionEnvironment", "productionApproval", "rollback"],
+      "additionalProperties": false,
+      "properties": {
+        "registrySignature": { "const": "Ed25519" },
+        "staging": { "const": "signed-local-smoke" },
+        "productionEnvironment": { "const": "production" },
+        "productionApproval": { "const": true },
+        "rollback": { "const": "cloudflare-version-history" }
+      }
+    }
+  }
+}

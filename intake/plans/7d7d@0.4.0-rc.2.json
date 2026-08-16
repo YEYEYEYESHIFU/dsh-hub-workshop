@@ -1,5 +1,6 @@
 {
   "schema": "omdsh-workshop-harness-plan/v1",
+  "engineVersion": "1.1.0",
   "id": "7d7d@0.4.0-rc.2:0.1.0-rc.6:harness-profile",
   "projectId": "7d7d",
   "releaseId": "7d7d@0.4.0-rc.2",
@@ -38,6 +39,7 @@
       }
     ]
   },
+  "loaderAdapter": null,
   "classification": {
     "management": "transactional",
     "installMode": "transactional",
@@ -337,5 +339,6 @@
         "previousRestored": true
       }
     }
-  ]
+  ],
+  "evidenceKey": "sha256:2a2323418676d135f5f354276c448bec0a25e9efb21cbce03de76a21245a35a0"
 }

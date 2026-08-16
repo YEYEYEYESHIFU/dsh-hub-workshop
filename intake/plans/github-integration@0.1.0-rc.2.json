@@ -1,5 +1,6 @@
 {
   "schema": "omdsh-workshop-harness-plan/v1",
+  "engineVersion": "1.1.0",
   "id": "github-integration@0.1.0-rc.2:0.1.0-rc.6:skill",
   "projectId": "github-integration",
   "releaseId": "github-integration@0.1.0-rc.2",
@@ -15,6 +16,7 @@
     "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
   },
   "profileBase": null,
+  "loaderAdapter": null,
   "classification": {
     "management": "guided",
     "installMode": "guided",
@@ -158,5 +160,6 @@
         "executableIntentReviewed": true
       }
     }
-  ]
+  ],
+  "evidenceKey": "sha256:49031581a7d6e569a97515bb01b6e9741b3eecb747c74360936b5e84942151b7"
 }

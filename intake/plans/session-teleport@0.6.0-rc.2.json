@@ -1,5 +1,6 @@
 {
   "schema": "omdsh-workshop-harness-plan/v1",
+  "engineVersion": "1.1.0",
   "id": "session-teleport@0.6.0-rc.2:0.1.0-rc.6:harness-profile",
   "projectId": "session-teleport",
   "releaseId": "session-teleport@0.6.0-rc.2",
@@ -32,6 +33,7 @@
       }
     ]
   },
+  "loaderAdapter": null,
   "classification": {
     "management": "transactional",
     "installMode": "transactional",
@@ -331,5 +333,6 @@
         "previousRestored": true
       }
     }
-  ]
+  ],
+  "evidenceKey": "sha256:4664045b14cdbe78ef81b43164c1c8267f0961bf7ffda900dc4bc3fc2776d54f"
 }

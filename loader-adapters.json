@@ -1,0 +1,51 @@
+{
+  "$schema": "./loader-adapter.schema.json",
+  "schema": "omdsh-loader-adapter-registry/v1",
+  "adapters": [
+    {
+      "id": "official-profile",
+      "version": "1.0.0",
+      "match": { "installAdapter": "profile-bundle", "protocol": "harness-profile" },
+      "implementation": { "type": "bundled-module", "module": "scripts/loader-adapters/profile.mjs", "export": "createAdapter" },
+      "execution": "trusted-ephemeral",
+      "authority": "registry-eligible-after-evidence",
+      "lifecycle": ["inspect", "install-candidate", "ready", "invoke", "inject-failure", "activate", "update", "disable", "remove", "rollback", "cleanup"]
+    },
+    {
+      "id": "mcp-stdio",
+      "version": "1.0.0",
+      "match": { "installAdapter": "mcp-server", "protocol": "mcp" },
+      "implementation": { "type": "bundled-module", "module": "scripts/loader-adapters/mcp.mjs", "export": "createAdapter" },
+      "execution": "trusted-ephemeral",
+      "authority": "catalog-only",
+      "lifecycle": ["inspect", "ready", "invoke", "inject-failure", "remove", "cleanup"]
+    },
+    {
+      "id": "skill-filesystem",
+      "version": "1.0.0",
+      "match": { "installAdapter": "skill", "protocol": "skill" },
+      "implementation": { "type": "bundled-module", "module": "scripts/loader-adapters/skill.mjs", "export": "createAdapter" },
+      "execution": "static",
+      "authority": "catalog-only",
+      "lifecycle": ["inspect", "cleanup"]
+    },
+    {
+      "id": "official-repository-plugin",
+      "version": "1.0.0",
+      "match": { "installAdapter": "repository-plugin", "protocol": "harness-repository" },
+      "implementation": { "type": "unavailable", "reason": "The current public DSH runtime does not publish this loader contract." },
+      "execution": "trusted-ephemeral",
+      "authority": "blocked",
+      "lifecycle": []
+    },
+    {
+      "id": "third-party-guidance",
+      "version": "1.0.0",
+      "match": { "installAdapter": "third-party", "protocol": "third-party" },
+      "implementation": { "type": "unavailable", "reason": "Guidance is intentionally non-executable." },
+      "execution": "static",
+      "authority": "catalog-only",
+      "lifecycle": ["inspect"]
+    }
+  ]
+}

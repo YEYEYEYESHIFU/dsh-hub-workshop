@@ -1,0 +1,191 @@
+name: verify-release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'intake/records/*.json'
+      - 'official-baseline.json'
+      - 'loader-adapters.json'
+      - 'automation-policy.json'
+      - 'scripts/typed-harness-lib.mjs'
+      - 'scripts/automation-policy-lib.mjs'
+  workflow_dispatch:
+    inputs:
+      release_id:
+        description: Exact Intake release ID (project@version)
+        required: true
+        type: string
+      trust_source_execution:
+        description: Request the admission environment gate for executable source
+        required: true
+        default: false
+        type: boolean
+      risk_level:
+        description: Risk level recorded if the exact release passes
+        required: true
+        default: unknown
+        type: choice
+        options: [unknown, low, medium, high, critical]
+
+permissions:
+  actions: read
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: verify-${{ github.event_name }}-${{ inputs.release_id || github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    outputs:
+      static_matrix: ${{ steps.plan.outputs.static_matrix }}
+      trusted_matrix: ${{ steps.plan.outputs.trusted_matrix }}
+      static_count: ${{ steps.plan.outputs.static_count }}
+      trusted_count: ${{ steps.plan.outputs.trusted_count }}
+      admission_eligible: ${{ steps.plan.outputs.admission_eligible }}
+      release_ids: ${{ steps.plan.outputs.release_ids }}
+      selected_count: ${{ steps.plan.outputs.selected_count }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - id: selection
+        if: github.event_name == 'push'
+        run: node scripts/select-verification-releases.mjs --before "${{ github.event.before }}" --output "$RUNNER_TEMP/releases.json"
+      - id: plan
+        env:
+          RELEASE_ID: ${{ inputs.release_id }}
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            node scripts/automation-plan.mjs --releases-file "$RUNNER_TEMP/releases.json" --output "$RUNNER_TEMP/automation-plan.json"
+          else
+            node scripts/automation-plan.mjs --release "$RELEASE_ID" --output "$RUNNER_TEMP/automation-plan.json"
+          fi
+      - name: Require the explicit trusted-execution request
+        if: github.event_name == 'workflow_dispatch' && steps.plan.outputs.trusted_count != '0' && inputs.trust_source_execution != true
+        run: |
+          echo "Executable verification requires trust_source_execution=true and admission environment approval."
+          exit 1
+
+  static:
+    needs: prepare
+    if: needs.prepare.outputs.static_count != '0'
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare.outputs.static_matrix) }}
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - id: source
+        run: node scripts/checkout-intake-source.mjs --release "${{ matrix.releaseId }}" --output "$RUNNER_TEMP/source" --previous-output "$RUNNER_TEMP/previous"
+      - run: node scripts/run-automation-verification.mjs --release "${{ matrix.releaseId }}" --runtime "${{ matrix.runtimeVersion }}" --source "${{ steps.source.outputs.source_root }}" --previous-source "${{ steps.source.outputs.previous_source_root }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: verification-${{ matrix.key }}
+          path: |
+            intake/plans
+            intake/reports
+            intake/compatibility
+          if-no-files-found: error
+
+  trusted:
+    needs: prepare
+    if: needs.prepare.outputs.trusted_count != '0'
+    environment: admission
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare.outputs.trusted_matrix) }}
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - id: source
+        run: node scripts/checkout-intake-source.mjs --release "${{ matrix.releaseId }}" --output "$RUNNER_TEMP/source" --previous-output "$RUNNER_TEMP/previous"
+      - run: node scripts/run-automation-verification.mjs --release "${{ matrix.releaseId }}" --runtime "${{ matrix.runtimeVersion }}" --source "${{ steps.source.outputs.source_root }}" --previous-source "${{ steps.source.outputs.previous_source_root }}" --trust-source-execution --pnpm-store "$RUNNER_TEMP/pnpm-store"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: verification-${{ matrix.key }}
+          path: |
+            intake/plans
+            intake/reports
+            intake/compatibility
+          if-no-files-found: error
+
+  finalize:
+    needs: [prepare, static, trusted]
+    if: always() && needs.prepare.result == 'success' && needs.prepare.outputs.selected_count != '0' && (needs.static.result == 'success' || needs.static.result == 'skipped') && (needs.trusted.result == 'success' || needs.trusted.result == 'skipped')
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: verification-*
+          merge-multiple: true
+      - id: approval
+        if: needs.prepare.outputs.trusted_count != '0'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/github-environment-review.mjs
+      - name: Synchronize current-baseline evidence
+        run: npm run intake:sync-evidence
+      - name: Apply the contingent Admission decision
+        if: github.event_name == 'workflow_dispatch' && needs.prepare.outputs.admission_eligible == 'true'
+        env:
+          REVIEWER: ${{ needs.prepare.outputs.trusted_count != '0' && steps.approval.outputs.reviewer || 'automation-static-policy' }}
+        run: npm run registry:approve -- approve "${{ inputs.release_id }}" --reviewer "$REVIEWER" --risk-level "${{ inputs.risk_level }}"
+      - run: npm run validate
+      - id: changes
+        name: Detect material evidence changes
+        run: |
+          git add -A
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Commit evidence and generated feeds
+        if: steps.changes.outputs.changed == 'true'
+        env:
+          AUTOMATION_BRANCH: automation/verify-${{ github.run_id }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$AUTOMATION_BRANCH"
+          git commit -m "verify: selected Intake releases"
+          git push origin "$AUTOMATION_BRANCH"
+      - name: Open the evidence PR
+        if: steps.changes.outputs.changed == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AUTOMATION_BRANCH: automation/verify-${{ github.run_id }}
+          AUTOMATION_TITLE: "verify: selected Intake releases"
+          AUTOMATION_BODY: |
+            Typed Harness evidence for the exact release and declared DSH matrix.
+
+            Executable source was permitted only through the admission environment. The PR contains immutable plans, complete reports, license/risk facts, and deterministic feed projections. Production remains separately gated.
+        run: node scripts/github-automation-pr.mjs

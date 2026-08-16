@@ -1,0 +1,19 @@
+{
+  "schema": "omdsh-supplemental-evidence-sources/v1",
+  "providers": [
+    {
+      "id": "awesome-dsh-plugins",
+      "repository": "https://github.com/AdamPlatin123/awesome-dsh-plugins",
+      "ref": "main",
+      "artifacts": {
+        "directory": "data/snapshots",
+        "pattern": "^data/snapshots/[0-9]{8}T[0-9]{6}Z\\.json$"
+      },
+      "method": {
+        "kind": "agent-smoke",
+        "isolation": "provider-reported-kubernetes-pod",
+        "runtimeSelection": "latest-at-observation"
+      }
+    }
+  ]
+}

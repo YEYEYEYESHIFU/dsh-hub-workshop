@@ -1,0 +1,40 @@
+{
+  "$schema": "./automation-policy.schema.json",
+  "schema": "omdsh-hub-automation-policy/v1",
+  "discovery": {
+    "topic": "dsh-plugin",
+    "mode": "incremental-pull-request",
+    "schedule": "17 */6 * * *",
+    "autoAdmission": false
+  },
+  "verification": {
+    "declaredVersions": true,
+    "currentBaseline": true,
+    "unexpectedSkips": "fail",
+    "network": "deny-during-execution",
+    "installScripts": "disabled",
+    "adapters": {
+      "profile-bundle": "candidate-profile",
+      "mcp-server": "isolated-process",
+      "skill": "static",
+      "repository-plugin": "blocked-until-official-contract",
+      "third-party": "catalog-only"
+    }
+  },
+  "trust": {
+    "environment": "admission",
+    "sourceExecutionRequiresApproval": [
+      "profile-bundle",
+      "mcp-server"
+    ],
+    "staticSkillApproval": "automated",
+    "approvalScope": "exact-release-and-risk-facts"
+  },
+  "release": {
+    "registrySignature": "Ed25519",
+    "staging": "signed-local-smoke",
+    "productionEnvironment": "production",
+    "productionApproval": true,
+    "rollback": "cloudflare-version-history"
+  }
+}

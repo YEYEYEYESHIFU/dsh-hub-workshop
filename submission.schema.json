@@ -111,9 +111,9 @@
       "required": ["method", "protocol", "label", "instructions", "source"],
       "additionalProperties": false,
       "properties": {
-        "method": { "enum": ["profile-bundle", "repository-plugin", "guided"] },
+        "method": { "enum": ["profile-bundle", "repository-plugin", "loader-adapter", "guided"] },
         "protocol": {
-          "enum": ["harness-profile", "harness-repository", "harness-cordis", "mcp", "skill", "third-party"]
+          "$ref": "#/$defs/extensionId"
         },
         "label": { "type": "string", "minLength": 1 },
         "instructions": { "type": "string", "minLength": 1 },
@@ -139,6 +139,12 @@
     "packageManifest": { "$ref": "./package-manifest.schema.json" }
   },
   "$defs": {
+    "extensionId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-z0-9][a-z0-9.-]*$"
+    },
     "media": {
       "type": "object",
       "minProperties": 1,
@@ -172,7 +178,7 @@
       "if": {
         "properties": {
           "operation": { "const": "add-release" },
-          "management": { "properties": { "method": { "enum": ["profile-bundle", "repository-plugin"] } } }
+          "management": { "properties": { "method": { "enum": ["profile-bundle", "repository-plugin", "loader-adapter"] } } }
         },
         "required": ["operation", "management"]
       },

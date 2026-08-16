@@ -4,7 +4,7 @@ import test from 'node:test'
 
 import { applyEvidence, createIntakeRecord } from '../scripts/intake-lib.mjs'
 import { validateHarnessPlanBindings } from '../scripts/build-intake-queue.mjs'
-import { createHarnessPlan, harnessReportToEvidence, runHarnessPlan, validateHarnessPlan, validateHarnessReport } from '../scripts/typed-harness-lib.mjs'
+import { createHarnessPlan, harnessEvidenceKey, harnessReportToEvidence, runHarnessPlan, validateHarnessPlan, validateHarnessReport } from '../scripts/typed-harness-lib.mjs'
 
 const baseline = JSON.parse(await readFile(new URL('../official-baseline.json', import.meta.url), 'utf8'))
 const SHA = '4'.repeat(40)
@@ -181,6 +181,25 @@ test('typed plans cover Profile, Repository, MCP, Cordis, Skill, and third-party
     assert.equal(plan.policy.workspace, 'ephemeral')
     assert.equal(plan.policy.installScripts, 'disabled')
   }
+})
+
+test('Harness evidence keys bind source, runtime, adapter, capability, and engine inputs', () => {
+  const plan = createHarnessPlan(submission('profile'), baseline)
+  assert.equal(plan.evidenceKey, harnessEvidenceKey(plan))
+  for (const mutate of [
+    (value) => { value.source.ref = '5'.repeat(40) },
+    (value) => { value.baseline.version = '0.1.0-rc.2' },
+    (value) => { value.loaderAdapter = { id: 'profile-bundle', version: '1.0.0', execution: 'trusted-ephemeral', authority: 'registry-eligible-after-evidence' } },
+    (value) => { value.capability.expected = 'different-result' },
+    (value) => { value.engineVersion = '1.0.0' },
+  ]) {
+    const changed = structuredClone(plan)
+    mutate(changed)
+    assert.notEqual(harnessEvidenceKey(changed), plan.evidenceKey)
+  }
+  const tampered = structuredClone(plan)
+  tampered.source.ref = '5'.repeat(40)
+  assert.match(validateHarnessPlan(tampered).join('; '), /evidence key does not match/)
 })
 
 test('every v2 Intake record is bound to exactly one matching current-baseline plan', () => {

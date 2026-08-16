@@ -134,6 +134,19 @@ test('requires a capability target for executable protocols and forbids one for 
   assert.match(validateWorkshopManifest(staticOnly).join('\n'), /cannot declare a runtime capability target/)
 })
 
+test('accepts a namespaced loader contract without teaching the manifest core its name', () => {
+  const manifest = profileManifest()
+  manifest.integration.protocol = 'dev.omdsh.mygo-v1'
+  manifest.install.adapter = 'dev.omdsh.mygo-loader'
+  manifest.install.mode = 'isolated-trial'
+  manifest.install.failurePolicy = 'discard-process'
+  manifest.lifecycle.activation = 'restart-plugin'
+  assert.deepEqual(validateWorkshopManifest(manifest), [])
+
+  manifest.install.adapter = 'profile-bundle'
+  assert.match(validateWorkshopManifest(manifest).join('\n'), /cannot repurpose a built-in/)
+})
+
 test('keeps author capability declarations separate from current-baseline verification', () => {
   const profile = capabilityProfile({ declaration: profileManifest() })
   assert.equal(profile.install.seamless.state, 'declared')

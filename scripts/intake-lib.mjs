@@ -27,7 +27,7 @@ function safePath(value) {
 
 export function managementMode(method) {
   if (method === 'profile-bundle') return 'transactional'
-  if (method === 'repository-plugin') return 'managed'
+  if (['repository-plugin', 'loader-adapter'].includes(method)) return 'managed'
   if (method === 'guided') return 'guided'
   return null
 }
@@ -59,7 +59,7 @@ export function validateSubmission(manifest) {
   requireCondition(typeof declarations.testing === 'string' && declarations.testing.length > 0, 'testing declaration is required', errors)
 
   const mode = managementMode(management.method)
-  requireCondition(mode !== null, 'management method must be profile-bundle, repository-plugin, or guided', errors)
+  requireCondition(mode !== null, 'management method must be profile-bundle, repository-plugin, loader-adapter, or guided', errors)
   requireCondition(typeof management.instructions === 'string' && management.instructions.length > 0, 'integration instructions are required', errors)
 
   if (mode === 'transactional') {
@@ -81,7 +81,7 @@ export function validateSubmission(manifest) {
       }
     }
   }
-  if (mode === 'managed') {
+  if (management.method === 'repository-plugin') {
     requireCondition(management.protocol === 'harness-repository', 'managed intake must use harness-repository', errors)
     requireCondition(release.profileBundle === null, 'managed intake cannot declare a Profile Bundle', errors)
     const source = REPOSITORY_SOURCE_RE.exec(management.source || '')
@@ -96,6 +96,25 @@ export function validateSubmission(manifest) {
         requireCondition(release.updateFrom?.version !== release.version, 'previous release version must differ from the submitted release', errors)
       } else {
         requireCondition(release.updateFrom === null, 'initial managed release must set updateFrom to null', errors)
+      }
+    }
+  }
+  if (management.method === 'loader-adapter') {
+    const builtInProtocols = new Set(['harness-profile', 'harness-repository', 'harness-cordis', 'mcp', 'skill', 'third-party'])
+    const builtInAdapters = new Set(['profile-bundle', 'repository-plugin', 'mcp-server', 'skill', 'third-party'])
+    requireCondition(!builtInProtocols.has(management.protocol), 'loader-adapter intake requires a namespaced custom protocol', errors)
+    requireCondition(!builtInAdapters.has(packageManifest?.install?.adapter), 'loader-adapter intake requires a custom adapter id', errors)
+    requireCondition(release.profileBundle === null, 'loader-adapter intake cannot declare a Profile Bundle', errors)
+    requireCondition(management.source === null, 'loader-adapter intake resolves source through the fixed release and trusted Adapter Registry', errors)
+    requireCondition(!GUIDED_COMMAND_RE.test(management.instructions || ''), 'loader-adapter intake must not expose an executable install command', errors)
+    if (manifest.schema === 'omdsh-workshop-submission/v2') {
+      if (manifest.operation === 'add-release') {
+        requireCondition(typeof release.updateFrom?.version === 'string' && release.updateFrom.version.length > 0, 'loader-adapter add-release requires a previous release version for update testing', errors)
+        requireCondition(COMMIT_RE.test(release.updateFrom?.ref || ''), 'loader-adapter add-release requires a fixed previous release commit', errors)
+        requireCondition(release.updateFrom?.ref !== release.ref, 'previous release commit must differ from the submitted release', errors)
+        requireCondition(release.updateFrom?.version !== release.version, 'previous release version must differ from the submitted release', errors)
+      } else {
+        requireCondition(release.updateFrom === null, 'initial loader-adapter release must set updateFrom to null', errors)
       }
     }
   }
@@ -123,7 +142,7 @@ export function createIntakeRecord(manifest, baseline) {
   const errors = validateSubmission(manifest)
   if (errors.length > 0) throw new Error(errors.join('; '))
   const mode = managementMode(manifest.management.method)
-  const unavailableManagedContract = mode === 'managed' && baseline.contracts.repositoryPlugin.status !== 'available'
+  const unavailableManagedContract = manifest.management.method === 'repository-plugin' && baseline.contracts.repositoryPlugin.status !== 'available'
   return {
     schema: 'omdsh-workshop-intake/v1',
     id: `${manifest.project.id}@${manifest.release.version}`,
@@ -209,7 +228,7 @@ export function applyEvidence(record, evidence, baseline) {
   } else {
     requireCondition(`${evidence?.runtime?.package}@${evidence?.runtime?.version}` === `${baseline.runtime.package}@${baseline.runtime.version}`, 'evidence does not use the current official runtime', errors)
     requireCondition(evidence?.runtime?.integrity === baseline.runtime.integrity, 'evidence runtime integrity does not match the official baseline', errors)
-    if (mode === 'managed') {
+    if (record.submission.manifest.management.method === 'repository-plugin') {
       requireCondition(baseline.contracts.repositoryPlugin.status === 'available', 'official Repository Plugin contract is unavailable', errors)
     }
     requireCondition(evidence?.capability && typeof evidence.capability === 'object', `${mode} verification must identify a target capability`, errors)
@@ -272,7 +291,7 @@ export function evaluateRecord(record, baseline) {
     requireCondition(record.registry?.state === 'ineligible', `${record.id}: guided entries cannot enter Registry`, errors)
     requireCondition(record.tests?.officialBaseline?.status === 'not-applicable', `${record.id}: guided official baseline must be not-applicable`, errors)
   }
-  if (mode === 'managed' && baseline.contracts.repositoryPlugin.status !== 'available') {
+  if (record?.submission?.manifest?.management?.method === 'repository-plugin' && baseline.contracts.repositoryPlugin.status !== 'available') {
     requireCondition(record.verification?.state === 'blocked', `${record.id}: managed verification must remain blocked while the official contract is unavailable`, errors)
     requireCondition(record.registry?.state === 'ineligible', `${record.id}: unavailable managed contract cannot enter Registry`, errors)
   }

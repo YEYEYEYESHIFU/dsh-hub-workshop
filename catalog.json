@@ -1,7 +1,7 @@
 {
   "schema": "dsh-hub-index/v0.4",
   "hub": "github:omdsh-dev/dsh-hub-workshop",
-  "updated": "2026-08-16T02:45:55.252Z",
+  "updated": "2026-08-16T04:31:09.173Z",
   "policy": {
     "discovery": "Topic is discovery-only. Plugin Catalog entries require a valid package.json#dshWorkshop manifest or preserved legacy file-level artifacts. Legacy entries are compatibility-mapped and still need the manifest plus current-baseline tests.",
     "creation": "Community plugin repositories must be created at or after 2026-07-31T00:00:00.000Z. Official exemptions are limited to explicit owners: deepseek-ai. Missing created_at fails closed.",

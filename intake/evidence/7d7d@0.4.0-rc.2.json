@@ -14,7 +14,7 @@
     "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg==",
     "profile": "web",
     "platform": "ephemeral",
-    "node": "24.3.0"
+    "node": "22.23.2"
   },
   "capability": {
     "id": "7d7d-routes-registered",
@@ -35,7 +35,7 @@
     },
     "entry": {
       "status": "passed",
-      "evidence": "artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/7d7d/cordis.patch.yml"
+      "evidence": "artifact present at /Users/runner/work/_temp/source/cordis.patch.yml"
     },
     "dshContract": {
       "status": "passed",
@@ -43,7 +43,7 @@
     },
     "compatibility": {
       "status": "passed",
-      "evidence": "adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6"
+      "evidence": "adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6 with sha512 integrity"
     },
     "permissions": {
       "status": "passed",
@@ -59,11 +59,11 @@
     },
     "ready": {
       "status": "passed",
-      "evidence": "RC.6 booted the candidate and 7d7d-routes-registered became ready in pid 32998"
+      "evidence": "RC.6 booted the candidate and 7d7d-routes-registered became ready in pid 6435"
     },
     "functional": {
       "status": "passed",
-      "evidence": "the live RC.6 Profile registered, invoked, and observed 7d7d-routes-registered; GET /7d7d/api/manifest.json returned HTTP 200 with 18 game(s)"
+      "evidence": "the live RC.6 Profile registered, invoked, and observed 7d7d-routes-registered; GET /7d7d/api/manifest.json returned HTTP 200 with 17 game(s)"
     },
     "update": {
       "status": "passed",
@@ -90,6 +90,6 @@
       "evidence": "hot reload was not declared"
     }
   },
-  "verifiedAt": "2026-08-14T12:43:01.409Z",
-  "verifier": "local-fixed-checkout-rc6-profile"
+  "verifiedAt": "2026-08-16T04:31:09.173Z",
+  "verifier": "github-actions-official-profile@1.0.3-0.1.0-rc.6"
 }

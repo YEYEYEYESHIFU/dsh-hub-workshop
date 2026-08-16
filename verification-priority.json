@@ -1,7 +1,7 @@
 {
   "$schema": "./verification-priority.schema.json",
   "schema": "omdsh-verification-priority/v1",
-  "generatedAt": "2026-08-14T21:36:19.000Z",
+  "generatedAt": "2026-08-16T04:31:09.173Z",
   "policy": {
     "externalEvidenceIsSupplemental": true,
     "priorityDoesNotGrantVerification": true,

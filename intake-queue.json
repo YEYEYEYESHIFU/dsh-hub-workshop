@@ -1,6 +1,6 @@
 {
   "schema": "omdsh-workshop-intake-queue/v1",
-  "generatedAt": "2026-08-14T12:49:30.488Z",
+  "generatedAt": "2026-08-16T04:31:09.173Z",
   "officialBaseline": "@deepseek-ai/dsh@0.1.0-rc.6",
   "policy": {
     "managementModes": [
@@ -130,14 +130,14 @@
       },
       "verification": {
         "state": "current-baseline-passed",
-        "verifiedAt": "2026-08-14T12:43:01.409Z",
+        "verifiedAt": "2026-08-16T04:31:09.173Z",
         "evidence": "intake/evidence/7d7d@0.4.0-rc.2.json"
       },
       "tests": {
         "static": {
           "required": true,
           "status": "passed",
-          "evidence": "package.json#dshWorkshop passed the public manifest contract | artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/7d7d/cordis.patch.yml | RC.6 dsh.bundle.patch resolves to ./cordis.patch.yml | adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6 | reviewed 4 declared permission scope(s)"
+          "evidence": "package.json#dshWorkshop passed the public manifest contract | artifact present at /Users/runner/work/_temp/source/cordis.patch.yml | RC.6 dsh.bundle.patch resolves to ./cordis.patch.yml | adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6 with sha512 integrity | reviewed 4 declared permission scope(s)"
         },
         "supplyChain": {
           "required": true,

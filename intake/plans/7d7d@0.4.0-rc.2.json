@@ -39,7 +39,12 @@
       }
     ]
   },
-  "loaderAdapter": null,
+  "loaderAdapter": {
+    "id": "official-profile",
+    "version": "1.0.3",
+    "execution": "trusted-ephemeral",
+    "authority": "registry-eligible-after-evidence"
+  },
   "classification": {
     "management": "transactional",
     "installMode": "transactional",
@@ -340,5 +345,5 @@
       }
     }
   ],
-  "evidenceKey": "sha256:2a2323418676d135f5f354276c448bec0a25e9efb21cbce03de76a21245a35a0"
+  "evidenceKey": "sha256:b9fae2bc3b6110c730b559f40626613d5f898b045bf44d99861c2474d903ed0e"
 }

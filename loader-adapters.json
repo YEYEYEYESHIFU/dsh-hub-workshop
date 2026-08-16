@@ -4,7 +4,7 @@
   "adapters": [
     {
       "id": "official-profile",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "match": { "installAdapter": "profile-bundle", "protocol": "harness-profile" },
       "implementation": { "type": "bundled-module", "module": "scripts/loader-adapters/profile.mjs", "export": "createAdapter" },
       "execution": "trusted-ephemeral",

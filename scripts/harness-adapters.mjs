@@ -643,7 +643,7 @@ export async function createRc6ProfileAdapter({
         ], {
           cwd: runtimeRoot,
           env: childEnvironment(workspace),
-          timeoutMs: 180_000,
+          timeoutMs: 360_000,
         })
         const installed = await readJson(join(runtimeRoot, 'node_modules', '@deepseek-ai', 'dsh', 'package.json'))
         const lock = await readJson(join(runtimeRoot, 'package-lock.json'))

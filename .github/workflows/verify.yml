@@ -95,15 +95,15 @@ jobs:
       - run: npm ci --ignore-scripts
       - id: source
         run: node scripts/checkout-intake-source.mjs --release "${{ matrix.releaseId }}" --output "$RUNNER_TEMP/source" --previous-output "$RUNNER_TEMP/previous"
-      - run: node scripts/run-automation-verification.mjs --release "${{ matrix.releaseId }}" --runtime "${{ matrix.runtimeVersion }}" --source "${{ steps.source.outputs.source_root }}" --previous-source "${{ steps.source.outputs.previous_source_root }}"
+      - id: verify
+        run: node scripts/run-automation-verification.mjs --release "${{ matrix.releaseId }}" --runtime "${{ matrix.runtimeVersion }}" --source "${{ steps.source.outputs.source_root }}" --previous-source "${{ steps.source.outputs.previous_source_root }}"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: verification-${{ matrix.key }}
           path: |
-            intake/plans
-            intake/reports
-            intake/compatibility
+            ${{ steps.verify.outputs.plan_path }}
+            ${{ steps.verify.outputs.report_path }}
           if-no-files-found: error
 
   trusted:
@@ -123,20 +123,20 @@ jobs:
       - run: npm ci --ignore-scripts
       - id: source
         run: node scripts/checkout-intake-source.mjs --release "${{ matrix.releaseId }}" --output "$RUNNER_TEMP/source" --previous-output "$RUNNER_TEMP/previous"
-      - run: node scripts/run-automation-verification.mjs --release "${{ matrix.releaseId }}" --runtime "${{ matrix.runtimeVersion }}" --source "${{ steps.source.outputs.source_root }}" --previous-source "${{ steps.source.outputs.previous_source_root }}" --trust-source-execution
+      - id: verify
+        run: node scripts/run-automation-verification.mjs --release "${{ matrix.releaseId }}" --runtime "${{ matrix.runtimeVersion }}" --source "${{ steps.source.outputs.source_root }}" --previous-source "${{ steps.source.outputs.previous_source_root }}" --trust-source-execution
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: verification-${{ matrix.key }}
           path: |
-            intake/plans
-            intake/reports
-            intake/compatibility
+            ${{ steps.verify.outputs.plan_path }}
+            ${{ steps.verify.outputs.report_path }}
           if-no-files-found: error
 
   finalize:
     needs: [prepare, static, trusted]
-    if: always() && needs.prepare.result == 'success' && needs.prepare.outputs.selected_count != '0' && (needs.static.result == 'success' || needs.static.result == 'skipped') && (needs.trusted.result == 'success' || needs.trusted.result == 'skipped')
+    if: always() && needs.prepare.result == 'success' && needs.prepare.outputs.selected_count != '0'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4

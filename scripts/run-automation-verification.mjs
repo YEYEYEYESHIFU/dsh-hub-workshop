@@ -57,7 +57,7 @@ if (!force) {
   if (cached?.status === 'passed' && validateHarnessReport(cached, plan).length === 0) {
     await writeFile(planPath, `${JSON.stringify(plan, null, 2)}\n`)
     if (process.env.GITHUB_OUTPUT) {
-      await appendFile(process.env.GITHUB_OUTPUT, `report_path=${reportPath.replace(`${ROOT}/`, '')}\nstatus=${cached.status}\ncache_hit=true\n`)
+      await appendFile(process.env.GITHUB_OUTPUT, `plan_path=${planPath.replace(`${ROOT}/`, '')}\nreport_path=${reportPath.replace(`${ROOT}/`, '')}\nstatus=${cached.status}\ncache_hit=true\n`)
     }
     console.log(`${releaseId} on @deepseek-ai/dsh@${runtimeVersion}: cache hit ${plan.evidenceKey}`)
     process.exit(0)
@@ -86,7 +86,7 @@ await Promise.all([
   writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`)
 ])
 if (process.env.GITHUB_OUTPUT) {
-  await appendFile(process.env.GITHUB_OUTPUT, `report_path=${reportPath.replace(`${ROOT}/`, '')}\nstatus=${report.status}\ncache_hit=false\n`)
+  await appendFile(process.env.GITHUB_OUTPUT, `plan_path=${planPath.replace(`${ROOT}/`, '')}\nreport_path=${reportPath.replace(`${ROOT}/`, '')}\nstatus=${report.status}\ncache_hit=false\n`)
 }
 console.log(`${releaseId} on @deepseek-ai/dsh@${runtimeVersion}: ${report.status}; ${report.steps.filter((step) => step.status === 'passed').length}/${report.steps.length}`)
 if (report.status !== 'passed') process.exitCode = 1

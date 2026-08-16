@@ -1,0 +1,157 @@
+{
+  "schema": "omdsh-workshop-intake/v1",
+  "id": "dsh-notifier@0.4.0",
+  "submission": {
+    "repository": "https://github.com/THEWOLFWALKER/dsh-notifier",
+    "ref": "f7ce623205930f511abd944ffdd66cfc413af7d6",
+    "path": null,
+    "manifest": {
+      "schema": "omdsh-workshop-submission/v2",
+      "operation": "create-project",
+      "project": {
+        "id": "dsh-notifier",
+        "displayName": "dsh-notifier",
+        "summary": "Unified notification push plugin for DeepSeek Harness (DSH): 27 outbound channels, bidirectional remote approval and conversation across six IM platforms, official QR login for QQ/DingTalk/Feishu, multi-agent routing, and a loopback-only web admin console — zero runtime dependencies.",
+        "kind": "extension",
+        "category": "channels",
+        "tags": [
+          "deepseek-harness",
+          "dsh-plugin",
+          "notify",
+          "notification",
+          "telegram",
+          "dingtalk",
+          "feishu",
+          "wxpusher",
+          "qq",
+          "wechat",
+          "cordis",
+          "plugin",
+          "remote-approval",
+          "webhook"
+        ],
+        "repository": "https://github.com/THEWOLFWALKER/dsh-notifier",
+        "path": null,
+        "author": {
+          "name": "THEWOLFWALKER",
+          "url": "https://github.com/THEWOLFWALKER"
+        },
+        "license": "MIT"
+      },
+      "release": {
+        "version": "0.4.0",
+        "ref": "f7ce623205930f511abd944ffdd66cfc413af7d6",
+        "updatedAt": "2026-08-16T03:14:58Z",
+        "channel": "stable",
+        "compatibility": "DeepSeek Harness dsh 0.1.0-rc.6 official baseline; peer dependency @deepseek-ai/cordis ^4.0.1; Node >=22; zero runtime dependencies (fetch + node:crypto + native WebSocket only).",
+        "changelog": "0.4.0: system desktop notifications — a native-command desktop channel (macOS osascript / Linux notify-send / Windows PowerShell BurntToast, spawned without a shell) plus an admin-console Notifications page (SSE event stream, browser system notifications and sound); tests 588 -> 625. Prior releases deliver 27 channels, level-based routing, bidirectional remote approval and conversation over Telegram/Feishu/QQ/WxPusher/WeChat/DingTalk, official QR login, multi-agent routing, and the web admin console.",
+        "capabilities": {
+          "requiresFabric": false,
+          "deepHook": false,
+          "restartRequired": false
+        },
+        "profileBundle": null,
+        "updateFrom": null
+      },
+      "management": {
+        "method": "guided",
+        "protocol": "harness-cordis",
+        "label": "DeepSeek Harness Cordis plugin (dsh-notifier)",
+        "instructions": "Add the dsh-notifier package to a DeepSeek Harness profile; its bundle patch (cordis.patch.yml) inserts the dsh-notifier row and the notify and notify_test tools register when the plugin applies. Configure outbound channels under config.channels, and optional admin.enabled, inbound.*, and routing.* keys, in the profile overlay. The web admin console binds 127.0.0.1 only and requires a Bearer token.",
+        "source": null
+      },
+      "declarations": {
+        "permissions": "Registers two model-facing tools (notify, notify_test; harness:tool) and subscribes to DSH session and agent runtime events for auto-push and remote approval/conversation (harness:event); makes outbound HTTPS requests to 27 notification channels and QQ/Feishu/DingTalk/Telegram APIs (network:outbound); binds a loopback-only admin HTTP server plus inbound callback endpoints (network:listen); persists a local state store, approval ledger, and token vault (file:read, file:write); the desktop channel spawns native notification binaries without a shell (subprocess:exec, shell:none); stores scan-login credentials and channel secrets locally (credentials:write).",
+        "testing": "625 node:test tests across 37 test files pass (channel adapters and spec engine, signers, inbound adapters and approvals, routing, admin API/SSE/UI wiring, ledger, rate limiting, tool registration, plugin entry); CI runs a three-platform matrix (ubuntu/windows/macos) aligned with Node >=22. Channel delivery is validated against in-process mock servers; no external service is contacted.",
+        "trustedPublisherRequested": false,
+        "installScriptsMustRemainDisabled": true
+      },
+      "packageManifest": {
+        "schema": "omdsh-workshop-package/v1",
+        "type": "plugin",
+        "integration": {
+          "protocol": "harness-cordis",
+          "artifact": "cordis.patch.yml"
+        },
+        "install": {
+          "mode": "guided",
+          "adapter": "third-party",
+          "failurePolicy": "manual",
+          "touchesCurrentBeforeActivation": false
+        },
+        "lifecycle": {
+          "activation": "immediate",
+          "dispose": "supported"
+        },
+        "permissions": [
+          "harness:tool",
+          "harness:event",
+          "network:outbound",
+          "network:listen",
+          "file:read",
+          "file:write",
+          "subprocess:exec",
+          "shell:none",
+          "credentials:write"
+        ],
+        "compatibility": {
+          "dshVersions": [
+            "0.1.0-rc.6"
+          ]
+        },
+        "capability": {
+          "id": "notify",
+          "kind": "tool",
+          "invocation": "invoke the model-facing notify tool with a message and an optional target channel through the DSH ToolRuntime",
+          "expected": "the message is delivered to the configured channel (e.g. Telegram) and a structured result is returned; an unreachable or unconfigured channel returns a structured skipped/failed result without blocking the turn"
+        },
+        "evidence": {
+          "install": null,
+          "failureIsolation": null,
+          "hotReload": null,
+          "remove": null
+        }
+      }
+    }
+  },
+  "classification": {
+    "management": "guided"
+  },
+  "baseline": {
+    "package": "@deepseek-ai/dsh",
+    "version": "0.1.0-rc.6",
+    "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+  },
+  "review": {
+    "state": "pending-review",
+    "notes": "Automatically prepared from #29; public fixed-source preflight passed. Human review is still required."
+  },
+  "verification": {
+    "state": "untested"
+  },
+  "tests": {
+    "static": {
+      "required": true,
+      "status": "passed",
+      "evidence": "submission manifest validation; public repository and fixed commit resolved; pinned path(s): /cordis.patch.yml, /package.json"
+    },
+    "supplyChain": {
+      "required": true,
+      "status": "pending"
+    },
+    "officialBaseline": {
+      "required": false,
+      "status": "not-applicable",
+      "evidence": "guided entries expose no executable install intent"
+    },
+    "lifecycle": {
+      "required": false,
+      "status": "not-applicable",
+      "evidence": "guided entries have no Workshop-owned lifecycle"
+    }
+  },
+  "registry": {
+    "state": "ineligible",
+    "reason": "guided-catalog-only"
+  }
+}

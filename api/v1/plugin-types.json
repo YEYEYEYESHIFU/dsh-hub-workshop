@@ -1,6 +1,6 @@
 {
   "schema": "omdsh-ai-plugin-types/v1",
-  "generatedAt": "2026-08-14T12:49:30.488Z",
+  "generatedAt": "2026-08-16T04:31:09.173Z",
   "scope": "Public Catalog and formal Intake facts only. Discovery never authorizes installation.",
   "contracts": {
     "packageManifest": "/package-manifest.schema.json",

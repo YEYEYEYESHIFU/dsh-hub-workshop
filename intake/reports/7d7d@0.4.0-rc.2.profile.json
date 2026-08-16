@@ -1,5 +1,7 @@
 {
   "schema": "omdsh-workshop-harness-report/v1",
+  "engineVersion": "1.1.0",
+  "evidenceKey": "sha256:b9fae2bc3b6110c730b559f40626613d5f898b045bf44d99861c2474d903ed0e",
   "planId": "7d7d@0.4.0-rc.2:0.1.0-rc.6:harness-profile",
   "projectId": "7d7d",
   "releaseId": "7d7d@0.4.0-rc.2",
@@ -38,6 +40,12 @@
       }
     ]
   },
+  "loaderAdapter": {
+    "id": "official-profile",
+    "version": "1.0.3",
+    "execution": "trusted-ephemeral",
+    "authority": "registry-eligible-after-evidence"
+  },
   "classification": {
     "management": "transactional",
     "installMode": "transactional",
@@ -72,7 +80,7 @@
     {
       "id": "artifact.present",
       "status": "passed",
-      "evidence": "artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/7d7d/cordis.patch.yml",
+      "evidence": "artifact present at /Users/runner/work/_temp/source/cordis.patch.yml",
       "facts": {
         "artifactPresent": true
       }
@@ -88,7 +96,7 @@
     {
       "id": "compatibility.baseline",
       "status": "passed",
-      "evidence": "adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6",
+      "evidence": "adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6 with sha512 integrity",
       "facts": {
         "compatibilityPassed": true
       }
@@ -113,7 +121,7 @@
     {
       "id": "update-source.immutable",
       "status": "passed",
-      "evidence": "clean public Git binding contains 80b6ddb779a009d378a1c30c85dfef598f527997; extracted 77-file archive matches tree 844a8af6a4ea6d29a0c65e120bbe1431faac92a5; @mattheliu/7d7d@0.4.0-rc.1 is the fixed update origin",
+      "evidence": "clean Git origin, HEAD, and source path match 80b6ddb779a009d378a1c30c85dfef598f527997; Git tree 844a8af6a4ea6d29a0c65e120bbe1431faac92a5; @mattheliu/7d7d@0.4.0-rc.1 is the fixed update origin",
       "facts": {
         "sourceImmutable": true,
         "previousVersionMatched": true
@@ -133,10 +141,11 @@
     {
       "id": "runtime.exact",
       "status": "passed",
-      "evidence": "installed exact @deepseek-ai/dsh@0.1.0-rc.6 and web Profile base with matching sha512 integrities",
+      "evidence": "installed exact @deepseek-ai/dsh@0.1.0-rc.6, pnpm@10.34.5, and web Profile base with matching sha512 integrities",
       "facts": {
         "runtimeExact": true,
-        "profileBaseExact": true
+        "profileBaseExact": true,
+        "toolchainExact": true
       }
     },
     {
@@ -169,7 +178,7 @@
     {
       "id": "ready.probe",
       "status": "passed",
-      "evidence": "RC.6 booted the candidate and 7d7d-routes-registered became ready in pid 32998",
+      "evidence": "RC.6 booted the candidate and 7d7d-routes-registered became ready in pid 6435",
       "facts": {
         "ready": true
       }
@@ -177,7 +186,7 @@
     {
       "id": "capability.invoke",
       "status": "passed",
-      "evidence": "the live RC.6 Profile registered, invoked, and observed 7d7d-routes-registered; GET /7d7d/api/manifest.json returned HTTP 200 with 18 game(s)",
+      "evidence": "the live RC.6 Profile registered, invoked, and observed 7d7d-routes-registered; GET /7d7d/api/manifest.json returned HTTP 200 with 17 game(s)",
       "facts": {
         "capabilityObserved": true
       },
@@ -225,7 +234,7 @@
     {
       "id": "lifecycle.restart",
       "status": "passed",
-      "evidence": "RC.6 restarted the current Profile and observed 7d7d-routes-registered in pid 33007",
+      "evidence": "RC.6 restarted the current Profile and observed 7d7d-routes-registered in pid 6441",
       "facts": {
         "restarted": true,
         "restartScope": "profile",
@@ -295,6 +304,6 @@
       "reason": "Harness passed; independent review is still required"
     }
   },
-  "verifiedAt": "2026-08-14T12:43:01.409Z",
-  "verifier": "local-fixed-checkout-rc6-profile"
+  "verifiedAt": "2026-08-16T04:31:09.173Z",
+  "verifier": "github-actions-official-profile@1.0.3-0.1.0-rc.6"
 }

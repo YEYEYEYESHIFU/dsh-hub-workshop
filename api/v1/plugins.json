@@ -1,6 +1,6 @@
 {
   "schema": "omdsh-ai-plugins/v1",
-  "generatedAt": "2026-08-14T12:49:30.488Z",
+  "generatedAt": "2026-08-16T04:31:09.173Z",
   "scope": {
     "purpose": "read-only-discovery-and-verification-status",
     "installAuthority": "omdsh-registry/v1",

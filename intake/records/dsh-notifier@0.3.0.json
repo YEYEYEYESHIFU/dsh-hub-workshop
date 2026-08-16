@@ -1,0 +1,150 @@
+{
+  "schema": "omdsh-workshop-intake/v1",
+  "id": "dsh-notifier@0.3.0",
+  "submission": {
+    "repository": "https://github.com/THEWOLFWALKER/dsh-notifier",
+    "ref": "e41993e2b6b65536b54e70d7fd6c4257f8a96423",
+    "path": null,
+    "manifest": {
+      "schema": "omdsh-workshop-submission/v2",
+      "operation": "create-project",
+      "project": {
+        "id": "dsh-notifier",
+        "displayName": "dsh-notifier",
+        "summary": "Unified notification push for DeepSeek Harness: one notify() API, 26 outbound channels, and optional five-channel two-way remote approval and conversation.",
+        "kind": "extension",
+        "category": "channels",
+        "tags": [
+          "notification",
+          "notify",
+          "telegram",
+          "feishu",
+          "dingtalk",
+          "wxpusher",
+          "webhook",
+          "remote-approval",
+          "cordis",
+          "plugin"
+        ],
+        "repository": "https://github.com/THEWOLFWALKER/dsh-notifier",
+        "path": null,
+        "author": {
+          "name": "THEWOLFWALKER",
+          "url": "https://github.com/THEWOLFWALKER"
+        },
+        "license": "MIT"
+      },
+      "release": {
+        "version": "0.3.0",
+        "ref": "e41993e2b6b65536b54e70d7fd6c4257f8a96423",
+        "updatedAt": "2026-08-16T02:12:50Z",
+        "channel": "stable",
+        "compatibility": "@deepseek-ai/dsh@0.1.0-rc.6 (official public baseline); Node >=22; peer @deepseek-ai/cordis@^4.0.1",
+        "changelog": "v0.3.0 adds five-channel two-way inbound (telegram/feishu/qq/wxpusher/wechat) for remote approval and conversation, on top of the unified notify() API and 26 outbound channels. This submission declares the omdsh-workshop-package/v1 dshWorkshop intake manifest.",
+        "capabilities": {
+          "requiresFabric": false,
+          "deepHook": false,
+          "restartRequired": true
+        },
+        "profileBundle": {
+          "packageName": "dsh-notifier",
+          "spec": "0.3.0"
+        },
+        "updateFrom": null
+      },
+      "management": {
+        "method": "profile-bundle",
+        "protocol": "harness-profile",
+        "label": "dsh-notifier (cordis.patch.yml profile bundle)",
+        "instructions": "Install the npm package through the DeepSeek Harness profile bundle mechanism (dsh plugin add dsh-notifier), then restart the profile. Configure one or more channels in the profile cordis.patch.yml as documented in the repository README; with no channels configured the plugin subscribes but takes no action and never breaks startup.",
+        "source": null
+      },
+      "declarations": {
+        "permissions": "Outbound HTTP(S) to the configured notification channel APIs (Telegram/Slack/Discord/Feishu/DingTalk/WeCom/QQ official bot/OneBot/Teams/Mattermost/Google Chat plus generic webhooks); optional inbound stack when configured — WebSocket client connections (Feishu/QQ), long polling (Telegram/WeChat iLink), and one HTTP callback listener (WxPusher on 127.0.0.1:8103); local JSONL ledger and JSON state store under the configured stateDir. No subprocess, no shell, no native code, no install scripts; secrets supported via ${ENV:NAME} references and never echoed.",
+        "testing": "329 node:test cases pass at the pinned commit (zero runtime dependencies, pure ESM). The suite covers channel adapters, routing, approval/conversation router, the five inbound channels, ledger/digest, segmentation, and tool registration.",
+        "trustedPublisherRequested": false,
+        "installScriptsMustRemainDisabled": true
+      },
+      "packageManifest": {
+        "schema": "omdsh-workshop-package/v1",
+        "type": "plugin",
+        "integration": {
+          "protocol": "harness-profile",
+          "artifact": "cordis.patch.yml"
+        },
+        "install": {
+          "mode": "transactional",
+          "adapter": "profile-bundle",
+          "failurePolicy": "generation-rollback",
+          "touchesCurrentBeforeActivation": false
+        },
+        "lifecycle": {
+          "activation": "restart-profile",
+          "dispose": "supported"
+        },
+        "permissions": [
+          "harness:tool",
+          "harness:event",
+          "network:outbound",
+          "network:listen",
+          "files:write"
+        ],
+        "compatibility": {
+          "dshVersions": [
+            "0.1.0-rc.6"
+          ]
+        },
+        "capability": {
+          "id": "notify",
+          "kind": "tool",
+          "invocation": "invoke the model-facing notify tool with a message and an optional target channel through the DSH ToolRuntime",
+          "expected": "the message is delivered to the configured channel (e.g. Telegram) and a structured result is returned; an unreachable or unconfigured channel returns a structured skipped/failed result without blocking the turn"
+        },
+        "evidence": {
+          "install": null,
+          "failureIsolation": null,
+          "hotReload": null,
+          "remove": null
+        }
+      }
+    }
+  },
+  "classification": {
+    "management": "transactional"
+  },
+  "baseline": {
+    "package": "@deepseek-ai/dsh",
+    "version": "0.1.0-rc.6",
+    "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+  },
+  "review": {
+    "state": "pending-review",
+    "notes": "Automatically prepared from #25; public fixed-source preflight passed. Human review is still required."
+  },
+  "verification": {
+    "state": "untested"
+  },
+  "tests": {
+    "static": {
+      "required": true,
+      "status": "passed",
+      "evidence": "submission manifest validation; public repository and fixed commit resolved; pinned path(s): /cordis.patch.yml, /package.json"
+    },
+    "supplyChain": {
+      "required": true,
+      "status": "pending"
+    },
+    "officialBaseline": {
+      "required": true,
+      "status": "pending"
+    },
+    "lifecycle": {
+      "required": true,
+      "status": "pending"
+    }
+  },
+  "registry": {
+    "state": "ineligible",
+    "reason": "current-baseline-verification-required"
+  }
+}

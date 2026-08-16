@@ -151,6 +151,7 @@ jobs:
         with:
           pattern: verification-*
           merge-multiple: true
+          path: intake
       - id: approval
         if: needs.prepare.outputs.trusted_count != '0'
         env:
@@ -159,7 +160,7 @@ jobs:
       - name: Synchronize current-baseline evidence
         run: npm run intake:sync-evidence
       - name: Apply the contingent Admission decision
-        if: github.event_name == 'workflow_dispatch' && needs.prepare.outputs.admission_eligible == 'true'
+        if: github.event_name == 'workflow_dispatch' && needs.prepare.outputs.admission_eligible == 'true' && inputs.risk_level != 'unknown'
         env:
           REVIEWER: ${{ needs.prepare.outputs.trusted_count != '0' && steps.approval.outputs.reviewer || 'automation-static-policy' }}
         run: npm run registry:approve -- approve "${{ inputs.release_id }}" --reviewer "$REVIEWER" --risk-level "${{ inputs.risk_level }}"

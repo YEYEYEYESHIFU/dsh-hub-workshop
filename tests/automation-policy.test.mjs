@@ -7,6 +7,7 @@ import { automationPlanExitCode, buildAutomationPlan, buildVerificationJobs, dec
 const policy = JSON.parse(await readFile(new URL('../automation-policy.json', import.meta.url), 'utf8'))
 const baseline = JSON.parse(await readFile(new URL('../official-baseline.json', import.meta.url), 'utf8'))
 const loaderRegistry = JSON.parse(await readFile(new URL('../loader-adapters.json', import.meta.url), 'utf8'))
+const verificationWorkflow = await readFile(new URL('../.github/workflows/verify.yml', import.meta.url), 'utf8')
 
 function record(adapter, protocol, compatibility = 'Exact @deepseek-ai/dsh@0.1.0-rc.2 support.') {
   return {
@@ -29,6 +30,11 @@ test('automation policy retains the two trust boundaries', () => {
   assert.deepEqual(validateAutomationPolicy(policy), [])
   assert.equal(policy.discovery.autoAdmission, false)
   assert.equal(policy.release.productionApproval, true)
+})
+
+test('verification finalization preserves independent evidence without implicit Admission', () => {
+  assert.match(verificationWorkflow, /merge-multiple: true\n\s+path: intake/)
+  assert.match(verificationWorkflow, /inputs\.risk_level != 'unknown'/)
 })
 
 test('Profile verification follows the declared exact version and current baseline', () => {

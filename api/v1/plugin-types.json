@@ -15,11 +15,11 @@
     }
   },
   "totals": {
-    "catalogProjects": 673,
-    "catalogComponents": 680,
+    "catalogProjects": 1741,
+    "catalogComponents": 1748,
     "presentationGroups": 1,
     "candidateProjects": 0,
-    "projects": 673
+    "projects": 1741
   },
   "kinds": [
     {
@@ -29,14 +29,14 @@
         "en": "Skill"
       },
       "counts": {
-        "catalog": 30,
+        "catalog": 55,
         "candidates": 0,
-        "total": 30
+        "total": 55
       },
       "examples": [
         "github-integration",
         "omdsh-dev/dsh-genui",
-        "fishquito7/dsh-skill-viewer"
+        "fishsb/dsh-prompt-enhancer"
       ]
     },
     {
@@ -46,14 +46,14 @@
         "en": "MCP"
       },
       "counts": {
-        "catalog": 15,
+        "catalog": 35,
         "candidates": 0,
-        "total": 15
+        "total": 35
       },
       "examples": [
-        "fly233338/dsh-overleaf",
-        "edge-echo/dsh-mcp-bridge",
-        "zouyuanqing/dsh-vision-primitives"
+        "fishquito7/dsh-skill-mcp-panel",
+        "limuyang2/agent-team",
+        "gxpppp/dsh-search-mcp"
       ]
     },
     {
@@ -63,14 +63,14 @@
         "en": "Extension"
       },
       "counts": {
-        "catalog": 374,
+        "catalog": 1154,
         "candidates": 0,
-        "total": 374
+        "total": 1154
       },
       "examples": [
         "session-teleport",
         "nanmicoder/dsh-agent-teams",
-        "ysr666/dsh-vision-router"
+        "han-1413141/dsh-cost-meter"
       ]
     },
     {
@@ -80,14 +80,14 @@
         "en": "Channel"
       },
       "counts": {
-        "catalog": 14,
+        "catalog": 53,
         "candidates": 0,
-        "total": 14
+        "total": 53
       },
       "examples": [
-        "vlln/whale-girl",
+        "pgzxb/dsh-feishu",
         "biboyang/dsh-im-bridge",
-        "jesse-njx/dsh-chatnode-wechat"
+        "sliverp/deepseek-harness-qqbot"
       ]
     },
     {
@@ -97,14 +97,14 @@
         "en": "UI"
       },
       "counts": {
-        "catalog": 170,
+        "catalog": 326,
         "candidates": 0,
-        "total": 170
+        "total": 326
       },
       "examples": [
         "7d7d",
-        "anionex/dsh-vision-toolkit",
-        "nagi-ovo/dsh-ads"
+        "omdsh-dev/dsh-better-sidebar",
+        "anionex/dsh-vision-toolkit"
       ]
     },
     {
@@ -114,14 +114,14 @@
         "en": "Adapter"
       },
       "counts": {
-        "catalog": 12,
+        "catalog": 22,
         "candidates": 0,
-        "total": 12
+        "total": 22
       },
       "examples": [
-        "whiteguo233/dsh-openbiliclaw",
+        "zseven-w/dsh-crew",
         "huanlinoto/dsh-plugin-aigc-canvas",
-        "adkid-zephyr/liltloom"
+        "welsione/dsh-mmx-bridge"
       ]
     },
     {
@@ -144,14 +144,14 @@
         "en": "Toolkit"
       },
       "counts": {
-        "catalog": 58,
+        "catalog": 96,
         "candidates": 0,
-        "total": 58
+        "total": 96
       },
       "examples": [
         "toybox",
         "zseven-w/dsh-noema",
-        "omdsh-dev/dsh-custom-tool"
+        "toolclub/dsh-agent-team-gui"
       ]
     }
   ],
@@ -176,14 +176,14 @@
         "en": "Developer tools"
       },
       "counts": {
-        "catalog": 396,
+        "catalog": 1174,
         "candidates": 0,
-        "total": 396
+        "total": 1174
       },
       "examples": [
         "github-integration",
         "nanmicoder/dsh-agent-teams",
-        "ysr666/dsh-vision-router"
+        "han-1413141/dsh-cost-meter"
       ]
     },
     {
@@ -193,14 +193,14 @@
         "en": "Channels"
       },
       "counts": {
-        "catalog": 13,
+        "catalog": 51,
         "candidates": 0,
-        "total": 13
+        "total": 51
       },
       "examples": [
-        "vlln/whale-girl",
+        "pgzxb/dsh-feishu",
         "biboyang/dsh-im-bridge",
-        "jesse-njx/dsh-chatnode-wechat"
+        "sliverp/deepseek-harness-qqbot"
       ]
     },
     {
@@ -210,14 +210,14 @@
         "en": "Interface"
       },
       "counts": {
-        "catalog": 169,
+        "catalog": 314,
         "candidates": 0,
-        "total": 169
+        "total": 314
       },
       "examples": [
         "7d7d",
-        "anionex/dsh-vision-toolkit",
-        "nagi-ovo/dsh-ads"
+        "omdsh-dev/dsh-better-sidebar",
+        "anionex/dsh-vision-toolkit"
       ]
     },
     {
@@ -227,13 +227,11 @@
         "en": "Platform"
       },
       "counts": {
-        "catalog": 1,
+        "catalog": 0,
         "candidates": 0,
-        "total": 1
+        "total": 0
       },
-      "examples": [
-        "whiteguo233/dsh-openbiliclaw"
-      ]
+      "examples": []
     },
     {
       "id": "safety",
@@ -242,14 +240,14 @@
         "en": "Safety"
       },
       "counts": {
-        "catalog": 16,
+        "catalog": 38,
         "candidates": 0,
-        "total": 16
+        "total": 38
       },
       "examples": [
-        "ang-xwbwz/dsh-approval-ai",
-        "severuszh/dsh-yolo-mode",
-        "xmutfyh/dsh-plugin-writing-guard"
+        "omdsh-dev/dsh-security-audit",
+        "timeance/dsh-approve-for-me",
+        "shaoshi20/dshscan"
       ]
     },
     {
@@ -259,14 +257,14 @@
         "en": "Memory"
       },
       "counts": {
-        "catalog": 77,
+        "catalog": 163,
         "candidates": 0,
-        "total": 77
+        "total": 163
       },
       "examples": [
         "session-teleport",
         "zseven-w/dsh-noema",
-        "omdsh-dev/dsh-mnemon"
+        "perrylink/dsh-memento"
       ]
     },
     {
@@ -334,7 +332,7 @@
         "zh": "引导接入",
         "en": "Guided"
       },
-      "count": 678
+      "count": 1746
     }
   ],
   "reviewStates": [
@@ -344,7 +342,7 @@
         "zh": "待审核",
         "en": "Pending review"
       },
-      "count": 680
+      "count": 1748
     },
     {
       "id": "needs-fix",
@@ -375,15 +373,15 @@
     "seamlessInstall": [
       {
         "id": "declared",
-        "count": 6
+        "count": 14
       },
       {
         "id": "unknown",
-        "count": 663
+        "count": 1722
       },
       {
         "id": "unsupported",
-        "count": 10
+        "count": 11
       },
       {
         "id": "verified",
@@ -393,15 +391,15 @@
     "failureIsolation": [
       {
         "id": "declared",
-        "count": 11
+        "count": 19
       },
       {
         "id": "unknown",
-        "count": 663
+        "count": 1722
       },
       {
         "id": "unsupported",
-        "count": 5
+        "count": 6
       },
       {
         "id": "verified",
@@ -411,26 +409,26 @@
     "hotReload": [
       {
         "id": "declared",
-        "count": 1
+        "count": 5
       },
       {
         "id": "unknown",
-        "count": 663
+        "count": 1722
       },
       {
         "id": "unsupported",
-        "count": 16
+        "count": 21
       }
     ]
   },
   "protocols": [
     {
       "id": "harness-cordis",
-      "count": 1
+      "count": 2
     },
     {
       "id": "harness-profile",
-      "count": 624
+      "count": 1692
     },
     {
       "id": "mcp",
@@ -438,7 +436,7 @@
     },
     {
       "id": "skill",
-      "count": 5
+      "count": 4
     },
     {
       "id": "third-party",
@@ -448,11 +446,11 @@
   "admissionRoutes": [
     {
       "id": "legacy-compatibility-map",
-      "count": 663
+      "count": 1722
     },
     {
       "id": "package-json-manifest",
-      "count": 17
+      "count": 26
     }
   ],
   "guardrails": [

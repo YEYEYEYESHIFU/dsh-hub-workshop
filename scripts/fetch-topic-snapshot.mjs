@@ -2,12 +2,17 @@
 
 import { readFile, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
+import {
+  COMMUNITY_PLUGIN_CREATED_AT_CUTOFF,
+  OFFICIAL_REPOSITORY_OWNERS,
+  isRetiredRepositoryOwner,
+} from './topic-admission-policy.mjs'
 
 const ROOT = resolve(import.meta.dirname, '..')
 const TOPIC = 'dsh-plugin'
 const USER_AGENT = 'omdsh-workshop-topic-refresh/2.0'
-const TOKEN = process.env.GITHUB_TOKEN || ''
-const REQUEST_INTERVAL_MS = TOKEN ? 2_100 : 6_500
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN?.trim() || ''
+const REQUEST_INTERVAL_MS = GITHUB_TOKEN ? 2_200 : 6_500
 const decoder = new TextDecoder()
 let lastRequestAt = 0
 
@@ -28,7 +33,7 @@ async function search(query, page) {
       accept: 'application/vnd.github+json',
       'user-agent': USER_AGENT,
       'x-github-api-version': '2022-11-28',
-      ...(TOKEN ? { authorization: `Bearer ${TOKEN}` } : {}),
+      ...(GITHUB_TOKEN ? { authorization: `Bearer ${GITHUB_TOKEN}` } : {}),
     },
   })
   if (!response.ok) {
@@ -40,46 +45,69 @@ async function search(query, page) {
   return value
 }
 
-const MIN_INTERVAL_MS = 1_000
-const startBoundary = Date.parse('2008-01-01T00:00:00.000Z')
-const endDate = new Date()
-endDate.setUTCDate(endDate.getUTCDate() + 1)
-endDate.setUTCHours(0, 0, 0, 0)
-const endBoundary = endDate.getTime()
-const partitions = []
-
-async function partition(start, end) {
-  const query = `topic:${TOPIC} created:>=${new Date(start).toISOString()} created:<${new Date(end).toISOString()}`
-  const first = await search(query, 1)
-  if (first.total_count > 1_000) {
-    if (end - start <= MIN_INTERVAL_MS) {
-      throw new Error(`one-second Topic partition exceeds the GitHub Search cap: ${query} (${first.total_count})`)
-    }
-    const midpoint = start + Math.floor((end - start) / 2)
-    await partition(start, midpoint)
-    await partition(midpoint, end)
-    return
-  }
-  partitions.push({ query, first, pages: Math.ceil(first.total_count / 100) })
+function searchInstant(milliseconds) {
+  return new Date(Math.floor(milliseconds / 1_000) * 1_000).toISOString().replace('.000Z', 'Z')
 }
 
-await partition(startBoundary, endBoundary)
+function lastSecondBeforeNextUtcMidnight() {
+  const now = new Date()
+  return Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1) - 1_000
+}
+
+function rangeQuery(start, end) {
+  return `topic:${TOPIC} created:${searchInstant(start)}..${searchInstant(end)}`
+}
+
+// GitHub Search exposes at most 1,000 results for any one query. The Topic can
+// grow past that limit in hours, so fixed "yesterday/today" buckets are not a
+// completeness guarantee. Probe a half-open creation-time range and bisect it
+// until every leaf query is independently below the cap. GitHub supports one
+// inclusive range qualifier, so adjacent partitions advance by one second to
+// remain non-overlapping without dropping a boundary timestamp.
+const partitions = []
 const repositoriesByName = new Map()
 let observed = 0
 let observedPages = 0
-for (const { query, first, pages } of partitions) {
-  observed += first.total_count
-  observedPages += pages
+async function captureRange(start, end, attempt = 1) {
+  const query = rangeQuery(start, end)
+  const first = await search(query, 1)
+  if (first.total_count > 1_000) {
+    const midpoint = Math.floor((start + end) / 2_000) * 1_000
+    if (midpoint < start || midpoint >= end) {
+      throw new Error(`one-second partition exceeds the GitHub Search 1,000-result cap: ${query} (${first.total_count})`)
+    }
+    await captureRange(start, midpoint)
+    await captureRange(midpoint + 1_000, end)
+    return
+  }
+  const pages = Math.ceil(first.total_count / 100)
+  const partitionRepositories = new Map()
   for (let page = 1; page <= pages; page += 1) {
     const value = page === 1 ? first : await search(query, page)
     for (const repository of value.items) {
       const key = repository.full_name.toLocaleLowerCase('en-US')
-      const previous = repositoriesByName.get(key)
-      if (!previous || String(repository.updated_at) > String(previous.updated_at)) repositoriesByName.set(key, repository)
+      const previous = partitionRepositories.get(key)
+      if (!previous || String(repository.updated_at) > String(previous.updated_at)) partitionRepositories.set(key, repository)
     }
     process.stderr.write(`captured ${query} page ${page}/${pages}\n`)
   }
+  if (partitionRepositories.size !== first.total_count) {
+    if (attempt >= 4) {
+      throw new Error(`unstable GitHub Search partition after ${attempt} attempts: ${query} (${partitionRepositories.size}/${first.total_count} unique)`)
+    }
+    process.stderr.write(`retrying unstable partition ${query}: ${partitionRepositories.size}/${first.total_count} unique on attempt ${attempt}\n`)
+    await captureRange(start, end, attempt + 1)
+    return
+  }
+  partitions.push(query)
+  observed += first.total_count
+  observedPages += pages
+  for (const [key, repository] of partitionRepositories) {
+    const previous = repositoriesByName.get(key)
+    if (!previous || String(repository.updated_at) > String(previous.updated_at)) repositoriesByName.set(key, repository)
+  }
 }
+await captureRange(Date.UTC(2008, 0, 1), lastSecondBeforeNextUtcMidnight())
 if (repositoriesByName.size !== observed) {
   throw new Error(`partitioned Topic snapshot mismatch: received ${repositoriesByName.size} unique repositories, expected ${observed}`)
 }
@@ -91,8 +119,9 @@ const sanitizePublicText = (value = '') => String(value)
   .replaceAll(/\bNDA\b/gi, 'previous restricted program')
   .replaceAll('内测', '社区阶段')
 const generatedAt = new Date().toISOString()
-const repositories = [...repositoriesByName.values()]
+const discoveredRepositories = [...repositoriesByName.values()]
   .sort((left, right) => String(right.pushed_at || right.updated_at).localeCompare(String(left.pushed_at || left.updated_at)))
+const repositories = discoveredRepositories.filter((repository) => !isRetiredRepositoryOwner(repository))
 const snapshot = {
   schema: 'dsh-topic-discovery/v1',
   generatedAt,
@@ -101,10 +130,16 @@ const snapshot = {
   observedRepositoryCount: repositories.length,
   status: 'discovery-only',
   collection: {
-    method: TOKEN ? 'authenticated-partitioned-github-search' : 'anonymous-partitioned-github-search',
-    partitions: partitions.map(({ query }) => query),
-    authenticated: Boolean(TOKEN),
+    method: `${GITHUB_TOKEN ? 'authenticated' : 'anonymous'}-partitioned-github-search`,
+    partitions,
+    authenticated: Boolean(GITHUB_TOKEN),
     searchCapHandled: true,
+    pluginCreationPolicy: {
+      communityCreatedAtCutoff: COMMUNITY_PLUGIN_CREATED_AT_CUTOFF,
+      officialOwnerExemptions: OFFICIAL_REPOSITORY_OWNERS,
+    },
+    retiredOwnerExclusionsApplied: true,
+    excludedRepositoryCount: discoveredRepositories.length - repositories.length,
   },
   repositories: repositories.map((repository) => ({
     repositoryId: repository.id,
@@ -134,4 +169,4 @@ await Promise.all([
   writeFile(resolve(ROOT, 'topic-repositories.json'), `${JSON.stringify(snapshot, null, 2)}\n`),
   writeFile(discoveryPath, `${JSON.stringify(discovery, null, 2)}\n`),
 ])
-console.log(`refreshed public Topic snapshot: ${repositories.length} repositories across ${partitions.length} non-overlapping adaptive partitions`)
+console.log(`refreshed public Topic snapshot: ${repositories.length} repositories across ${partitions.length} non-overlapping partitions (${discoveredRepositories.length - repositories.length} retired-owner sources excluded)`)

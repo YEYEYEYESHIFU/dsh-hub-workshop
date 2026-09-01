@@ -1,0 +1,147 @@
+{
+  "schema": "omdsh-workshop-harness-report/v1",
+  "planId": "bug-tamer@0.1.0-rc.2:0.1.0-rc.6:skill",
+  "projectId": "bug-tamer",
+  "releaseId": "bug-tamer@0.1.0-rc.2",
+  "source": {
+    "repository": "https://github.com/omdsh-dev/toybox",
+    "ref": "86e98729b92db0b9fe901c39e32bca74cf8c0f54",
+    "path": "/plugins/bug-tamer/.dsh-plugin"
+  },
+  "updateFrom": null,
+  "baseline": {
+    "package": "@deepseek-ai/dsh",
+    "version": "0.1.0-rc.6",
+    "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+  },
+  "profileBase": null,
+  "classification": {
+    "management": "guided",
+    "installMode": "guided",
+    "adapter": "skill",
+    "protocol": "skill",
+    "failurePolicy": "manual",
+    "activation": "immediate"
+  },
+  "status": "passed",
+  "execution": {
+    "adapter": "rc6-skill-static-adapter",
+    "trustedSourceExecution": true,
+    "workspace": "ephemeral"
+  },
+  "steps": [
+    {
+      "id": "source.immutable",
+      "status": "passed",
+      "evidence": "clean Git origin, HEAD, and source path match 86e98729b92db0b9fe901c39e32bca74cf8c0f54; Git tree 255e62a97d8681d342c301dc53ed2774a18bcf6b",
+      "facts": {
+        "sourceImmutable": true
+      }
+    },
+    {
+      "id": "manifest.validate",
+      "status": "passed",
+      "evidence": "package.json#dshWorkshop passed the public manifest contract",
+      "facts": {
+        "manifestValid": true
+      }
+    },
+    {
+      "id": "artifact.present",
+      "status": "passed",
+      "evidence": "artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/toybox/plugins/bug-tamer/.dsh-plugin/skills/bug-tamer/SKILL.md",
+      "facts": {
+        "artifactPresent": true
+      }
+    },
+    {
+      "id": "protocol.contract",
+      "status": "passed",
+      "evidence": "Skill matches the RC.6 one-level filesystem provider contract",
+      "facts": {
+        "protocolContractValid": true
+      }
+    },
+    {
+      "id": "compatibility.baseline",
+      "status": "passed",
+      "evidence": "adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6",
+      "facts": {
+        "compatibilityPassed": true
+      }
+    },
+    {
+      "id": "permissions.review",
+      "status": "passed",
+      "evidence": "reviewed 2 declared permission scope(s)",
+      "facts": {
+        "permissionsReviewed": true
+      }
+    },
+    {
+      "id": "supply-chain.review",
+      "status": "passed",
+      "evidence": "no package lifecycle scripts; installation is forced to ignore scripts",
+      "facts": {
+        "supplyChainPassed": true,
+        "installScriptsDisabled": true
+      }
+    },
+    {
+      "id": "skill.frontmatter",
+      "status": "passed",
+      "evidence": "RC.6 frontmatter accepted skill bug-tamer",
+      "facts": {
+        "frontmatterValid": true
+      }
+    },
+    {
+      "id": "skill.references",
+      "status": "passed",
+      "evidence": "checked 1 file(s), 0 relative reference(s), 3982 byte(s)",
+      "facts": {
+        "referencesResolved": true,
+        "pathsContained": true
+      }
+    },
+    {
+      "id": "skill.commands-review",
+      "status": "passed",
+      "evidence": "statically reviewed 1 command block(s); no high-risk pattern found and nothing was executed",
+      "facts": {
+        "executableIntentReviewed": true
+      }
+    }
+  ],
+  "cleanup": {
+    "status": "passed",
+    "evidence": "Skill adapter removed its metadata workspace; source was never executed or modified",
+    "facts": {
+      "workspaceRemoved": true
+    }
+  },
+  "claims": {
+    "seamlessInstall": {
+      "state": "not-claimed",
+      "reason": "only transactional Profile Bundle installation can claim seamless installation"
+    },
+    "failureIsolation": {
+      "state": "not-claimed",
+      "reason": "guided installation has manual failure handling"
+    },
+    "hotReload": {
+      "state": "not-declared",
+      "reason": "declared activation is immediate"
+    },
+    "protocolCompatibility": {
+      "state": "verified",
+      "reason": "all required typed Harness steps passed"
+    },
+    "registryReadiness": {
+      "state": "catalog-only",
+      "reason": "this protocol has no current Workshop Registry install authority"
+    }
+  },
+  "verifiedAt": "2026-08-14T12:49:23.022Z",
+  "verifier": "local-fixed-checkout-skill-static"
+}

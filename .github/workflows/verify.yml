@@ -10,6 +10,9 @@ on:
       - 'automation-policy.json'
       - 'scripts/typed-harness-lib.mjs'
       - 'scripts/automation-policy-lib.mjs'
+      - 'scripts/harness-adapters.mjs'
+      - 'scripts/loader-adapter-lib.mjs'
+      - 'scripts/loader-adapters/*.mjs'
   workflow_dispatch:
     inputs:
       release_id:
@@ -47,6 +50,7 @@ jobs:
       trusted_count: ${{ steps.plan.outputs.trusted_count }}
       admission_eligible: ${{ steps.plan.outputs.admission_eligible }}
       release_ids: ${{ steps.plan.outputs.release_ids }}
+      runnable_release_ids: ${{ steps.plan.outputs.runnable_release_ids }}
       selected_count: ${{ steps.plan.outputs.selected_count }}
     steps:
       - uses: actions/checkout@v4
@@ -92,14 +96,15 @@ jobs:
       - run: npm ci --ignore-scripts
       - id: source
         run: node scripts/checkout-intake-source.mjs --release "${{ matrix.releaseId }}" --output "$RUNNER_TEMP/source" --previous-output "$RUNNER_TEMP/previous"
-      - run: node scripts/run-automation-verification.mjs --release "${{ matrix.releaseId }}" --runtime "${{ matrix.runtimeVersion }}" --source "${{ steps.source.outputs.source_root }}" --previous-source "${{ steps.source.outputs.previous_source_root }}"
+      - id: verify
+        run: node scripts/run-automation-verification.mjs --release "${{ matrix.releaseId }}" --runtime "${{ matrix.runtimeVersion }}" --source "${{ steps.source.outputs.source_root }}" --previous-source "${{ steps.source.outputs.previous_source_root }}"
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: verification-${{ matrix.key }}
           path: |
-            intake/plans
-            intake/reports
-            intake/compatibility
+            ${{ steps.verify.outputs.plan_path }}
+            ${{ steps.verify.outputs.report_path }}
           if-no-files-found: error
 
   trusted:
@@ -119,19 +124,20 @@ jobs:
       - run: npm ci --ignore-scripts
       - id: source
         run: node scripts/checkout-intake-source.mjs --release "${{ matrix.releaseId }}" --output "$RUNNER_TEMP/source" --previous-output "$RUNNER_TEMP/previous"
-      - run: node scripts/run-automation-verification.mjs --release "${{ matrix.releaseId }}" --runtime "${{ matrix.runtimeVersion }}" --source "${{ steps.source.outputs.source_root }}" --previous-source "${{ steps.source.outputs.previous_source_root }}" --trust-source-execution --pnpm-store "$RUNNER_TEMP/pnpm-store"
+      - id: verify
+        run: node scripts/run-automation-verification.mjs --release "${{ matrix.releaseId }}" --runtime "${{ matrix.runtimeVersion }}" --source "${{ steps.source.outputs.source_root }}" --previous-source "${{ steps.source.outputs.previous_source_root }}" --trust-source-execution
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: verification-${{ matrix.key }}
           path: |
-            intake/plans
-            intake/reports
-            intake/compatibility
+            ${{ steps.verify.outputs.plan_path }}
+            ${{ steps.verify.outputs.report_path }}
           if-no-files-found: error
 
   finalize:
     needs: [prepare, static, trusted]
-    if: always() && needs.prepare.result == 'success' && needs.prepare.outputs.selected_count != '0' && (needs.static.result == 'success' || needs.static.result == 'skipped') && (needs.trusted.result == 'success' || needs.trusted.result == 'skipped')
+    if: always() && needs.prepare.result == 'success' && needs.prepare.outputs.selected_count != '0'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -146,15 +152,18 @@ jobs:
         with:
           pattern: verification-*
           merge-multiple: true
+          path: intake
       - id: approval
         if: needs.prepare.outputs.trusted_count != '0'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node scripts/github-environment-review.mjs
       - name: Synchronize current-baseline evidence
-        run: npm run intake:sync-evidence
+        env:
+          RUNNABLE_RELEASE_IDS: ${{ needs.prepare.outputs.runnable_release_ids }}
+        run: node scripts/sync-harness-evidence.mjs --releases-json "$RUNNABLE_RELEASE_IDS"
       - name: Apply the contingent Admission decision
-        if: github.event_name == 'workflow_dispatch' && needs.prepare.outputs.admission_eligible == 'true'
+        if: github.event_name == 'workflow_dispatch' && needs.prepare.outputs.admission_eligible == 'true' && inputs.risk_level != 'unknown'
         env:
           REVIEWER: ${{ needs.prepare.outputs.trusted_count != '0' && steps.approval.outputs.reviewer || 'automation-static-policy' }}
         run: npm run registry:approve -- approve "${{ inputs.release_id }}" --reviewer "$REVIEWER" --risk-level "${{ inputs.risk_level }}"

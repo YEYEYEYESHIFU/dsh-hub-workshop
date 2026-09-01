@@ -23,9 +23,10 @@ test('the empty Registry is deterministic and grants no install authority', asyn
   assert.equal(first['catalog.json'].stats.installMethods.manual, first['catalog.json'].stats.packages)
   const sourceCatalog = await json('catalog.json')
   const admissions = await json('registry-admissions.json')
+  const queue = await json('intake-queue.json')
   assert.equal(
     first['catalog.json'].updated,
-    new Date(Math.max(Date.parse(sourceCatalog.updated), Date.parse(admissions.updatedAt))).toISOString(),
+    new Date(Math.max(Date.parse(sourceCatalog.updated), Date.parse(admissions.updatedAt), Date.parse(queue.generatedAt))).toISOString(),
   )
 })
 

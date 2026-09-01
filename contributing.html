@@ -63,6 +63,7 @@
 <ul>
 <li>有实际代码或静态 Skill/MCP 资产，不是空仓库、概念 README 或候选计划；</li>
 <li>申报包的 <code>package.json#dshWorkshop</code> 通过 <a href="package-manifest.schema.json">v1 package manifest schema</a>；它明确区分事务安装、隔离试装和引导接入，并声明失败处置、热重载/重启、dispose、权限与证据路径；</li>
+<li>新 v2 投稿按 <a href="harness-plan.schema.json">分类型 Harness 计划</a>执行；通过报告符合 <a href="harness-report.schema.json">Harness report schema</a>，随后才能生成 v2 Intake evidence；</li>
 <li>MCP 同时提供符合官方 <code>server.json</code> schema 的清单；npm 包的 <code>mcpName</code> 与服务器名一致；</li>
 <li>README 写清用途、安装步骤、依赖和已知限制；</li>
 <li>有固定的 40 位 commit 供审查与追溯；</li>
@@ -212,6 +213,7 @@ node --check docs/assets/app.js
 <ul>
 <li>Contain working code or static Skill/MCP assets, not an empty repository, concept README, or proposal.</li>
 <li>Provide a <code>package.json#dshWorkshop</code> value that passes the <a href="package-manifest.schema.json">v1 package manifest schema</a>, distinguishing transactional, isolated-trial, and guided integration while declaring failure handling, reload/restart, dispose, permissions, and evidence paths.</li>
+<li>Run new v2 submissions through a <a href="harness-plan.schema.json">typed Harness plan</a>; a passing result follows the <a href="harness-report.schema.json">Harness report schema</a> before it can become v2 Intake evidence.</li>
 <li>For MCP, also provide an official-schema <code>server.json</code>; npm <code>mcpName</code> must match the server name.</li>
 <li>Document its purpose, installation, dependencies, and known limits in the README.</li>
 <li>Pin a full 40-character commit for review and traceability.</li>
@@ -343,13 +345,9 @@ node --check docs/assets/app.js
 
     </main>
     <footer class="site-footer doc-footer">
-      <a class="footer-brand" href="./">DSH Hub Workshop</a>
-      <p data-i18n="footer.notice">DSH Hub Workshop 只做索引，不对插件内容做安全担保。是否信任与安装，请自行核验。</p>
-      <div class="footer-links">
-        <a href="./" data-i18n="nav.catalog">插件</a>
-        <a href="catalog.json">JSON API</a>
-        <a href="https://github.com/omdsh-dev/dsh-hub-workshop">GitHub</a>
-      </div>
+      <div class="footer-summary"><a class="footer-brand" href="./">DSH Hub Workshop</a><p data-i18n="footer.notice">DSH Hub Workshop 只做索引，不对插件内容做安全担保。是否信任与安装，请自行核验。</p></div>
+      <nav class="footer-group" aria-label="站点资源"><strong class="footer-heading">站点资源</strong><div class="footer-links"><a href="./" data-i18n="nav.catalog">插件</a><a href="catalog.json">JSON API</a><a href="https://github.com/omdsh-dev/dsh-hub-workshop">GitHub</a></div></nav>
+      <nav class="footer-group footer-ecosystem" aria-label="生态外链"><strong class="footer-heading">生态外链</strong><a class="footer-external-link" href="https://dshfind.com/" target="_blank" rel="noopener noreferrer"><span><b>dshfind</b><small>DSH 学习与分享社区</small></span><span aria-hidden="true">↗</span></a></nav>
     </footer>
   </body>
 </html>

@@ -1,0 +1,81 @@
+{
+  "schema": "omdsh-workshop-intake-evidence/v2",
+  "projectId": "chinese-colors-mcp",
+  "releaseId": "chinese-colors-mcp@0.1.0-rc.2",
+  "management": "guided",
+  "source": {
+    "repository": "https://github.com/omdsh-dev/toybox",
+    "ref": "86e98729b92db0b9fe901c39e32bca74cf8c0f54",
+    "path": "/plugins/chinese-colors-mcp/.dsh-plugin"
+  },
+  "runtime": null,
+  "capability": null,
+  "checks": {
+    "static": {
+      "status": "passed",
+      "evidence": "clean Git origin, HEAD, and source path match 86e98729b92db0b9fe901c39e32bca74cf8c0f54; Git tree 71598fcbf77c04841c57325de22a53a8d6c88089"
+    },
+    "manifest": {
+      "status": "passed",
+      "evidence": "package.json#dshWorkshop passed the public manifest contract"
+    },
+    "entry": {
+      "status": "passed",
+      "evidence": "artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/toybox/plugins/chinese-colors-mcp/.dsh-plugin/server.json"
+    },
+    "dshContract": {
+      "status": "passed",
+      "evidence": "server.json and package ownership conform to the official MCP Registry contract"
+    },
+    "compatibility": {
+      "status": "passed",
+      "evidence": "adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6"
+    },
+    "permissions": {
+      "status": "passed",
+      "evidence": "reviewed 0 declared permission scope(s)"
+    },
+    "supplyChain": {
+      "status": "passed",
+      "evidence": "no package lifecycle scripts; installation is forced to ignore scripts"
+    },
+    "install": {
+      "status": "not-applicable",
+      "evidence": "install.apply: protocol is Catalog-only in the current DSH Registry"
+    },
+    "ready": {
+      "status": "not-applicable",
+      "evidence": "ready.probe: protocol is Catalog-only in the current DSH Registry"
+    },
+    "functional": {
+      "status": "not-applicable",
+      "evidence": "guided protocol has no DSH runtime capability claim"
+    },
+    "update": {
+      "status": "not-applicable",
+      "evidence": "update.apply: protocol is Catalog-only in the current DSH Registry"
+    },
+    "disable": {
+      "status": "not-applicable",
+      "evidence": "disable.apply: protocol is Catalog-only in the current DSH Registry"
+    },
+    "remove": {
+      "status": "not-applicable",
+      "evidence": "remove.apply: protocol is Catalog-only in the current DSH Registry"
+    },
+    "recovery": {
+      "status": "not-applicable",
+      "evidence": "recovery.generation: protocol is Catalog-only in the current DSH Registry"
+    },
+    "failureIsolation": {
+      "status": "not-applicable",
+      "evidence": "guided protocol has manual failure handling"
+    },
+    "hotReload": {
+      "status": "not-applicable",
+      "evidence": "guided protocols cannot claim a DSH runtime hot reload"
+    }
+  },
+  "verifiedAt": "2026-08-14T12:49:27.951Z",
+  "verifier": "local-fixed-checkout-mcp-preflight"
+}

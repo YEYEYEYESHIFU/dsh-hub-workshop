@@ -1,0 +1,309 @@
+{
+  "schema": "omdsh-workshop-harness-report/v1",
+  "engineVersion": "1.1.0",
+  "evidenceKey": "sha256:b9fae2bc3b6110c730b559f40626613d5f898b045bf44d99861c2474d903ed0e",
+  "planId": "7d7d@0.4.0-rc.2:0.1.0-rc.6:harness-profile",
+  "projectId": "7d7d",
+  "releaseId": "7d7d@0.4.0-rc.2",
+  "source": {
+    "repository": "https://github.com/omdsh-dev/7d7d",
+    "ref": "1c8ea4981fcfdb58e8f9726058b950aaf8cc9404",
+    "path": null
+  },
+  "updateFrom": {
+    "repository": "https://github.com/omdsh-dev/7d7d",
+    "ref": "80b6ddb779a009d378a1c30c85dfef598f527997",
+    "path": null,
+    "version": "0.4.0-rc.1"
+  },
+  "baseline": {
+    "package": "@deepseek-ai/dsh",
+    "version": "0.1.0-rc.6",
+    "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+  },
+  "profileBase": {
+    "template": "web",
+    "bundles": [
+      "@deepseek-ai/dsh-base",
+      "@deepseek-ai/dsh-web-app"
+    ],
+    "exactPackages": [
+      {
+        "package": "@deepseek-ai/dsh-base",
+        "version": "0.1.0-rc.6",
+        "integrity": "sha512-SR0V0Lq4Bm2ir7k2OaiINZZWFSDt1n4dS8J6IlIabYhoIF46baEQY2awZ9/InOWCe+dIpQob0/3y3yZOHqjnpw=="
+      },
+      {
+        "package": "@deepseek-ai/dsh-web-app",
+        "version": "0.1.0-rc.6",
+        "integrity": "sha512-GKvfD1oHbdNN4Mbb77nCydfv2ZRxGVnKcKIGUfXGvs5cNC3cfPYPP/Ok9b/Kbk9zFYMuz+lLikka+HK3zyUcAQ=="
+      }
+    ]
+  },
+  "loaderAdapter": {
+    "id": "official-profile",
+    "version": "1.0.3",
+    "execution": "trusted-ephemeral",
+    "authority": "registry-eligible-after-evidence"
+  },
+  "classification": {
+    "management": "transactional",
+    "installMode": "transactional",
+    "adapter": "profile-bundle",
+    "protocol": "harness-profile",
+    "failurePolicy": "generation-rollback",
+    "activation": "restart-profile"
+  },
+  "status": "passed",
+  "execution": {
+    "adapter": "rc6-profile-generation-adapter",
+    "trustedSourceExecution": true,
+    "workspace": "ephemeral"
+  },
+  "steps": [
+    {
+      "id": "source.immutable",
+      "status": "passed",
+      "evidence": "clean Git origin, HEAD, and source path match 1c8ea4981fcfdb58e8f9726058b950aaf8cc9404; Git tree 96d5a8e39904f6a3899da039495fa1c74292c3cf",
+      "facts": {
+        "sourceImmutable": true
+      }
+    },
+    {
+      "id": "manifest.validate",
+      "status": "passed",
+      "evidence": "package.json#dshWorkshop passed the public manifest contract",
+      "facts": {
+        "manifestValid": true
+      }
+    },
+    {
+      "id": "artifact.present",
+      "status": "passed",
+      "evidence": "artifact present at /Users/runner/work/_temp/source/cordis.patch.yml",
+      "facts": {
+        "artifactPresent": true
+      }
+    },
+    {
+      "id": "protocol.contract",
+      "status": "passed",
+      "evidence": "RC.6 dsh.bundle.patch resolves to ./cordis.patch.yml",
+      "facts": {
+        "protocolContractValid": true
+      }
+    },
+    {
+      "id": "compatibility.baseline",
+      "status": "passed",
+      "evidence": "adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6 with sha512 integrity",
+      "facts": {
+        "compatibilityPassed": true
+      }
+    },
+    {
+      "id": "permissions.review",
+      "status": "passed",
+      "evidence": "reviewed 4 declared permission scope(s)",
+      "facts": {
+        "permissionsReviewed": true
+      }
+    },
+    {
+      "id": "supply-chain.review",
+      "status": "passed",
+      "evidence": "no package lifecycle scripts; installation is forced to ignore scripts",
+      "facts": {
+        "supplyChainPassed": true,
+        "installScriptsDisabled": true
+      }
+    },
+    {
+      "id": "update-source.immutable",
+      "status": "passed",
+      "evidence": "clean Git origin, HEAD, and source path match 80b6ddb779a009d378a1c30c85dfef598f527997; Git tree 844a8af6a4ea6d29a0c65e120bbe1431faac92a5; @mattheliu/7d7d@0.4.0-rc.1 is the fixed update origin",
+      "facts": {
+        "sourceImmutable": true,
+        "previousVersionMatched": true
+      }
+    },
+    {
+      "id": "sandbox.policy",
+      "status": "passed",
+      "evidence": "macOS sandbox-exec denies external network and writes outside the ephemeral workspace; loopback-only HTTP is allowed for the Web capability probe",
+      "facts": {
+        "workspaceEphemeral": true,
+        "networkDeniedByDefault": true,
+        "installScriptsDisabled": true,
+        "currentProtected": true
+      }
+    },
+    {
+      "id": "runtime.exact",
+      "status": "passed",
+      "evidence": "installed exact @deepseek-ai/dsh@0.1.0-rc.6, pnpm@10.34.5, and web Profile base with matching sha512 integrities",
+      "facts": {
+        "runtimeExact": true,
+        "profileBaseExact": true,
+        "toolchainExact": true
+      }
+    },
+    {
+      "id": "candidate.create",
+      "status": "passed",
+      "evidence": "RC.6 initialized a separate candidate on @deepseek-ai/dsh-base + @deepseek-ai/dsh-web-app while current remained byte-identical",
+      "facts": {
+        "candidateCreated": true,
+        "currentUntouched": true,
+        "profileBaseBound": true
+      }
+    },
+    {
+      "id": "install.scripts-disabled",
+      "status": "passed",
+      "evidence": "fixture has no lifecycle scripts and pnpm is forced offline with --ignore-scripts",
+      "facts": {
+        "installScriptsDisabled": true
+      }
+    },
+    {
+      "id": "install.apply",
+      "status": "passed",
+      "evidence": "RC.6 pnpm forwarder installed the fixed bundle and --dump-config resolved its patch",
+      "facts": {
+        "installed": true,
+        "currentUntouched": true
+      }
+    },
+    {
+      "id": "ready.probe",
+      "status": "passed",
+      "evidence": "RC.6 booted the candidate and 7d7d-routes-registered became ready in pid 6435",
+      "facts": {
+        "ready": true
+      }
+    },
+    {
+      "id": "capability.invoke",
+      "status": "passed",
+      "evidence": "the live RC.6 Profile registered, invoked, and observed 7d7d-routes-registered; GET /7d7d/api/manifest.json returned HTTP 200 with 17 game(s)",
+      "facts": {
+        "capabilityObserved": true
+      },
+      "capability": {
+        "id": "7d7d-routes-registered",
+        "kind": "service",
+        "invocation": "boot the RC.6 candidate Profile and activate the 7d7d Cordis entry",
+        "expected": "the /7d7d prefix and /7d7d/api/server.json routes are both registered",
+        "observed": "7d7d-routes-registered"
+      }
+    },
+    {
+      "id": "failure.inject-candidate",
+      "status": "passed",
+      "evidence": "malformed candidate failed closed with exit 1",
+      "facts": {
+        "failureInjected": true
+      }
+    },
+    {
+      "id": "failure.current-unchanged",
+      "status": "passed",
+      "evidence": "failed candidate left current Profile and protected sentinel unchanged",
+      "facts": {
+        "currentUnchanged": true
+      }
+    },
+    {
+      "id": "failure.discard-candidate",
+      "status": "passed",
+      "evidence": "failed candidate directory was discarded",
+      "facts": {
+        "candidateDiscarded": true
+      }
+    },
+    {
+      "id": "activation.switch",
+      "status": "passed",
+      "evidence": "candidate became current and the former current was retained as previous",
+      "facts": {
+        "activated": true,
+        "previousRetained": true
+      }
+    },
+    {
+      "id": "lifecycle.restart",
+      "status": "passed",
+      "evidence": "RC.6 restarted the current Profile and observed 7d7d-routes-registered in pid 6441",
+      "facts": {
+        "restarted": true,
+        "restartScope": "profile",
+        "capabilityObserved": true
+      }
+    },
+    {
+      "id": "update.apply",
+      "status": "passed",
+      "evidence": "RC.6 upgraded an isolated candidate from 0.4.0-rc.1 to target 0.4.0-rc.2 while current remained unchanged",
+      "facts": {
+        "updatePassed": true
+      }
+    },
+    {
+      "id": "disable.apply",
+      "status": "passed",
+      "evidence": "removing the bundle from dsh.profile.bundles disabled its patch while retaining the dependency",
+      "facts": {
+        "disablePassed": true
+      }
+    },
+    {
+      "id": "remove.apply",
+      "status": "passed",
+      "evidence": "RC.6 plugin forwarder removed the dependency and reconciled the bundle list",
+      "facts": {
+        "removePassed": true
+      }
+    },
+    {
+      "id": "recovery.generation",
+      "status": "passed",
+      "evidence": "previous generation was restored byte-for-byte as current",
+      "facts": {
+        "recoveryPassed": true,
+        "previousRestored": true
+      }
+    }
+  ],
+  "cleanup": {
+    "status": "passed",
+    "evidence": "RC.6 Profile workspace and every generation were removed",
+    "facts": {
+      "workspaceRemoved": true
+    }
+  },
+  "claims": {
+    "seamlessInstall": {
+      "state": "verified",
+      "reason": "all required typed Harness steps passed"
+    },
+    "failureIsolation": {
+      "state": "verified",
+      "reason": "all required typed Harness steps passed"
+    },
+    "hotReload": {
+      "state": "not-declared",
+      "reason": "declared activation is restart-profile"
+    },
+    "protocolCompatibility": {
+      "state": "verified",
+      "reason": "all required typed Harness steps passed"
+    },
+    "registryReadiness": {
+      "state": "evidence-ready",
+      "reason": "Harness passed; independent review is still required"
+    }
+  },
+  "verifiedAt": "2026-08-16T04:31:09.173Z",
+  "verifier": "github-actions-official-profile@1.0.3-0.1.0-rc.6"
+}

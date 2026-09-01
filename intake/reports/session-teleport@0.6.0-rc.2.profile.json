@@ -1,0 +1,261 @@
+{
+  "schema": "omdsh-workshop-harness-report/v1",
+  "planId": "session-teleport@0.6.0-rc.2:0.1.0-rc.6:harness-profile",
+  "projectId": "session-teleport",
+  "releaseId": "session-teleport@0.6.0-rc.2",
+  "source": {
+    "repository": "https://github.com/omdsh-dev/session-teleport",
+    "ref": "0640ca9ccd1b9ac12709b74aecf2a0e75c8bb4b1",
+    "path": null
+  },
+  "updateFrom": {
+    "repository": "https://github.com/omdsh-dev/session-teleport",
+    "ref": "d76e0d98b09ad1d08f2592ffd47161acb907bfc4",
+    "path": null,
+    "version": "0.6.0-rc.1"
+  },
+  "baseline": {
+    "package": "@deepseek-ai/dsh",
+    "version": "0.1.0-rc.6",
+    "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+  },
+  "profileBase": {
+    "template": "base",
+    "bundles": [
+      "@deepseek-ai/dsh-base"
+    ],
+    "exactPackages": [
+      {
+        "package": "@deepseek-ai/dsh-base",
+        "version": "0.1.0-rc.6",
+        "integrity": "sha512-SR0V0Lq4Bm2ir7k2OaiINZZWFSDt1n4dS8J6IlIabYhoIF46baEQY2awZ9/InOWCe+dIpQob0/3y3yZOHqjnpw=="
+      }
+    ]
+  },
+  "classification": {
+    "management": "transactional",
+    "installMode": "transactional",
+    "adapter": "profile-bundle",
+    "protocol": "harness-profile",
+    "failurePolicy": "generation-rollback",
+    "activation": "restart-profile"
+  },
+  "status": "blocked",
+  "execution": {
+    "adapter": "rc6-profile-generation-adapter",
+    "trustedSourceExecution": true,
+    "workspace": "ephemeral"
+  },
+  "steps": [
+    {
+      "id": "source.immutable",
+      "status": "passed",
+      "evidence": "clean Git origin, HEAD, and source path match 0640ca9ccd1b9ac12709b74aecf2a0e75c8bb4b1; Git tree acd7a07eaa5d5a9071ab76f3564aaceb200a3290",
+      "facts": {
+        "sourceImmutable": true
+      }
+    },
+    {
+      "id": "manifest.validate",
+      "status": "passed",
+      "evidence": "package.json#dshWorkshop passed the public manifest contract",
+      "facts": {
+        "manifestValid": true
+      }
+    },
+    {
+      "id": "artifact.present",
+      "status": "passed",
+      "evidence": "artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/session-teleport/cordis.patch.yml",
+      "facts": {
+        "artifactPresent": true
+      }
+    },
+    {
+      "id": "protocol.contract",
+      "status": "passed",
+      "evidence": "RC.6 dsh.bundle.patch resolves to ./cordis.patch.yml",
+      "facts": {
+        "protocolContractValid": true
+      }
+    },
+    {
+      "id": "compatibility.baseline",
+      "status": "passed",
+      "evidence": "adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6",
+      "facts": {
+        "compatibilityPassed": true
+      }
+    },
+    {
+      "id": "permissions.review",
+      "status": "passed",
+      "evidence": "reviewed 4 declared permission scope(s)",
+      "facts": {
+        "permissionsReviewed": true
+      }
+    },
+    {
+      "id": "supply-chain.review",
+      "status": "passed",
+      "evidence": "no package lifecycle scripts; installation is forced to ignore scripts",
+      "facts": {
+        "supplyChainPassed": true,
+        "installScriptsDisabled": true
+      }
+    },
+    {
+      "id": "update-source.immutable",
+      "status": "passed",
+      "evidence": "clean public Git binding contains d76e0d98b09ad1d08f2592ffd47161acb907bfc4; extracted 114-file archive matches tree e897db2766bc298df712d3f45b91965eeb04c06a; @mattheliu/session-teleport@0.6.0-rc.1 is the fixed update origin",
+      "facts": {
+        "sourceImmutable": true,
+        "previousVersionMatched": true
+      }
+    },
+    {
+      "id": "sandbox.policy",
+      "status": "passed",
+      "evidence": "macOS sandbox-exec denies external network and writes outside the ephemeral workspace",
+      "facts": {
+        "workspaceEphemeral": true,
+        "networkDeniedByDefault": true,
+        "installScriptsDisabled": true,
+        "currentProtected": true
+      }
+    },
+    {
+      "id": "runtime.exact",
+      "status": "passed",
+      "evidence": "installed exact @deepseek-ai/dsh@0.1.0-rc.6 and base Profile base with matching sha512 integrities; prebound source runtime dependencies pg@8.23.0",
+      "facts": {
+        "runtimeExact": true,
+        "profileBaseExact": true
+      }
+    },
+    {
+      "id": "candidate.create",
+      "status": "passed",
+      "evidence": "RC.6 initialized a separate candidate on @deepseek-ai/dsh-base while current remained byte-identical",
+      "facts": {
+        "candidateCreated": true,
+        "currentUntouched": true,
+        "profileBaseBound": true
+      }
+    },
+    {
+      "id": "install.scripts-disabled",
+      "status": "passed",
+      "evidence": "fixture has no lifecycle scripts and pnpm is forced offline with --ignore-scripts",
+      "facts": {
+        "installScriptsDisabled": true
+      }
+    },
+    {
+      "id": "install.apply",
+      "status": "passed",
+      "evidence": "RC.6 pnpm forwarder installed the fixed bundle and --dump-config resolved its patch",
+      "facts": {
+        "installed": true,
+        "currentUntouched": true
+      }
+    },
+    {
+      "id": "ready.probe",
+      "status": "blocked",
+      "evidence": "PostgreSQL runtime validation blocked: POSTGRES_TEST_URL is unset; no local postgres or psql binaries are installed; the Docker daemon is unavailable. The database-backed /health check is required before DSH_TELEPORT_ENABLE=1.",
+      "facts": {}
+    },
+    {
+      "id": "capability.invoke",
+      "status": "blocked",
+      "evidence": "blocked by an earlier required step",
+      "facts": {}
+    },
+    {
+      "id": "failure.inject-candidate",
+      "status": "blocked",
+      "evidence": "blocked by an earlier required step",
+      "facts": {}
+    },
+    {
+      "id": "failure.current-unchanged",
+      "status": "blocked",
+      "evidence": "blocked by an earlier required step",
+      "facts": {}
+    },
+    {
+      "id": "failure.discard-candidate",
+      "status": "blocked",
+      "evidence": "blocked by an earlier required step",
+      "facts": {}
+    },
+    {
+      "id": "activation.switch",
+      "status": "blocked",
+      "evidence": "blocked by an earlier required step",
+      "facts": {}
+    },
+    {
+      "id": "lifecycle.restart",
+      "status": "blocked",
+      "evidence": "blocked by an earlier required step",
+      "facts": {}
+    },
+    {
+      "id": "update.apply",
+      "status": "blocked",
+      "evidence": "blocked by an earlier required step",
+      "facts": {}
+    },
+    {
+      "id": "disable.apply",
+      "status": "blocked",
+      "evidence": "blocked by an earlier required step",
+      "facts": {}
+    },
+    {
+      "id": "remove.apply",
+      "status": "blocked",
+      "evidence": "blocked by an earlier required step",
+      "facts": {}
+    },
+    {
+      "id": "recovery.generation",
+      "status": "blocked",
+      "evidence": "blocked by an earlier required step",
+      "facts": {}
+    }
+  ],
+  "cleanup": {
+    "status": "passed",
+    "evidence": "RC.6 Profile workspace and every generation were removed",
+    "facts": {
+      "workspaceRemoved": true
+    }
+  },
+  "claims": {
+    "seamlessInstall": {
+      "state": "blocked",
+      "reason": "typed Harness blocked"
+    },
+    "failureIsolation": {
+      "state": "blocked",
+      "reason": "typed Harness blocked"
+    },
+    "hotReload": {
+      "state": "not-declared",
+      "reason": "declared activation is restart-profile"
+    },
+    "protocolCompatibility": {
+      "state": "blocked",
+      "reason": "typed Harness blocked"
+    },
+    "registryReadiness": {
+      "state": "blocked",
+      "reason": "typed Harness blocked"
+    }
+  },
+  "verifiedAt": "2026-08-14T12:38:08.141Z",
+  "verifier": "local-fixed-checkout-rc6-profile"
+}

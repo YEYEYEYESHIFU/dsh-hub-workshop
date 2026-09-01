@@ -1,0 +1,144 @@
+{
+  "schema": "omdsh-workshop-intake/v1",
+  "id": "session-teleport@0.6.0-rc.2",
+  "submission": {
+    "repository": "https://github.com/omdsh-dev/session-teleport",
+    "ref": "0640ca9ccd1b9ac12709b74aecf2a0e75c8bb4b1",
+    "path": null,
+    "manifest": {
+      "schema": "omdsh-workshop-submission/v2",
+      "operation": "add-release",
+      "project": {
+        "id": "session-teleport",
+        "displayName": "Session Teleport",
+        "summary": "基于 PostgreSQL 的多设备 Session 接力插件，提供单写者 fencing、接管、恢复与审计边界。",
+        "kind": "extension",
+        "category": "memory",
+        "tags": [
+          "session",
+          "postgresql",
+          "handoff"
+        ],
+        "repository": "https://github.com/omdsh-dev/session-teleport",
+        "path": null,
+        "author": {
+          "name": "mattheliu",
+          "url": "https://github.com/mattheliu"
+        },
+        "license": "BSD-3-Clause"
+      },
+      "release": {
+        "version": "0.6.0-rc.2",
+        "ref": "0640ca9ccd1b9ac12709b74aecf2a0e75c8bb4b1",
+        "updatedAt": "2026-08-13T20:55:45+08:00",
+        "channel": "beta",
+        "compatibility": "Exact @deepseek-ai/dsh@0.1.0-rc.6 Harness evaluation.",
+        "changelog": "Migrated to the current typed Workshop contract and fixed public source.",
+        "capabilities": {
+          "requiresFabric": false,
+          "deepHook": false,
+          "restartRequired": true
+        },
+        "profileBundle": {
+          "packageName": "@mattheliu/session-teleport",
+          "spec": "github:omdsh-dev/session-teleport#0640ca9ccd1b9ac12709b74aecf2a0e75c8bb4b1"
+        },
+        "updateFrom": {
+          "version": "0.6.0-rc.1",
+          "ref": "d76e0d98b09ad1d08f2592ffd47161acb907bfc4"
+        }
+      },
+      "management": {
+        "method": "profile-bundle",
+        "protocol": "harness-profile",
+        "label": "Transactional candidate Profile review",
+        "instructions": "Evaluate the fixed Profile Bundle in an ephemeral candidate generation.",
+        "source": null
+      },
+      "declarations": {
+        "permissions": "database:read, database:write, filesystem:write, network:outbound",
+        "testing": "Run the typed adapter against this exact source and preserve the complete report.",
+        "trustedPublisherRequested": false,
+        "installScriptsMustRemainDisabled": true
+      },
+      "packageManifest": {
+        "schema": "omdsh-workshop-package/v1",
+        "type": "plugin",
+        "integration": {
+          "protocol": "harness-profile",
+          "artifact": "cordis.patch.yml"
+        },
+        "install": {
+          "mode": "transactional",
+          "adapter": "profile-bundle",
+          "failurePolicy": "generation-rollback",
+          "touchesCurrentBeforeActivation": false
+        },
+        "lifecycle": {
+          "activation": "restart-profile",
+          "dispose": "supported"
+        },
+        "permissions": [
+          "database:read",
+          "database:write",
+          "filesystem:write",
+          "network:outbound"
+        ],
+        "capability": {
+          "id": "session-persistence-teleport",
+          "kind": "provider",
+          "invocation": "boot an RC.6 candidate Profile with DSH_TELEPORT_ENABLE=1 and run the Session persistence lifecycle",
+          "expected": "the Teleport persistence provider becomes ready only after its PostgreSQL-backed health check passes"
+        },
+        "evidence": {
+          "install": "docs/PLUGIN_LIFECYCLE.md",
+          "failureIsolation": "docs/PLUGIN_LIFECYCLE.md",
+          "hotReload": null,
+          "remove": "docs/PLUGIN_LIFECYCLE.md"
+        }
+      }
+    }
+  },
+  "classification": {
+    "management": "transactional"
+  },
+  "baseline": {
+    "package": "@deepseek-ai/dsh",
+    "version": "0.1.0-rc.6",
+    "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+  },
+  "review": {
+    "state": "pending-review"
+  },
+  "verification": {
+    "state": "blocked",
+    "verifiedAt": "2026-08-14T12:38:08.141Z",
+    "evidence": "intake/reports/session-teleport@0.6.0-rc.2.profile.json"
+  },
+  "tests": {
+    "static": {
+      "required": true,
+      "status": "passed",
+      "evidence": "submission manifest validation"
+    },
+    "supplyChain": {
+      "required": true,
+      "status": "passed",
+      "evidence": "no package lifecycle scripts; installation is forced to ignore scripts"
+    },
+    "officialBaseline": {
+      "required": true,
+      "status": "blocked",
+      "evidence": "PostgreSQL runtime validation blocked: POSTGRES_TEST_URL is unset; no local postgres or psql binaries are installed; the Docker daemon is unavailable. The database-backed /health check is required before DSH_TELEPORT_ENABLE=1."
+    },
+    "lifecycle": {
+      "required": true,
+      "status": "blocked",
+      "evidence": "lifecycle steps did not run after the blocking required step"
+    }
+  },
+  "registry": {
+    "state": "ineligible",
+    "reason": "current-baseline-verification-blocked"
+  }
+}

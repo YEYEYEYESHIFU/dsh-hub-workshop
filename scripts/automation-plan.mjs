@@ -3,7 +3,7 @@
 import { appendFile, readFile, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 
-import { buildAutomationPlan } from './automation-policy-lib.mjs'
+import { automationPlanExitCode, buildAutomationPlan } from './automation-policy-lib.mjs'
 
 function option(name) {
   const index = process.argv.indexOf(`--${name}`)
@@ -28,6 +28,7 @@ const output = option('output')
 if (output) await writeFile(resolve(output), `${JSON.stringify(plan, null, 2)}\n`)
 const staticJobs = plan.jobs.filter((job) => !job.requiresTrust)
 const trustedJobs = plan.jobs.filter((job) => job.requiresTrust)
+const runnableReleaseIds = [...new Set(plan.jobs.map((job) => job.releaseId))]
 if (process.env.GITHUB_OUTPUT) {
   await appendFile(process.env.GITHUB_OUTPUT, [
     `static_matrix=${JSON.stringify({ include: staticJobs })}`,
@@ -36,9 +37,10 @@ if (process.env.GITHUB_OUTPUT) {
     `trusted_count=${trustedJobs.length}`,
     `admission_eligible=${plan.summary.admissionEligible}`,
     `release_ids=${JSON.stringify(plan.releaseIds)}`,
+    `runnable_release_ids=${JSON.stringify(runnableReleaseIds)}`,
     `selected_count=${plan.summary.releases}`,
     `blocked_count=${plan.blocked.length}`
   ].map((line) => `${line}\n`).join(''))
 }
 console.log(JSON.stringify(plan, null, 2))
-if (plan.blocked.length > 0) process.exitCode = 2
+process.exitCode = automationPlanExitCode(plan, { explicitSingleRelease: Boolean(option('release')) })

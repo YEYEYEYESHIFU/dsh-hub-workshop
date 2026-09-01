@@ -1,0 +1,815 @@
+{
+  "schema": "omdsh-workshop-evidence-manifest/v1",
+  "baseline": "@deepseek-ai/dsh@0.1.0-rc.6",
+  "generatedAt": "2026-08-15T00:40:27.883Z",
+  "scope": {
+    "typedProjects": 11,
+    "preAdmissionReviews": 11,
+    "catalogComponents": 441,
+    "publicPluginProjects": 434
+  },
+  "summary": {
+    "passedProjects": 10,
+    "blockedProjects": 1,
+    "failedProjects": 0,
+    "passedSteps": 172,
+    "blockedSteps": 11,
+    "failedSteps": 0,
+    "totalSteps": 183
+  },
+  "projects": [
+    {
+      "projectId": "7d7d",
+      "releaseId": "7d7d@0.4.0-rc.2",
+      "kind": "harness-profile",
+      "adapter": "profile-bundle",
+      "status": "passed",
+      "passedSteps": 24,
+      "blockedSteps": 0,
+      "failedSteps": 0,
+      "totalSteps": 24
+    },
+    {
+      "projectId": "almanac-mcp",
+      "releaseId": "almanac-mcp@0.1.0-rc.2",
+      "kind": "mcp",
+      "adapter": "mcp-server",
+      "status": "passed",
+      "passedSteps": 19,
+      "blockedSteps": 0,
+      "failedSteps": 0,
+      "totalSteps": 19
+    },
+    {
+      "projectId": "bug-tamer",
+      "releaseId": "bug-tamer@0.1.0-rc.2",
+      "kind": "skill",
+      "adapter": "skill",
+      "status": "passed",
+      "passedSteps": 10,
+      "blockedSteps": 0,
+      "failedSteps": 0,
+      "totalSteps": 10
+    },
+    {
+      "projectId": "chinese-colors-mcp",
+      "releaseId": "chinese-colors-mcp@0.1.0-rc.2",
+      "kind": "mcp",
+      "adapter": "mcp-server",
+      "status": "passed",
+      "passedSteps": 19,
+      "blockedSteps": 0,
+      "failedSteps": 0,
+      "totalSteps": 19
+    },
+    {
+      "projectId": "code-archaeologist",
+      "releaseId": "code-archaeologist@0.1.0-rc.2",
+      "kind": "skill",
+      "adapter": "skill",
+      "status": "passed",
+      "passedSteps": 10,
+      "blockedSteps": 0,
+      "failedSteps": 0,
+      "totalSteps": 10
+    },
+    {
+      "projectId": "code-talent-scout",
+      "releaseId": "code-talent-scout@0.1.0-rc.2",
+      "kind": "skill",
+      "adapter": "skill",
+      "status": "passed",
+      "passedSteps": 10,
+      "blockedSteps": 0,
+      "failedSteps": 0,
+      "totalSteps": 10
+    },
+    {
+      "projectId": "decision-dice-mcp",
+      "releaseId": "decision-dice-mcp@0.1.0-rc.2",
+      "kind": "mcp",
+      "adapter": "mcp-server",
+      "status": "passed",
+      "passedSteps": 19,
+      "blockedSteps": 0,
+      "failedSteps": 0,
+      "totalSteps": 19
+    },
+    {
+      "projectId": "github-integration",
+      "releaseId": "github-integration@0.1.0-rc.2",
+      "kind": "skill",
+      "adapter": "skill",
+      "status": "passed",
+      "passedSteps": 10,
+      "blockedSteps": 0,
+      "failedSteps": 0,
+      "totalSteps": 10
+    },
+    {
+      "projectId": "naming-master-mcp",
+      "releaseId": "naming-master-mcp@0.1.0-rc.2",
+      "kind": "mcp",
+      "adapter": "mcp-server",
+      "status": "passed",
+      "passedSteps": 19,
+      "blockedSteps": 0,
+      "failedSteps": 0,
+      "totalSteps": 19
+    },
+    {
+      "projectId": "session-teleport",
+      "releaseId": "session-teleport@0.6.0-rc.2",
+      "kind": "harness-profile",
+      "adapter": "profile-bundle",
+      "status": "blocked",
+      "passedSteps": 13,
+      "blockedSteps": 11,
+      "failedSteps": 0,
+      "totalSteps": 24
+    },
+    {
+      "projectId": "time-capsule-mcp",
+      "releaseId": "time-capsule-mcp@0.1.0-rc.2",
+      "kind": "mcp",
+      "adapter": "mcp-server",
+      "status": "passed",
+      "passedSteps": 19,
+      "blockedSteps": 0,
+      "failedSteps": 0,
+      "totalSteps": 19
+    }
+  ],
+  "preAdmissionReview": {
+    "baseline": "@deepseek-ai/dsh@0.1.0-rc.6",
+    "summary": {
+      "projects": 11,
+      "fixedSources": 11,
+      "typePlansReady": 11,
+      "adaptersPassed": 0,
+      "humanReviewsApproved": 0,
+      "admissions": 0,
+      "rc6Verified": 0
+    },
+    "projects": [
+      {
+        "projectId": "7d7d",
+        "releaseId": "7d7d@0.4.0-rc.2",
+        "pluginVersion": "0.4.0-rc.2",
+        "dshBaseline": "@deepseek-ai/dsh@0.1.0-rc.6",
+        "fixedSource": "passed",
+        "typePlan": "ready",
+        "trustReview": "pending-human",
+        "reviewFindings": [
+          {
+            "severity": "review",
+            "code": "process-execution-intent"
+          }
+        ],
+        "adapter": "blocked",
+        "humanReview": "pending",
+        "admission": "not-created",
+        "rc6Verified": false
+      },
+      {
+        "projectId": "almanac-mcp",
+        "releaseId": "almanac-mcp@0.1.0-rc.2",
+        "pluginVersion": "0.1.0-rc.2",
+        "dshBaseline": "@deepseek-ai/dsh@0.1.0-rc.6",
+        "fixedSource": "passed",
+        "typePlan": "ready",
+        "trustReview": "pending-human",
+        "reviewFindings": [
+          {
+            "severity": "review",
+            "code": "process-execution-intent"
+          }
+        ],
+        "adapter": "blocked",
+        "humanReview": "pending",
+        "admission": "not-created",
+        "rc6Verified": false
+      },
+      {
+        "projectId": "bug-tamer",
+        "releaseId": "bug-tamer@0.1.0-rc.2",
+        "pluginVersion": "0.1.0-rc.2",
+        "dshBaseline": "@deepseek-ai/dsh@0.1.0-rc.6",
+        "fixedSource": "passed",
+        "typePlan": "ready",
+        "trustReview": "pending-human",
+        "reviewFindings": [],
+        "adapter": "blocked",
+        "humanReview": "pending",
+        "admission": "not-created",
+        "rc6Verified": false
+      },
+      {
+        "projectId": "chinese-colors-mcp",
+        "releaseId": "chinese-colors-mcp@0.1.0-rc.2",
+        "pluginVersion": "0.1.0-rc.2",
+        "dshBaseline": "@deepseek-ai/dsh@0.1.0-rc.6",
+        "fixedSource": "passed",
+        "typePlan": "ready",
+        "trustReview": "pending-human",
+        "reviewFindings": [
+          {
+            "severity": "review",
+            "code": "process-execution-intent"
+          }
+        ],
+        "adapter": "blocked",
+        "humanReview": "pending",
+        "admission": "not-created",
+        "rc6Verified": false
+      },
+      {
+        "projectId": "code-archaeologist",
+        "releaseId": "code-archaeologist@0.1.0-rc.2",
+        "pluginVersion": "0.1.0-rc.2",
+        "dshBaseline": "@deepseek-ai/dsh@0.1.0-rc.6",
+        "fixedSource": "passed",
+        "typePlan": "ready",
+        "trustReview": "pending-human",
+        "reviewFindings": [],
+        "adapter": "blocked",
+        "humanReview": "pending",
+        "admission": "not-created",
+        "rc6Verified": false
+      },
+      {
+        "projectId": "code-talent-scout",
+        "releaseId": "code-talent-scout@0.1.0-rc.2",
+        "pluginVersion": "0.1.0-rc.2",
+        "dshBaseline": "@deepseek-ai/dsh@0.1.0-rc.6",
+        "fixedSource": "passed",
+        "typePlan": "ready",
+        "trustReview": "pending-human",
+        "reviewFindings": [],
+        "adapter": "blocked",
+        "humanReview": "pending",
+        "admission": "not-created",
+        "rc6Verified": false
+      },
+      {
+        "projectId": "decision-dice-mcp",
+        "releaseId": "decision-dice-mcp@0.1.0-rc.2",
+        "pluginVersion": "0.1.0-rc.2",
+        "dshBaseline": "@deepseek-ai/dsh@0.1.0-rc.6",
+        "fixedSource": "passed",
+        "typePlan": "ready",
+        "trustReview": "pending-human",
+        "reviewFindings": [
+          {
+            "severity": "review",
+            "code": "process-execution-intent"
+          }
+        ],
+        "adapter": "blocked",
+        "humanReview": "pending",
+        "admission": "not-created",
+        "rc6Verified": false
+      },
+      {
+        "projectId": "github-integration",
+        "releaseId": "github-integration@0.1.0-rc.2",
+        "pluginVersion": "0.1.0-rc.2",
+        "dshBaseline": "@deepseek-ai/dsh@0.1.0-rc.6",
+        "fixedSource": "passed",
+        "typePlan": "ready",
+        "trustReview": "pending-human",
+        "reviewFindings": [],
+        "adapter": "blocked",
+        "humanReview": "pending",
+        "admission": "not-created",
+        "rc6Verified": false
+      },
+      {
+        "projectId": "naming-master-mcp",
+        "releaseId": "naming-master-mcp@0.1.0-rc.2",
+        "pluginVersion": "0.1.0-rc.2",
+        "dshBaseline": "@deepseek-ai/dsh@0.1.0-rc.6",
+        "fixedSource": "passed",
+        "typePlan": "ready",
+        "trustReview": "pending-human",
+        "reviewFindings": [
+          {
+            "severity": "review",
+            "code": "process-execution-intent"
+          }
+        ],
+        "adapter": "blocked",
+        "humanReview": "pending",
+        "admission": "not-created",
+        "rc6Verified": false
+      },
+      {
+        "projectId": "session-teleport",
+        "releaseId": "session-teleport@0.6.0-rc.2",
+        "pluginVersion": "0.6.0-rc.2",
+        "dshBaseline": "@deepseek-ai/dsh@0.1.0-rc.6",
+        "fixedSource": "passed",
+        "typePlan": "ready",
+        "trustReview": "needs-fix",
+        "reviewFindings": [
+          {
+            "severity": "review",
+            "code": "process-execution-intent"
+          },
+          {
+            "severity": "blocker",
+            "code": "rc6-unknown-event-not-ignorable"
+          }
+        ],
+        "adapter": "blocked",
+        "humanReview": "pending",
+        "admission": "not-created",
+        "rc6Verified": false
+      },
+      {
+        "projectId": "time-capsule-mcp",
+        "releaseId": "time-capsule-mcp@0.1.0-rc.2",
+        "pluginVersion": "0.1.0-rc.2",
+        "dshBaseline": "@deepseek-ai/dsh@0.1.0-rc.6",
+        "fixedSource": "passed",
+        "typePlan": "ready",
+        "trustReview": "pending-human",
+        "reviewFindings": [
+          {
+            "severity": "review",
+            "code": "process-execution-intent"
+          }
+        ],
+        "adapter": "blocked",
+        "humanReview": "pending",
+        "admission": "not-created",
+        "rc6Verified": false
+      }
+    ],
+    "note": "Plugin release versions and the DSH validation baseline are independent version axes. Every listed plugin release is reviewed against exact @deepseek-ai/dsh@0.1.0-rc.6."
+  },
+  "rc6Alignment": {
+    "sessionTeleport": {
+      "releaseId": "session-teleport@0.6.0-rc.2",
+      "baseline": "@deepseek-ai/dsh@0.1.0-rc.6",
+      "fixedSource": {
+        "status": "failed",
+        "passed": 51,
+        "failed": 1,
+        "rootCause": "rc6-unknown-event-not-ignorable"
+      },
+      "candidateFix": {
+        "status": "passed",
+        "passed": 52,
+        "failed": 0,
+        "admissionEvidence": false
+      },
+      "decision": {
+        "state": "blocked-source-fix-required",
+        "rc6Verified": false,
+        "registryEligible": false,
+        "blockers": [
+          "A new fixed plugin release must carry the RC.6-compatible JSONL migration test fixture.",
+          "Native PostgreSQL and live RC.6 Profile provider lifecycle acceptance are still required.",
+          "Independent human trust review and admission remain pending."
+        ]
+      }
+    }
+  },
+  "artifacts": [
+    {
+      "path": "intake/plans/7d7d@0.4.0-rc.2.json",
+      "sha256": "eee9822016aefbae31f192c67089f6efd06e8b10ca04299bf2de7232f3eac6a8",
+      "role": "typed-plan",
+      "projectId": "7d7d"
+    },
+    {
+      "path": "intake/reports/7d7d@0.4.0-rc.2.profile.json",
+      "sha256": "b2de34adc3e21a4b874a8f195333215ca22150b0d01c40754a75a6dd51c2927f",
+      "role": "passed-profile-report",
+      "projectId": "7d7d",
+      "status": "passed",
+      "passedSteps": 24,
+      "blockedSteps": 0,
+      "failedSteps": 0,
+      "totalSteps": 24,
+      "verifiedAt": "2026-08-14T12:43:01.409Z",
+      "verifier": "local-fixed-checkout-rc6-profile"
+    },
+    {
+      "path": "intake/plans/almanac-mcp@0.1.0-rc.2.json",
+      "sha256": "d958c0f2d99915bcecae222ed3322d349315514db61e906c78e440daf145c8e2",
+      "role": "typed-plan",
+      "projectId": "almanac-mcp"
+    },
+    {
+      "path": "intake/reports/almanac-mcp@0.1.0-rc.2.preflight.json",
+      "sha256": "b97b38415c1784086c3c9ef6180accbe9292f26240cea87d9b5f3af04accc68a",
+      "role": "passed-preflight-report",
+      "projectId": "almanac-mcp",
+      "status": "passed",
+      "passedSteps": 19,
+      "blockedSteps": 0,
+      "failedSteps": 0,
+      "totalSteps": 19,
+      "verifiedAt": "2026-08-14T12:49:27.083Z",
+      "verifier": "local-fixed-checkout-mcp-preflight"
+    },
+    {
+      "path": "intake/plans/bug-tamer@0.1.0-rc.2.json",
+      "sha256": "e0fd6b342503e746294cacc984aadf199a0f14b216cc5ab734319eda8f92bcef",
+      "role": "typed-plan",
+      "projectId": "bug-tamer"
+    },
+    {
+      "path": "intake/reports/bug-tamer@0.1.0-rc.2.preflight.json",
+      "sha256": "47978144de0fe03e90db3518c02a7d71282882a3ee0fa7c15bc5a0d3c40a905d",
+      "role": "passed-preflight-report",
+      "projectId": "bug-tamer",
+      "status": "passed",
+      "passedSteps": 10,
+      "blockedSteps": 0,
+      "failedSteps": 0,
+      "totalSteps": 10,
+      "verifiedAt": "2026-08-14T12:49:23.022Z",
+      "verifier": "local-fixed-checkout-skill-static"
+    },
+    {
+      "path": "intake/plans/chinese-colors-mcp@0.1.0-rc.2.json",
+      "sha256": "1c3bf116f3ae94002d8c098dedfd4818bf04444bd316d0e78b18bd3d09a4f152",
+      "role": "typed-plan",
+      "projectId": "chinese-colors-mcp"
+    },
+    {
+      "path": "intake/reports/chinese-colors-mcp@0.1.0-rc.2.preflight.json",
+      "sha256": "482464ef650425c7f754af5bc1f38abc18d4c373aa76c061e1b56db09f8b542c",
+      "role": "passed-preflight-report",
+      "projectId": "chinese-colors-mcp",
+      "status": "passed",
+      "passedSteps": 19,
+      "blockedSteps": 0,
+      "failedSteps": 0,
+      "totalSteps": 19,
+      "verifiedAt": "2026-08-14T12:49:27.951Z",
+      "verifier": "local-fixed-checkout-mcp-preflight"
+    },
+    {
+      "path": "intake/plans/code-archaeologist@0.1.0-rc.2.json",
+      "sha256": "fc64b931a7f02c3b0675f560e8774b0b65d6bc407738ba4df5a54978d8801eff",
+      "role": "typed-plan",
+      "projectId": "code-archaeologist"
+    },
+    {
+      "path": "intake/reports/code-archaeologist@0.1.0-rc.2.preflight.json",
+      "sha256": "2cc8c0a4841e02af08200cd5040ce3d925dc13aba62141ce6bedaf0bb30cdac0",
+      "role": "passed-preflight-report",
+      "projectId": "code-archaeologist",
+      "status": "passed",
+      "passedSteps": 10,
+      "blockedSteps": 0,
+      "failedSteps": 0,
+      "totalSteps": 10,
+      "verifiedAt": "2026-08-14T12:49:23.102Z",
+      "verifier": "local-fixed-checkout-skill-static"
+    },
+    {
+      "path": "intake/plans/code-talent-scout@0.1.0-rc.2.json",
+      "sha256": "ee28988db9fac701eeb99e29e01a9796655b8c46ad1aafd7449e099eb75e96c4",
+      "role": "typed-plan",
+      "projectId": "code-talent-scout"
+    },
+    {
+      "path": "intake/reports/code-talent-scout@0.1.0-rc.2.preflight.json",
+      "sha256": "e137866de7968b02b5bb0bc2bf8c3c585469d70a6a45920cefa345917ebddc1d",
+      "role": "passed-preflight-report",
+      "projectId": "code-talent-scout",
+      "status": "passed",
+      "passedSteps": 10,
+      "blockedSteps": 0,
+      "failedSteps": 0,
+      "totalSteps": 10,
+      "verifiedAt": "2026-08-14T12:49:23.164Z",
+      "verifier": "local-fixed-checkout-skill-static"
+    },
+    {
+      "path": "intake/plans/decision-dice-mcp@0.1.0-rc.2.json",
+      "sha256": "9281123e663485e596cebcddeb21178ba3a1fd8068302ee1fd3f1ef4f660550a",
+      "role": "typed-plan",
+      "projectId": "decision-dice-mcp"
+    },
+    {
+      "path": "intake/reports/decision-dice-mcp@0.1.0-rc.2.preflight.json",
+      "sha256": "944ff865675e96b9e0fea436e8f163bfb77389dfaf323af38e7e8f779b50e23d",
+      "role": "passed-preflight-report",
+      "projectId": "decision-dice-mcp",
+      "status": "passed",
+      "passedSteps": 19,
+      "blockedSteps": 0,
+      "failedSteps": 0,
+      "totalSteps": 19,
+      "verifiedAt": "2026-08-14T12:49:28.784Z",
+      "verifier": "local-fixed-checkout-mcp-preflight"
+    },
+    {
+      "path": "intake/plans/github-integration@0.1.0-rc.2.json",
+      "sha256": "156a3d6a03f8243c9645d1b33d038b1ee92478ecedbaa7dd6399fa74a79b676e",
+      "role": "typed-plan",
+      "projectId": "github-integration"
+    },
+    {
+      "path": "intake/reports/github-integration@0.1.0-rc.2.preflight.json",
+      "sha256": "cc82631f2d2abfaf4366675b634361d64648c90ecc71a3298945a53c80bb699c",
+      "role": "passed-preflight-report",
+      "projectId": "github-integration",
+      "status": "passed",
+      "passedSteps": 10,
+      "blockedSteps": 0,
+      "failedSteps": 0,
+      "totalSteps": 10,
+      "verifiedAt": "2026-08-14T12:49:23.226Z",
+      "verifier": "local-fixed-checkout-skill-static"
+    },
+    {
+      "path": "intake/plans/naming-master-mcp@0.1.0-rc.2.json",
+      "sha256": "0d6253f51100a036b04c33739d98441ad1db5cbc155a26b5a6c0fc84ddacd439",
+      "role": "typed-plan",
+      "projectId": "naming-master-mcp"
+    },
+    {
+      "path": "intake/reports/naming-master-mcp@0.1.0-rc.2.preflight.json",
+      "sha256": "d358b15692a47b92ec2b825818d8e7a1c7c1ce71b9fc17d6adc15484b5c9c068",
+      "role": "passed-preflight-report",
+      "projectId": "naming-master-mcp",
+      "status": "passed",
+      "passedSteps": 19,
+      "blockedSteps": 0,
+      "failedSteps": 0,
+      "totalSteps": 19,
+      "verifiedAt": "2026-08-14T12:49:29.644Z",
+      "verifier": "local-fixed-checkout-mcp-preflight"
+    },
+    {
+      "path": "intake/plans/session-teleport@0.6.0-rc.2.json",
+      "sha256": "81ebb30c1a08502bc97c5a9e80a0882473b705ea0a5dfc71ec4dcacf7df860b8",
+      "role": "typed-plan",
+      "projectId": "session-teleport"
+    },
+    {
+      "path": "intake/reports/session-teleport@0.6.0-rc.2.profile.json",
+      "sha256": "73a51e55f9ca7b8551bd9868fe936d8030b81eed6a7a299c16f5eb2697b8de54",
+      "role": "blocked-profile-report",
+      "projectId": "session-teleport",
+      "status": "blocked",
+      "passedSteps": 13,
+      "blockedSteps": 11,
+      "failedSteps": 0,
+      "totalSteps": 24,
+      "verifiedAt": "2026-08-14T12:38:08.141Z",
+      "verifier": "local-fixed-checkout-rc6-profile"
+    },
+    {
+      "path": "intake/plans/time-capsule-mcp@0.1.0-rc.2.json",
+      "sha256": "b9874bb55bc3b6eee02bd4823cc42852761ab31a8a8c6a894fe7d03b466d2979",
+      "role": "typed-plan",
+      "projectId": "time-capsule-mcp"
+    },
+    {
+      "path": "intake/reports/time-capsule-mcp@0.1.0-rc.2.preflight.json",
+      "sha256": "ec1df636006f8ccdfe108563fb84d23288d37ab0ebd39c5978510028cee72c70",
+      "role": "passed-preflight-report",
+      "projectId": "time-capsule-mcp",
+      "status": "passed",
+      "passedSteps": 19,
+      "blockedSteps": 0,
+      "failedSteps": 0,
+      "totalSteps": 19,
+      "verifiedAt": "2026-08-14T12:49:30.488Z",
+      "verifier": "local-fixed-checkout-mcp-preflight"
+    },
+    {
+      "path": "intake/reports/session-teleport@0.6.0-rc.2.local-preflight.json",
+      "sha256": "836faa8366ec8174c3a5a3086e9f90b547801ea266fdd32b7ec8256eddf14a6a",
+      "role": "local-preflight-report",
+      "projectId": "session-teleport",
+      "status": "blocked",
+      "verifiedAt": "2026-08-14T16:02:06.000Z",
+      "verifier": "local-fixed-checkout-session-teleport-preflight"
+    },
+    {
+      "path": "intake/reports/session-teleport@0.6.0-rc.2.rc6-alignment.json",
+      "sha256": "e1c05a7e6cc619c62caea7bea360706e6bd841d6c1e5d20333f5006625e0563a",
+      "role": "supplemental-rc6-alignment-evidence",
+      "projectId": "session-teleport",
+      "releaseId": "session-teleport@0.6.0-rc.2",
+      "fixedSourceStatus": "failed",
+      "candidateFixStatus": "passed",
+      "admissionState": "blocked-source-fix-required"
+    },
+    {
+      "path": "intake/real-project-review-index.json",
+      "sha256": "1e61fe4b7ca3d2829fa97e3e67668bfd427944c9cb2ef1c5797b162fad31b59f",
+      "role": "assisted-pre-admission-review-index",
+      "projects": 11
+    },
+    {
+      "path": "intake/reviews/7d7d@0.4.0-rc.2.json",
+      "sha256": "87f6efde6da55ec811c39ce026c4a1771a97f783c59108f95493b6d89bb02b77",
+      "role": "assisted-pre-admission-review",
+      "projectId": "7d7d",
+      "releaseId": "7d7d@0.4.0-rc.2",
+      "fixedSource": "passed",
+      "typePlan": "ready",
+      "trustReview": "pending-human",
+      "adapter": "blocked",
+      "humanReview": "pending",
+      "admission": "not-created"
+    },
+    {
+      "path": "intake/reviews/almanac-mcp@0.1.0-rc.2.json",
+      "sha256": "f174ab9843bdb27a1593e5eda83d5f96248a0a653aefeecb03312bc75970d716",
+      "role": "assisted-pre-admission-review",
+      "projectId": "almanac-mcp",
+      "releaseId": "almanac-mcp@0.1.0-rc.2",
+      "fixedSource": "passed",
+      "typePlan": "ready",
+      "trustReview": "pending-human",
+      "adapter": "blocked",
+      "humanReview": "pending",
+      "admission": "not-created"
+    },
+    {
+      "path": "intake/reviews/bug-tamer@0.1.0-rc.2.json",
+      "sha256": "86c96473c3de0ea0d610eb8cc0785c2c8ba4a684b1c7a3613c88d4574e65c852",
+      "role": "assisted-pre-admission-review",
+      "projectId": "bug-tamer",
+      "releaseId": "bug-tamer@0.1.0-rc.2",
+      "fixedSource": "passed",
+      "typePlan": "ready",
+      "trustReview": "pending-human",
+      "adapter": "blocked",
+      "humanReview": "pending",
+      "admission": "not-created"
+    },
+    {
+      "path": "intake/reviews/chinese-colors-mcp@0.1.0-rc.2.json",
+      "sha256": "508723374022618408d20865cc64267dc69b4342b9f7866dcc3263480f081e83",
+      "role": "assisted-pre-admission-review",
+      "projectId": "chinese-colors-mcp",
+      "releaseId": "chinese-colors-mcp@0.1.0-rc.2",
+      "fixedSource": "passed",
+      "typePlan": "ready",
+      "trustReview": "pending-human",
+      "adapter": "blocked",
+      "humanReview": "pending",
+      "admission": "not-created"
+    },
+    {
+      "path": "intake/reviews/code-archaeologist@0.1.0-rc.2.json",
+      "sha256": "da743e976ea08cb54c043c01026cc3492c59eb1cf2be836e0afe4bc6ef609cee",
+      "role": "assisted-pre-admission-review",
+      "projectId": "code-archaeologist",
+      "releaseId": "code-archaeologist@0.1.0-rc.2",
+      "fixedSource": "passed",
+      "typePlan": "ready",
+      "trustReview": "pending-human",
+      "adapter": "blocked",
+      "humanReview": "pending",
+      "admission": "not-created"
+    },
+    {
+      "path": "intake/reviews/code-talent-scout@0.1.0-rc.2.json",
+      "sha256": "1314b3e394fdb76def619ae3b9d27456f962b26e04540453b1594783e385a59c",
+      "role": "assisted-pre-admission-review",
+      "projectId": "code-talent-scout",
+      "releaseId": "code-talent-scout@0.1.0-rc.2",
+      "fixedSource": "passed",
+      "typePlan": "ready",
+      "trustReview": "pending-human",
+      "adapter": "blocked",
+      "humanReview": "pending",
+      "admission": "not-created"
+    },
+    {
+      "path": "intake/reviews/decision-dice-mcp@0.1.0-rc.2.json",
+      "sha256": "55b3f65cb259144bd5227da67750333ae883bdf92e6037d74bf1293f1c592ba8",
+      "role": "assisted-pre-admission-review",
+      "projectId": "decision-dice-mcp",
+      "releaseId": "decision-dice-mcp@0.1.0-rc.2",
+      "fixedSource": "passed",
+      "typePlan": "ready",
+      "trustReview": "pending-human",
+      "adapter": "blocked",
+      "humanReview": "pending",
+      "admission": "not-created"
+    },
+    {
+      "path": "intake/reviews/github-integration@0.1.0-rc.2.json",
+      "sha256": "e6612408265a78580e73af7f0c44c87fb8c15a11dc66f2e8bbd5aed516507c74",
+      "role": "assisted-pre-admission-review",
+      "projectId": "github-integration",
+      "releaseId": "github-integration@0.1.0-rc.2",
+      "fixedSource": "passed",
+      "typePlan": "ready",
+      "trustReview": "pending-human",
+      "adapter": "blocked",
+      "humanReview": "pending",
+      "admission": "not-created"
+    },
+    {
+      "path": "intake/reviews/naming-master-mcp@0.1.0-rc.2.json",
+      "sha256": "843e952ab79053292134ac11a45b9191aef99f5b400c675b6348ca134847d740",
+      "role": "assisted-pre-admission-review",
+      "projectId": "naming-master-mcp",
+      "releaseId": "naming-master-mcp@0.1.0-rc.2",
+      "fixedSource": "passed",
+      "typePlan": "ready",
+      "trustReview": "pending-human",
+      "adapter": "blocked",
+      "humanReview": "pending",
+      "admission": "not-created"
+    },
+    {
+      "path": "intake/reviews/session-teleport@0.6.0-rc.2.json",
+      "sha256": "f6b7c7ff449bd73b033af3d9fe99951be17e2f772d7e4e97e82ab3be871d3207",
+      "role": "assisted-pre-admission-review",
+      "projectId": "session-teleport",
+      "releaseId": "session-teleport@0.6.0-rc.2",
+      "fixedSource": "passed",
+      "typePlan": "ready",
+      "trustReview": "needs-fix",
+      "adapter": "blocked",
+      "humanReview": "pending",
+      "admission": "not-created"
+    },
+    {
+      "path": "intake/reviews/time-capsule-mcp@0.1.0-rc.2.json",
+      "sha256": "8f9f44864dd9127c4c15505e2ba004e678a591ebc824a4f4fbe416228e7e1074",
+      "role": "assisted-pre-admission-review",
+      "projectId": "time-capsule-mcp",
+      "releaseId": "time-capsule-mcp@0.1.0-rc.2",
+      "fixedSource": "passed",
+      "typePlan": "ready",
+      "trustReview": "pending-human",
+      "adapter": "blocked",
+      "humanReview": "pending",
+      "admission": "not-created"
+    }
+  ],
+  "regression": {
+    "npmTest": {
+      "status": "passed",
+      "passed": 64,
+      "failed": 0
+    },
+    "npmRunCheck": {
+      "status": "passed",
+      "intakeQueued": 11,
+      "registryAdmitted": 0,
+      "catalogComponents": 441,
+      "publicPluginProjects": 434,
+      "currentBaselineVerified": 0
+    },
+    "sourceSuites": {
+      "toybox": {
+        "status": "passed",
+        "typecheckedPlugins": 5,
+        "testsPassed": 23,
+        "sourceGatesPassed": 8
+      },
+      "githubIntegration": {
+        "status": "passed",
+        "packedFiles": 2
+      },
+      "sevenDSevenD": {
+        "status": "passed",
+        "testsPassed": 44,
+        "packedFiles": 52
+      },
+      "sessionTeleport": {
+        "status": "blocked-source-fix-required",
+        "fixedSourceTestsPassed": 51,
+        "fixedSourceTestsFailed": 1,
+        "candidateFixTestsPassed": 52,
+        "candidateFixTestsFailed": 0,
+        "candidateFixAdmissionEvidence": false,
+        "packedFiles": 90,
+        "blockers": [
+          "A new fixed plugin release must carry the RC.6-compatible JSONL migration test fixture.",
+          "Native PostgreSQL and live RC.6 Profile provider lifecycle acceptance are still required.",
+          "Independent human trust review and admission remain pending."
+        ]
+      }
+    }
+  },
+  "cleanup": {
+    "profileWorkspacesRemoved": true,
+    "mcpProcessesRemoved": true,
+    "sourceCheckoutsClean": true,
+    "temporaryHarnessArchivesRemoved": true
+  },
+  "publication": {
+    "committed": false,
+    "pushed": false,
+    "deployed": false
+  }
+}

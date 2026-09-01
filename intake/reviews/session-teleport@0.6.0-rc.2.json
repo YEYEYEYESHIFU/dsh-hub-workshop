@@ -1,0 +1,132 @@
+{
+  "schema": "omdsh-workshop-real-project-review/v1",
+  "id": "session-teleport",
+  "releaseId": "session-teleport@0.6.0-rc.2",
+  "source": {
+    "repository": "https://github.com/omdsh-dev/session-teleport",
+    "ref": "0640ca9ccd1b9ac12709b74aecf2a0e75c8bb4b1",
+    "path": null,
+    "packagePath": "package.json",
+    "publiclyReachable": true,
+    "observedDefaultHead": "0640ca9ccd1b9ac12709b74aecf2a0e75c8bb4b1",
+    "tree": "acd7a07eaa5d5a9071ab76f3564aaceb200a3290"
+  },
+  "catalog": {
+    "version": "0.6.0-rc.2",
+    "license": "BSD-3-Clause",
+    "kind": "extension",
+    "legacyManagement": "profile-bundle"
+  },
+  "package": {
+    "name": "@mattheliu/session-teleport",
+    "version": "0.6.0-rc.2",
+    "license": "BSD-3-Clause",
+    "private": true,
+    "workshopManifest": "valid",
+    "legacySignals": [
+      "dsh.bundle.patch:./cordis.patch.yml"
+    ],
+    "lifecycleScripts": []
+  },
+  "sequence": [
+    {
+      "stage": "fixed-source",
+      "state": "passed",
+      "reason": "Anonymous public Git fetch resolved the exact commit and tree acd7a07eaa5d5a9071ab76f3564aaceb200a3290."
+    },
+    {
+      "stage": "type-plan",
+      "state": "passed",
+      "reason": "A valid author declaration is available for Harness planning."
+    },
+    {
+      "stage": "trust-review",
+      "state": "completed",
+      "reason": "Assisted static and supplemental RC.6 review recorded 2 finding(s) without granting admission."
+    },
+    {
+      "stage": "adapter",
+      "state": "blocked",
+      "reason": "The fixed release has unresolved RC.6 alignment evidence and cannot authorize its adapter."
+    },
+    {
+      "stage": "evidence",
+      "state": "saved",
+      "reason": "Pre-admission review evidence is stored at intake/reviews/session-teleport@0.6.0-rc.2.json."
+    },
+    {
+      "stage": "human-review",
+      "state": "pending",
+      "reason": "Independent maintainer review has not been recorded."
+    },
+    {
+      "stage": "admission",
+      "state": "not-created",
+      "reason": "Admission is a separate explicit change after approved review and passing Harness evidence."
+    }
+  ],
+  "typePlan": {
+    "state": "ready",
+    "declaredProtocol": "harness-profile",
+    "declaredAdapter": "profile-bundle",
+    "observedLegacyProtocol": "harness-profile",
+    "observedLegacyAdapter": "profile-bundle",
+    "migrationOptions": [],
+    "reason": "Author declaration and fixed release facts are sufficient to generate a typed Harness plan."
+  },
+  "trustReview": {
+    "state": "needs-fix",
+    "method": "assisted-static-public-source-review",
+    "sourceExecutionAuthorized": false,
+    "checks": {
+      "publicCommit": "passed",
+      "packageJson": "passed",
+      "workshopManifest": "passed",
+      "catalogVersion": "passed",
+      "license": "passed",
+      "artifact": "passed",
+      "credentials": "passed",
+      "symlinkContainment": "passed",
+      "nativeCode": "passed",
+      "lifecycleScripts": "passed",
+      "processExecutionIntent": "review-required",
+      "rc6Baseline": "not-applicable",
+      "rc6Alignment": "failed"
+    },
+    "findings": [
+      {
+        "severity": "review",
+        "code": "process-execution-intent",
+        "evidence": "10 tracked file(s) contain process-execution intent and require manual inspection."
+      },
+      {
+        "severity": "blocker",
+        "code": "rc6-unknown-event-not-ignorable",
+        "evidence": "The exact RC.6 fixed-source suite passed 51 test(s) and failed 1; an isolated candidate fixture fix passed 52/52 but is not admission evidence."
+      }
+    ]
+  },
+  "adapter": {
+    "state": "blocked",
+    "name": "profile-bundle",
+    "reason": "Blocked until a new fixed release resolves the supplemental RC.6 alignment finding and receives explicit human trust approval.",
+    "report": null
+  },
+  "humanReview": {
+    "state": "pending",
+    "reviewer": null,
+    "reason": "The generated assisted review cannot approve its own independent human gate."
+  },
+  "admission": {
+    "state": "not-created",
+    "reason": "The fixed release has a failing RC.6 alignment test and no approved human review."
+  },
+  "claims": {
+    "rc6Verified": false,
+    "seamlessInstall": "unknown",
+    "failureIsolation": "unknown",
+    "hotReload": "unknown"
+  },
+  "reviewedAt": "2026-08-14T16:03:29.198Z",
+  "reviewer": "codex-assisted-pre-admission-review"
+}

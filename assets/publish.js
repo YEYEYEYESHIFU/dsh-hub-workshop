@@ -1,5 +1,6 @@
 const form = document.querySelector('#manifest-form')
 const bundleFields = document.querySelector('#bundle-fields')
+const updateSourceFields = document.querySelector('#update-source-fields')
 const sourceField = document.querySelector('#source-field')
 const projectOptions = document.querySelector('#published-projects')
 const output = document.querySelector('#manifest-output')
@@ -12,6 +13,7 @@ const candidatePrefillName = document.querySelector('#candidate-prefill-name')
 const managementDetails = document.querySelector('#management-details')
 const managementSummary = document.querySelector('#management-summary')
 const guidedProtocolField = document.querySelector('#guided-protocol-field')
+const capabilityFields = document.querySelector('#capability-fields')
 const previewDetails = document.querySelector('#manifest-preview')
 const stepButtons = [...document.querySelectorAll('[data-publish-step]')]
 const formSections = [...document.querySelectorAll('[data-form-step]')]
@@ -202,6 +204,11 @@ function fillCandidate(candidate) {
   form.elements.permissions.value = ''
   form.elements.testing.value = ''
   form.elements.permissionScopes.value = ''
+  form.elements.capabilityId.value = ''
+  form.elements.capabilityKind.value = 'service'
+  form.elements.capabilityKind.dataset.generated = 'service'
+  form.elements.capabilityInvocation.value = ''
+  form.elements.capabilityExpected.value = ''
   form.elements.evidenceInstall.value = ''
   form.elements.evidenceIsolation.value = ''
   form.elements.evidenceHotReload.value = ''
@@ -211,6 +218,8 @@ function fillCandidate(candidate) {
   form.elements.source.value = ''
   form.elements.packageName.value = ''
   form.elements.spec.value = ''
+  form.elements.previousVersion.value = ''
+  form.elements.previousRef.value = ''
   form.elements.activation.value = 'immediate'
   form.elements.dispose.value = 'unknown'
   if (candidate.install.possibleAdapter === 'official-profile/v1' && candidate.declaration.packageName) {
@@ -246,14 +255,21 @@ function managementMode() {
   const transactional = method === 'profile-bundle'
   const repositoryPlugin = method === 'repository-plugin'
   const guided = method === 'guided'
+  const requiresUpdateSource = transactional || repositoryPlugin
   bundleFields.hidden = !transactional
   sourceField.hidden = !repositoryPlugin
   guidedProtocolField.hidden = !guided
+  updateSourceFields.hidden = !requiresUpdateSource
   for (const input of bundleFields.querySelectorAll('input')) input.required = transactional
   sourceField.querySelector('input').required = repositoryPlugin
+  for (const input of updateSourceFields.querySelectorAll('input')) input.required = requiresUpdateSource
   managementDetails.open = guided
   managementSummary.textContent = t(`publish.methodSummary.${method || 'unselected'}`)
   const protocol = managementSelection().protocol
+  const capabilityRequired = ['harness-profile', 'harness-repository', 'harness-cordis', 'mcp'].includes(protocol)
+  capabilityFields.hidden = !capabilityRequired
+  for (const input of capabilityFields.querySelectorAll('input, select, textarea')) input.required = capabilityRequired
+  if (capabilityRequired) assignSuggestion(form.elements.capabilityKind, protocol === 'mcp' ? 'tool' : 'service')
   const defaultArtifact = method === 'profile-bundle'
     ? 'package.json'
     : method === 'repository-plugin'
@@ -372,6 +388,13 @@ function fillExistingProject() {
   form.elements.source.value = catalog?.install?.source || ''
   form.elements.packageName.value = release?.install?.packageName || ''
   form.elements.spec.value = ''
+  form.elements.previousVersion.value = release?.version || ''
+  form.elements.previousRef.value = release?.source?.ref || ''
+  form.elements.capabilityId.value = catalog?.workshop?.capability?.id || ''
+  form.elements.capabilityKind.value = catalog?.workshop?.capability?.kind || 'service'
+  form.elements.capabilityKind.dataset.generated = catalog?.workshop?.capability?.kind ? '' : 'service'
+  form.elements.capabilityInvocation.value = catalog?.workshop?.capability?.invocation || ''
+  form.elements.capabilityExpected.value = catalog?.workshop?.capability?.expected || ''
   managementMode()
 }
 
@@ -435,6 +458,12 @@ function values() {
   if (method === 'repository-plugin' && (!source || !source.includes(`#${ref}`) || !String(data.get('instructions')).includes(source))) {
     throw new Error(t('publish.invalidSource'))
   }
+  const requiresUpdateSource = transactional || method === 'repository-plugin'
+  const previousVersion = String(data.get('previousVersion') || '').trim()
+  const previousRef = String(data.get('previousRef') || '').trim()
+  if (requiresUpdateSource && (!previousVersion || !/^[0-9a-f]{40}$/.test(previousRef) || previousVersion === String(data.get('version')) || previousRef === ref)) {
+    throw new Error(t('publish.invalidUpdateSource'))
+  }
   const artifact = String(data.get('integrationArtifact') || '').trim()
   if (!repositoryPathPattern.test(artifact)) throw new Error(t('publish.invalidIntegrationArtifact'))
   const activation = String(data.get('activation'))
@@ -449,6 +478,13 @@ function values() {
         : protocol === 'skill'
           ? { mode: 'guided', adapter: 'skill', failurePolicy: 'manual', touchesCurrentBeforeActivation: true }
           : { mode: 'guided', adapter: 'third-party', failurePolicy: 'manual', touchesCurrentBeforeActivation: true }
+  const capabilityRequired = ['harness-profile', 'harness-repository', 'harness-cordis', 'mcp'].includes(protocol)
+  const capability = capabilityRequired ? {
+    id: String(data.get('capabilityId') || '').trim(),
+    kind: String(data.get('capabilityKind') || ''),
+    invocation: String(data.get('capabilityInvocation') || '').trim(),
+    expected: String(data.get('capabilityExpected') || '').trim(),
+  } : null
   const packageManifest = {
     schema: 'omdsh-workshop-package/v1',
     type: 'plugin',
@@ -466,6 +502,7 @@ function values() {
     install: packageInstall,
     lifecycle: { activation, dispose },
     permissions: permissionScopes(data.get('permissionScopes')),
+    ...(capability ? { capability } : {}),
     evidence: {
       install: evidencePath(data.get('evidenceInstall')),
       failureIsolation: evidencePath(data.get('evidenceIsolation')),
@@ -505,6 +542,7 @@ function values() {
         restartRequired: /^restart-/.test(activation),
       },
       profileBundle: transactional ? { packageName, spec } : null,
+      updateFrom: requiresUpdateSource ? { version: previousVersion, ref: previousRef } : null,
     },
     management: {
       method,
@@ -608,6 +646,7 @@ form.addEventListener('reset', () => {
     output.textContent = '{}'
     previewDetails.open = false
     ensurePublishedAt()
+    form.elements.capabilityKind.dataset.generated = 'service'
     managementMode()
     availableStep = 0
     setStep(0)

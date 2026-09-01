@@ -1,0 +1,81 @@
+{
+  "schema": "omdsh-workshop-intake-evidence/v2",
+  "projectId": "github-integration",
+  "releaseId": "github-integration@0.1.0-rc.2",
+  "management": "guided",
+  "source": {
+    "repository": "https://github.com/omdsh-dev/dsh-github-integration",
+    "ref": "a190f89c71a179e5b8748db5bba21465e47de2c9",
+    "path": "/plugins/github-integration/.dsh-plugin"
+  },
+  "runtime": null,
+  "capability": null,
+  "checks": {
+    "static": {
+      "status": "passed",
+      "evidence": "clean Git origin, HEAD, and source path match a190f89c71a179e5b8748db5bba21465e47de2c9; Git tree 7b6e0fc0b99af963c4180790923242397a81e734"
+    },
+    "manifest": {
+      "status": "passed",
+      "evidence": "package.json#dshWorkshop passed the public manifest contract"
+    },
+    "entry": {
+      "status": "passed",
+      "evidence": "artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/dsh-github-integration/plugins/github-integration/.dsh-plugin/skills/github-issue-pr/SKILL.md"
+    },
+    "dshContract": {
+      "status": "passed",
+      "evidence": "Skill matches the RC.6 one-level filesystem provider contract"
+    },
+    "compatibility": {
+      "status": "passed",
+      "evidence": "adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6"
+    },
+    "permissions": {
+      "status": "passed",
+      "evidence": "reviewed 2 declared permission scope(s)"
+    },
+    "supplyChain": {
+      "status": "passed",
+      "evidence": "no package lifecycle scripts; installation is forced to ignore scripts"
+    },
+    "install": {
+      "status": "not-applicable",
+      "evidence": "install.apply: protocol is Catalog-only in the current DSH Registry"
+    },
+    "ready": {
+      "status": "not-applicable",
+      "evidence": "ready.probe: protocol is Catalog-only in the current DSH Registry"
+    },
+    "functional": {
+      "status": "not-applicable",
+      "evidence": "guided protocol has no DSH runtime capability claim"
+    },
+    "update": {
+      "status": "not-applicable",
+      "evidence": "update.apply: protocol is Catalog-only in the current DSH Registry"
+    },
+    "disable": {
+      "status": "not-applicable",
+      "evidence": "disable.apply: protocol is Catalog-only in the current DSH Registry"
+    },
+    "remove": {
+      "status": "not-applicable",
+      "evidence": "remove.apply: protocol is Catalog-only in the current DSH Registry"
+    },
+    "recovery": {
+      "status": "not-applicable",
+      "evidence": "recovery.generation: protocol is Catalog-only in the current DSH Registry"
+    },
+    "failureIsolation": {
+      "status": "not-applicable",
+      "evidence": "guided protocol has manual failure handling"
+    },
+    "hotReload": {
+      "status": "not-applicable",
+      "evidence": "guided protocols cannot claim a DSH runtime hot reload"
+    }
+  },
+  "verifiedAt": "2026-08-14T12:49:23.226Z",
+  "verifier": "local-fixed-checkout-skill-static"
+}

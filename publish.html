@@ -168,11 +168,28 @@
               <label><span data-i18n="publish.packageName">包名</span><input name="packageName" placeholder="@owner/session-notes"></label>
               <label><span data-i18n="publish.spec">不可变 spec</span><input name="spec" placeholder="git+https://github.com/owner/repo.git#40-char-commit"></label>
             </div>
+            <div id="update-source-fields" class="form-grid update-source-fields" hidden>
+              <div class="form-wide update-source-heading"><strong data-i18n="publish.updateSourceTitle">升级测试起点</strong><small data-i18n="publish.updateSourceHelp">固定一个已公开的上一版本；Harness 会在隔离 candidate 中先装上一版，再升级到本次 Release。不能用本次版本重复安装冒充升级。</small></div>
+              <label><span data-i18n="publish.previousVersion">上一版本</span><input name="previousVersion" placeholder="0.9.0"></label>
+              <label><span data-i18n="publish.previousRef">上一版本完整 commit SHA</span><input name="previousRef" pattern="[0-9a-f]{40}" minlength="40" maxlength="40" placeholder="0123456789abcdef0123456789abcdef01234567"></label>
+            </div>
             <div class="form-section-body declaration-fields">
               <div class="permission-grid">
                 <label><span data-i18n="publish.permissions">权限说明</span><textarea name="permissions" required rows="3" placeholder="无额外权限；或说明文件、网络、Shell、凭据访问" data-i18n-placeholder="publish.permissionsPlaceholder"></textarea><small data-i18n="publish.permissionsHelp">没有额外权限也请明确填写“无”。</small></label>
                 <label><span data-i18n="publish.testing">测试与已知限制</span><textarea name="testing" required rows="3" placeholder="已运行的测试；未覆盖的环境或已知限制" data-i18n-placeholder="publish.testingPlaceholder"></textarea><small data-i18n="publish.testingHelp">只写实际验证过的内容，不需要包装。</small></label>
                 <label><span data-i18n="publish.permissionScopes">结构化权限</span><input name="permissionScopes" placeholder="filesystem:read, network:outbound"><small data-i18n="publish.permissionScopesHelp">英文逗号分隔；没有额外权限可留空，文字说明仍须填写。</small></label>
+              </div>
+              <div id="capability-fields" class="capability-declaration" hidden>
+                <div class="capability-declaration-heading">
+                  <div><strong data-i18n="publish.capabilityTitle">实际能力断言</strong><small data-i18n="publish.capabilityHelp">声明 Harness 必须注册、调用并观察的一个具体能力；这只是测试目标，不是“已验证”。</small></div>
+                  <span data-i18n="publish.capabilityRequired">可执行类型必填</span>
+                </div>
+                <div class="form-grid">
+                  <label><span data-i18n="publish.capabilityId">能力 ID</span><input name="capabilityId" pattern="[a-z0-9][a-z0-9.-]*" placeholder="session-teleport-ready"><small data-i18n="publish.capabilityIdHelp">稳定、可观测的英文标识；不能只写 loaded 或 started。</small></label>
+                  <label><span data-i18n="publish.capabilityKind">能力类型</span><select name="capabilityKind" data-generated="service"><option value="tool" data-i18n="publish.capabilityKind.tool">工具</option><option value="command" data-i18n="publish.capabilityKind.command">命令</option><option value="service" selected data-i18n="publish.capabilityKind.service">服务</option><option value="ui" data-i18n="publish.capabilityKind.ui">界面</option><option value="event" data-i18n="publish.capabilityKind.event">事件</option><option value="provider" data-i18n="publish.capabilityKind.provider">Provider</option><option value="other" data-i18n="publish.capabilityKind.other">其他</option></select></label>
+                  <label class="form-wide"><span data-i18n="publish.capabilityInvocation">调用方式</span><textarea name="capabilityInvocation" rows="2" maxlength="1000" placeholder="调用命令、工具或服务端点，并写明最小输入" data-i18n-placeholder="publish.capabilityInvocationPlaceholder"></textarea></label>
+                  <label class="form-wide"><span data-i18n="publish.capabilityExpected">预期观察</span><textarea name="capabilityExpected" rows="2" maxlength="1000" placeholder="可重复判断的响应、状态、事件或 UI 结果" data-i18n-placeholder="publish.capabilityExpectedPlaceholder"></textarea><small data-i18n="publish.capabilityExpectedHelp">adapter 必须回报同一个断言及实际观察值；字段不一致会直接失败。</small></label>
+                </div>
               </div>
             </div>
             <details id="management-details" class="form-disclosure">
@@ -220,61 +237,98 @@
         <header class="distribution-studio-intro">
           <div>
             <p class="hero-kicker" data-i18n="distributionStudio.kicker">Community Modpack</p>
-            <h2 data-i18n="distributionStudio.title">把固定 Release 组合成你的整合包。</h2>
+            <h2 data-i18n="distributionStudio.title">选好组件，做成你的整合包。</h2>
           </div>
-          <p data-i18n="distributionStudio.description">只选择已进入事务安装链路的 Release。生成的是纯数据清单，实际应用仍经过 OMDSH candidate 与官方 Profile/Bundle。</p>
+          <p data-i18n="distributionStudio.description">可以组合 Registry 插件，也可以加入你自己的固定源码插件。许可证、来源和信任边界会在导出前自动汇总。</p>
         </header>
 
         <div class="distribution-studio-layout">
+          <div class="pack-mode-switch" role="group" aria-label="整合包用途">
+            <button type="button" data-pack-mode="local" aria-pressed="true"><strong data-i18n="distributionStudio.modeLocal">本地实验包</strong><small data-i18n="distributionStudio.modeLocalHelp">无需仓库和投稿，立即试跑</small></button>
+            <button type="button" data-pack-mode="publish" aria-pressed="false"><strong data-i18n="distributionStudio.modePublish">可信公开发行</strong><small data-i18n="distributionStudio.modePublishHelp">只使用已准入组件</small></button>
+          </div>
+          <ol class="pack-builder-rail" aria-label="整合包制作流程">
+            <li><span data-i18n="distributionStudio.flowName">命名</span><small data-i18n="distributionStudio.flowNameHelp">名称与预设</small></li>
+            <li><span data-i18n="distributionStudio.flowComponents">选组件</span><small data-i18n="distributionStudio.flowComponentsHelp">Registry 或自己的插件</small></li>
+            <li><span data-i18n="distributionStudio.flowReview">核对</span><small data-i18n="distributionStudio.flowReviewHelp">许可证与来源</small></li>
+            <li><span data-i18n="distributionStudio.flowExport">导出</span><small data-i18n="distributionStudio.flowExportHelp">生成可测试清单</small></li>
+          </ol>
+
           <form id="distribution-form" class="manifest-form distribution-form" novalidate>
             <section class="distribution-studio-section">
-              <header class="form-section-heading"><div><h2 data-i18n="distributionStudio.identity">整合包信息</h2><p data-i18n="distributionStudio.identityHelp">名称、用途与维护者构成一个可版本化作品。</p></div></header>
+              <header class="form-section-heading"><div><h2 data-i18n="distributionStudio.identity">给整合包一个名字</h2><p data-i18n="distributionStudio.identityHelp">先完成最少信息，公开发行资料可以稍后再补。</p></div></header>
               <div class="form-section-body form-grid">
-                <label class="form-wide"><span data-i18n="distributionStudio.repository">维护仓库</span><input name="repository" required type="url" pattern="https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/?" placeholder="https://github.com/owner/my-dsh"><small data-i18n="distributionStudio.repositoryHelp">清单生成后提交到这个仓库，再用完整 commit 发起收录。</small></label>
+                <label><span data-i18n="distributionStudio.titleZh">整合包名称</span><input name="titleZh" required placeholder="研究工作台"></label>
                 <label><span data-i18n="distributionStudio.id">整合包 ID</span><input name="id" required pattern="[a-z0-9][a-z0-9-]*" placeholder="research-dsh"></label>
-                <label><span data-i18n="distributionStudio.version">版本</span><input name="version" required pattern="(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z.-]+)?" placeholder="0.1.0-preview.1"></label>
-                <label><span data-i18n="distributionStudio.channel">更新通道</span><select name="channel"><option value="preview">Preview</option><option value="stable">Stable</option></select></label>
-                <label><span data-i18n="distributionStudio.maintainer">维护者 GitHub ID</span><input name="maintainer" required pattern="[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?" placeholder="github-login"></label>
-                <label><span data-i18n="distributionStudio.titleZh">中文名称</span><input name="titleZh" required placeholder="研究工作台"></label>
-                <label><span data-i18n="distributionStudio.titleEn">英文名称</span><input name="titleEn" required placeholder="Research Workbench"></label>
-                <label><span data-i18n="distributionStudio.summaryZh">中文简介</span><textarea name="summaryZh" required minlength="12" rows="3"></textarea></label>
-                <label><span data-i18n="distributionStudio.summaryEn">英文简介</span><textarea name="summaryEn" required minlength="12" rows="3"></textarea></label>
-                <label class="form-wide"><span data-i18n="distributionStudio.compatibility">真实测试过的 Harness 范围</span><textarea name="compatibility" required minlength="12" rows="2" placeholder="official-profile/v1；在明确的 DSH 版本与平台上验证" data-i18n-placeholder="distributionStudio.compatibilityPlaceholder"></textarea><small data-i18n="distributionStudio.compatibilityHelp">没有运行证据时请明确写“尚未实测”，不要猜测兼容性。</small></label>
-                <label class="form-wide"><span data-i18n="distributionStudio.useCases">具体用途</span><textarea name="useCases" required rows="3" placeholder="研究复杂问题 | Research complex questions&#10;定制 Web 界面 | Customize the Web interface" data-i18n-placeholder="distributionStudio.useCasesPlaceholder"></textarea><small data-i18n="distributionStudio.useCasesHelp">每行“中文 | English”，1–5 项；推荐只会匹配这些明确声明。</small></label>
+                <label><span data-i18n="distributionStudio.version">版本</span><input name="version" required value="0.1.0-preview.1" pattern="(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z.-]+)?"></label>
+                <label><span data-i18n="distributionStudio.agentPreset">官方 Agent Preset</span><select name="agentPreset"><option value="standard">Standard</option><option value="code">Code</option><option value="minimal">Minimal</option><option value="cordis">Cordis</option></select><small data-i18n="distributionStudio.agentPresetHelp">发行清单只引用官方 ID；自定义预设由 CLI 导出时安全嵌入。</small></label>
               </div>
+              <details id="distribution-publication-fields" class="pack-publication-fields">
+                <summary><span data-i18n="distributionStudio.publicationFields">公开发行资料</span><small data-i18n="distributionStudio.publicationFieldsHelp">仅在申请社区可信发行时需要</small></summary>
+                <div class="form-section-body form-grid">
+                  <label class="form-wide"><span data-i18n="distributionStudio.repository">维护仓库</span><input name="repository" type="url" pattern="https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/?" placeholder="https://github.com/owner/my-dsh"><small data-i18n="distributionStudio.repositoryHelp">清单生成后提交到这个仓库，再用完整 commit 发起收录。</small></label>
+                  <label><span data-i18n="distributionStudio.channel">更新通道</span><select name="channel"><option value="preview">Preview</option><option value="stable">Stable</option></select></label>
+                  <label><span data-i18n="distributionStudio.maintainer">维护者 GitHub ID</span><input name="maintainer" pattern="[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?" placeholder="github-login"></label>
+                  <label><span data-i18n="distributionStudio.titleEn">英文名称</span><input name="titleEn" placeholder="Research Workbench"></label>
+                  <label><span data-i18n="distributionStudio.summaryZh">中文简介</span><textarea name="summaryZh" minlength="12" rows="3"></textarea></label>
+                  <label><span data-i18n="distributionStudio.summaryEn">英文简介</span><textarea name="summaryEn" minlength="12" rows="3"></textarea></label>
+                  <label class="form-wide"><span data-i18n="distributionStudio.compatibility">真实测试过的 Harness 范围</span><textarea name="compatibility" minlength="12" rows="2" placeholder="尚未实测，计划在 RC6 candidate Profile 验证"></textarea></label>
+                  <label class="form-wide"><span data-i18n="distributionStudio.useCases">具体用途</span><textarea name="useCases" rows="3" placeholder="研究复杂问题 | Research complex questions"></textarea></label>
+                </div>
+              </details>
             </section>
 
             <section class="distribution-studio-section">
-              <header class="form-section-heading"><div><h2 data-i18n="distributionStudio.components">选择组件</h2><p data-i18n="distributionStudio.componentsHelp">这里只列出可由一个 candidate 管理的固定 Profile Bundle Release。</p></div></header>
+              <header class="form-section-heading"><div><h2 data-i18n="distributionStudio.components">加入组件</h2><p data-i18n="distributionStudio.componentsHelp">从 Registry 选择，或者加入你自己的固定源码 Profile Bundle。</p></div></header>
               <div class="form-section-body">
                 <div class="distribution-release-picker">
                   <label><span data-i18n="distributionStudio.release">固定 Release</span><select id="distribution-release-picker"><option value="" data-i18n="distributionStudio.loading">正在读取可用 Release…</option></select></label>
                   <button id="distribution-add-release" class="secondary-action" type="button" data-i18n="distributionStudio.add">加入整合包</button>
                 </div>
+                <details class="pack-own-plugin">
+                  <summary><span data-i18n="distributionStudio.addOwn">加入自己的插件</span><small data-i18n="distributionStudio.addOwnHelp">固定源码，实验包可直接使用</small></summary>
+                  <div class="pack-own-plugin-grid">
+                    <label><span data-i18n="distributionStudio.ownId">组件 ID</span><input id="own-plugin-id" pattern="[a-z0-9][a-z0-9-]*" placeholder="my-plugin"></label>
+                    <label><span data-i18n="distributionStudio.ownPackage">npm 包名</span><input id="own-plugin-package" placeholder="@me/dsh-my-plugin"></label>
+                    <label><span data-i18n="distributionStudio.ownVersion">版本</span><input id="own-plugin-version" pattern="(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z.-]+)?" placeholder="0.1.0"></label>
+                    <label><span data-i18n="distributionStudio.ownLicense">许可证</span><input id="own-plugin-license" list="spdx-license-options" placeholder="MIT"><small data-i18n="distributionStudio.ownLicenseHelp">使用 SPDX 标识，例如 MIT、Apache-2.0、GPL-3.0-only</small></label>
+                    <label class="form-wide"><span data-i18n="distributionStudio.ownRepository">GitHub 仓库</span><input id="own-plugin-repository" type="url" pattern="https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/?" placeholder="https://github.com/me/dsh-my-plugin"></label>
+                    <label class="form-wide"><span data-i18n="distributionStudio.ownCommit">完整 commit SHA</span><input id="own-plugin-ref" pattern="[0-9a-f]{40}" placeholder="40-char commit"></label>
+                  </div>
+                  <button id="distribution-add-own" class="secondary-action" type="button" data-i18n="distributionStudio.addOwn">加入自己的插件</button>
+                </details>
+                <datalist id="spdx-license-options"><option value="MIT"></option><option value="Apache-2.0"></option><option value="BSD-3-Clause"></option><option value="MPL-2.0"></option><option value="GPL-3.0-only"></option><option value="AGPL-3.0-only"></option><option value="CC0-1.0"></option><option value="NOASSERTION"></option></datalist>
                 <p id="distribution-items-empty" class="distribution-items-empty" data-i18n="distributionStudio.empty">还没有组件。至少加入一个固定 Release。</p>
                 <ul id="distribution-items" class="distribution-items" aria-live="polite"></ul>
               </div>
             </section>
 
-            <aside class="distribution-application-boundary">
-              <span aria-hidden="true">✓</span>
-              <div><strong data-i18n="distributionStudio.boundaryTitle">固定应用边界</strong><p data-i18n="distributionStudio.boundary">必须生成 candidate、必须用户确认、可恢复受管理 Profile 代际；外部副作用不在恢复范围内。</p></div>
-            </aside>
+            <section class="distribution-studio-section pack-license-review">
+              <header class="form-section-heading"><div><h2 data-i18n="distributionStudio.licenseTitle">核对许可证与信任</h2><p data-i18n="distributionStudio.licenseHelp">这里列出整合包内的每个组件，不自动替你判断法律兼容性。</p></div><strong id="pack-trust-label">Registry bound</strong></header>
+              <div class="form-section-body">
+                <p id="pack-license-empty" class="distribution-items-empty" data-i18n="distributionStudio.licenseEmpty">加入组件后，这里会显示 SPDX 许可证、固定来源和审核提醒。</p>
+                <ul id="pack-license-list" class="pack-license-list" aria-live="polite"></ul>
+              </div>
+            </section>
+
+            <aside class="distribution-application-boundary"><span aria-hidden="true">✓</span><div><strong data-i18n="distributionStudio.boundaryTitle">固定应用边界</strong><p data-i18n="distributionStudio.boundary">应用前生成 candidate 并由用户确认。自有源码需要显式信任，外部副作用不在恢复范围内。</p></div></aside>
 
             <p id="distribution-error" class="publish-error" role="alert" hidden></p>
             <div class="form-actions">
               <button class="secondary-action" type="reset" data-i18n="publish.reset">清空</button>
-              <button class="primary-action" type="submit" data-i18n="distributionStudio.preview">校验并生成清单</button>
+              <button class="primary-action" type="submit" data-i18n="distributionStudio.preview">核对并导出</button>
             </div>
           </form>
 
           <details id="distribution-preview" class="manifest-preview">
-            <summary class="preview-heading"><span><strong data-i18n="distributionStudio.previewTitle">整合包 manifest</strong><small data-i18n="distributionStudio.previewHelp">下载后提交到你的仓库</small></span><span data-i18n="publish.localOnly">只在本机生成</span></summary>
+            <summary class="preview-heading"><span><strong data-i18n="distributionStudio.previewTitle">整合包清单</strong><small data-i18n="distributionStudio.previewHelp">可以交给 OMDSH CLI 构建并试跑</small></span><span id="pack-preview-mode">本地实验包</span></summary>
             <div class="preview-body">
               <pre><code id="distribution-output">{}</code></pre>
+              <p><strong data-i18n="distributionStudio.cliTitle">生成可安装发行包</strong><br><code id="distribution-cli-command">omdsh pack build …</code></p>
               <div class="preview-actions">
                 <button id="copy-distribution" class="primary-action" type="button" disabled data-i18n="publish.copy">复制 JSON</button>
                 <button id="download-distribution" class="secondary-action" type="button" disabled data-i18n="publish.download">下载文件</button>
+                <button id="copy-distribution-cli" class="secondary-action" type="button" disabled data-i18n="distributionStudio.copyCli">复制 CLI 命令</button>
                 <a id="open-distribution-submission" class="secondary-action is-disabled" href="https://github.com/omdsh-dev/dsh-hub-workshop/issues/new?template=distribution-submission.yml" aria-disabled="true" data-i18n="distributionStudio.openIssue">提交整合包</a>
               </div>
               <p data-i18n="distributionStudio.issueHelp">先把 JSON 提交到维护仓库，再在 Issue 中填写完整 commit。收录只投影当前版本，不执行仓库脚本。</p>
@@ -283,6 +337,6 @@
         </div>
       </section>
     </main>
-    <footer class="site-footer doc-footer"><a class="footer-brand" href="./">DSH Hub Workshop</a><p data-i18n="publish.footer">Author Studio 自动准备待审核记录；人工批准、测试验证与 Registry 授权仍彼此独立。</p><div class="footer-links"><a href="contributing.html" data-i18n="nav.contribute">收录指南</a><a href="registry.html" data-i18n="nav.registry">协议</a></div></footer>
+    <footer class="site-footer doc-footer"><div class="footer-summary"><a class="footer-brand" href="./">DSH Hub Workshop</a><p data-i18n="publish.footer">Author Studio 自动准备待审核记录；人工批准、测试验证与 Registry 授权仍彼此独立。</p></div><nav class="footer-group" aria-label="站点资源"><strong class="footer-heading">站点资源</strong><div class="footer-links"><a href="contributing.html" data-i18n="nav.contribute">收录指南</a><a href="registry.html" data-i18n="nav.registry">协议</a></div></nav><nav class="footer-group footer-ecosystem" aria-label="生态外链"><strong class="footer-heading">生态外链</strong><a class="footer-external-link" href="https://dshfind.com/" target="_blank" rel="noopener noreferrer"><span><b>dshfind</b><small>DSH 学习与分享社区</small></span><span aria-hidden="true">↗</span></a></nav></footer>
   </body>
 </html>

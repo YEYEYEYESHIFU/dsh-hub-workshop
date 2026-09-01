@@ -1,6 +1,6 @@
 {
   "schema": "omdsh-workshop-intake-queue/v1",
-  "generatedAt": "2026-08-14T00:10:00.000Z",
+  "generatedAt": "2026-08-16T04:31:09.173Z",
   "officialBaseline": "@deepseek-ai/dsh@0.1.0-rc.6",
   "policy": {
     "managementModes": [
@@ -16,6 +16,958 @@
     "failClosed": true
   },
   "records": [
+    {
+      "schema": "omdsh-workshop-intake/v1",
+      "id": "7d7d@0.4.0-rc.2",
+      "submission": {
+        "repository": "https://github.com/omdsh-dev/7d7d",
+        "ref": "1c8ea4981fcfdb58e8f9726058b950aaf8cc9404",
+        "path": null,
+        "manifest": {
+          "schema": "omdsh-workshop-submission/v2",
+          "operation": "add-release",
+          "project": {
+            "id": "7d7d",
+            "displayName": "7d7d 游戏门户",
+            "summary": "在 DSH Web UI 中生成、同步并游玩 HTML5 与同源自托管 Ruffle Flash 游戏的社区门户。",
+            "kind": "ui",
+            "category": "interface",
+            "tags": [
+              "games",
+              "html5",
+              "ruffle"
+            ],
+            "repository": "https://github.com/omdsh-dev/7d7d",
+            "path": null,
+            "author": {
+              "name": "mattheliu",
+              "url": "https://github.com/mattheliu"
+            },
+            "license": "MIT"
+          },
+          "release": {
+            "version": "0.4.0-rc.2",
+            "ref": "1c8ea4981fcfdb58e8f9726058b950aaf8cc9404",
+            "updatedAt": "2026-08-13T20:55:45+08:00",
+            "channel": "beta",
+            "compatibility": "Exact @deepseek-ai/dsh@0.1.0-rc.6 Harness evaluation.",
+            "changelog": "Migrated to the current typed Workshop contract and fixed public source.",
+            "capabilities": {
+              "requiresFabric": false,
+              "deepHook": false,
+              "restartRequired": true
+            },
+            "profileBundle": {
+              "packageName": "@mattheliu/7d7d",
+              "spec": "github:omdsh-dev/7d7d#1c8ea4981fcfdb58e8f9726058b950aaf8cc9404"
+            },
+            "updateFrom": {
+              "version": "0.4.0-rc.1",
+              "ref": "80b6ddb779a009d378a1c30c85dfef598f527997"
+            }
+          },
+          "management": {
+            "method": "profile-bundle",
+            "protocol": "harness-profile",
+            "label": "Transactional candidate Profile review",
+            "instructions": "Evaluate the fixed Profile Bundle in an ephemeral candidate generation.",
+            "source": null
+          },
+          "declarations": {
+            "permissions": "filesystem:write, network:outbound, ui:extend, webserver:register",
+            "testing": "Run the typed adapter against this exact source and preserve the complete report.",
+            "trustedPublisherRequested": false,
+            "installScriptsMustRemainDisabled": true
+          },
+          "packageManifest": {
+            "schema": "omdsh-workshop-package/v1",
+            "type": "plugin",
+            "integration": {
+              "protocol": "harness-profile",
+              "artifact": "cordis.patch.yml"
+            },
+            "install": {
+              "mode": "transactional",
+              "adapter": "profile-bundle",
+              "failurePolicy": "generation-rollback",
+              "touchesCurrentBeforeActivation": false
+            },
+            "lifecycle": {
+              "activation": "restart-profile",
+              "dispose": "supported"
+            },
+            "permissions": [
+              "filesystem:write",
+              "network:outbound",
+              "ui:extend",
+              "webserver:register"
+            ],
+            "capability": {
+              "id": "7d7d-routes-registered",
+              "kind": "service",
+              "invocation": "boot the RC.6 candidate Profile and activate the 7d7d Cordis entry",
+              "expected": "the /7d7d prefix and /7d7d/api/server.json routes are both registered"
+            },
+            "evidence": {
+              "install": "docs/WORKSHOP.md",
+              "failureIsolation": "docs/WORKSHOP.md",
+              "hotReload": null,
+              "remove": "docs/WORKSHOP.md"
+            }
+          }
+        }
+      },
+      "classification": {
+        "management": "transactional"
+      },
+      "baseline": {
+        "package": "@deepseek-ai/dsh",
+        "version": "0.1.0-rc.6",
+        "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+      },
+      "review": {
+        "state": "pending-review"
+      },
+      "verification": {
+        "state": "current-baseline-passed",
+        "verifiedAt": "2026-08-16T04:31:09.173Z",
+        "evidence": "intake/evidence/7d7d@0.4.0-rc.2.json"
+      },
+      "tests": {
+        "static": {
+          "required": true,
+          "status": "passed",
+          "evidence": "package.json#dshWorkshop passed the public manifest contract | artifact present at /Users/runner/work/_temp/source/cordis.patch.yml | RC.6 dsh.bundle.patch resolves to ./cordis.patch.yml | adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6 with sha512 integrity | reviewed 4 declared permission scope(s)"
+        },
+        "supplyChain": {
+          "required": true,
+          "status": "passed",
+          "evidence": "no package lifecycle scripts; installation is forced to ignore scripts"
+        },
+        "officialBaseline": {
+          "required": true,
+          "status": "passed",
+          "evidence": "@deepseek-ai/dsh@0.1.0-rc.6 (sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg==)"
+        },
+        "lifecycle": {
+          "required": true,
+          "status": "passed",
+          "evidence": "install, ready, 7d7d-routes-registered capability invocation, update, disable, remove, and recovery passed"
+        }
+      },
+      "registry": {
+        "state": "ineligible",
+        "reason": "review-approval-required"
+      }
+    },
+    {
+      "schema": "omdsh-workshop-intake/v1",
+      "id": "almanac-mcp@0.1.0-rc.2",
+      "submission": {
+        "repository": "https://github.com/omdsh-dev/toybox",
+        "ref": "86e98729b92db0b9fe901c39e32bca74cf8c0f54",
+        "path": "/plugins/almanac-mcp/.dsh-plugin",
+        "manifest": {
+          "schema": "omdsh-workshop-submission/v2",
+          "operation": "add-release",
+          "project": {
+            "id": "almanac-mcp",
+            "displayName": "老黄历 MCP",
+            "summary": "查询今日宜忌、冲煞、幸运方向，支持可复现抽签与每日一诗。",
+            "kind": "mcp",
+            "category": "fun",
+            "tags": [
+              "黄历",
+              "抽签",
+              "零依赖"
+            ],
+            "repository": "https://github.com/omdsh-dev/toybox",
+            "path": "/plugins/almanac-mcp/.dsh-plugin",
+            "author": {
+              "name": "mattheliu",
+              "url": "https://github.com/mattheliu"
+            },
+            "license": "MIT"
+          },
+          "release": {
+            "version": "0.1.0-rc.2",
+            "ref": "86e98729b92db0b9fe901c39e32bca74cf8c0f54",
+            "updatedAt": "2026-08-13T13:18:30Z",
+            "channel": "beta",
+            "compatibility": "Exact @deepseek-ai/dsh@0.1.0-rc.6 Harness evaluation.",
+            "changelog": "Migrated to the current typed Workshop contract and fixed public source.",
+            "capabilities": {
+              "requiresFabric": false,
+              "deepHook": false,
+              "restartRequired": true
+            },
+            "profileBundle": null,
+            "updateFrom": null
+          },
+          "management": {
+            "method": "guided",
+            "protocol": "mcp",
+            "label": "Isolated MCP review",
+            "instructions": "Review the fixed MCP server in an isolated process after explicit trust approval.",
+            "source": null
+          },
+          "declarations": {
+            "permissions": "none",
+            "testing": "Run the typed adapter against this exact source and preserve the complete report.",
+            "trustedPublisherRequested": false,
+            "installScriptsMustRemainDisabled": true
+          },
+          "packageManifest": {
+            "schema": "omdsh-workshop-package/v1",
+            "type": "plugin",
+            "integration": {
+              "protocol": "mcp",
+              "artifact": "server.json",
+              "mcp": {
+                "protocolVersions": [
+                  "2026-07-28"
+                ],
+                "serverManifest": "server.json",
+                "registrySchema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json"
+              }
+            },
+            "install": {
+              "mode": "isolated-trial",
+              "adapter": "mcp-server",
+              "failurePolicy": "discard-process",
+              "touchesCurrentBeforeActivation": false
+            },
+            "lifecycle": {
+              "activation": "restart-plugin",
+              "dispose": "supported"
+            },
+            "permissions": [],
+            "capability": {
+              "id": "yi_ji",
+              "kind": "tool",
+              "invocation": "yi_ji({date: '2030-01-15'})",
+              "expected": "📅 2030年1月15日（星期二）\n🧮 干支：庚戌年 · 庚午日\n🌿 五行属金\n✅ 宜：谈判签约、清算对账、断舍离、复盘总结、跨部门沟通、代码评审\n❌ 忌：借贷担保、感情用事、意气用事、拍脑袋定方案、在评审里纠结命名\n⚡ 冲煞：冲鼠（午）\n🧭 幸运方向：东"
+            },
+            "evidence": {
+              "install": null,
+              "failureIsolation": null,
+              "hotReload": null,
+              "remove": null
+            }
+          }
+        }
+      },
+      "classification": {
+        "management": "guided"
+      },
+      "baseline": {
+        "package": "@deepseek-ai/dsh",
+        "version": "0.1.0-rc.6",
+        "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+      },
+      "review": {
+        "state": "pending-review"
+      },
+      "verification": {
+        "state": "source-evidence-passed",
+        "verifiedAt": "2026-08-14T12:49:27.083Z",
+        "evidence": "intake/evidence/almanac-mcp@0.1.0-rc.2.json"
+      },
+      "tests": {
+        "static": {
+          "required": true,
+          "status": "passed",
+          "evidence": "package.json#dshWorkshop passed the public manifest contract | artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/toybox/plugins/almanac-mcp/.dsh-plugin/server.json | server.json and package ownership conform to the official MCP Registry contract | adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6 | reviewed 0 declared permission scope(s)"
+        },
+        "supplyChain": {
+          "required": true,
+          "status": "passed",
+          "evidence": "no package lifecycle scripts; installation is forced to ignore scripts"
+        },
+        "officialBaseline": {
+          "required": false,
+          "status": "not-applicable",
+          "evidence": "guided entries expose no executable install intent"
+        },
+        "lifecycle": {
+          "required": false,
+          "status": "not-applicable",
+          "evidence": "guided entries have no Workshop-owned lifecycle"
+        }
+      },
+      "registry": {
+        "state": "ineligible",
+        "reason": "guided-catalog-only"
+      }
+    },
+    {
+      "schema": "omdsh-workshop-intake/v1",
+      "id": "bug-tamer@0.1.0-rc.2",
+      "submission": {
+        "repository": "https://github.com/omdsh-dev/toybox",
+        "ref": "86e98729b92db0b9fe901c39e32bca74cf8c0f54",
+        "path": "/plugins/bug-tamer/.dsh-plugin",
+        "manifest": {
+          "schema": "omdsh-workshop-submission/v2",
+          "operation": "add-release",
+          "project": {
+            "id": "bug-tamer",
+            "displayName": "Bug 驯兽师",
+            "summary": "按诱捕、驯化、放归、饲养手册四阶段推进有证据的 Bug 修复。",
+            "kind": "skill",
+            "category": "fun",
+            "tags": [
+              "debug",
+              "回归测试",
+              "工作流"
+            ],
+            "repository": "https://github.com/omdsh-dev/toybox",
+            "path": "/plugins/bug-tamer/.dsh-plugin",
+            "author": {
+              "name": "mattheliu",
+              "url": "https://github.com/mattheliu"
+            },
+            "license": "MIT"
+          },
+          "release": {
+            "version": "0.1.0-rc.2",
+            "ref": "86e98729b92db0b9fe901c39e32bca74cf8c0f54",
+            "updatedAt": "2026-08-13T13:18:30Z",
+            "channel": "beta",
+            "compatibility": "Exact @deepseek-ai/dsh@0.1.0-rc.6 Harness evaluation.",
+            "changelog": "Migrated to the current typed Workshop contract and fixed public source.",
+            "capabilities": {
+              "requiresFabric": false,
+              "deepHook": false,
+              "restartRequired": false
+            },
+            "profileBundle": null,
+            "updateFrom": null
+          },
+          "management": {
+            "method": "guided",
+            "protocol": "skill",
+            "label": "Static Skill review",
+            "instructions": "Inspect the fixed Skill bundle statically without executing its instructions.",
+            "source": null
+          },
+          "declarations": {
+            "permissions": "filesystem:read, filesystem:write",
+            "testing": "Run the typed adapter against this exact source and preserve the complete report.",
+            "trustedPublisherRequested": false,
+            "installScriptsMustRemainDisabled": true
+          },
+          "packageManifest": {
+            "schema": "omdsh-workshop-package/v1",
+            "type": "plugin",
+            "integration": {
+              "protocol": "skill",
+              "artifact": "skills/bug-tamer/SKILL.md"
+            },
+            "install": {
+              "mode": "guided",
+              "adapter": "skill",
+              "failurePolicy": "manual",
+              "touchesCurrentBeforeActivation": false
+            },
+            "lifecycle": {
+              "activation": "immediate",
+              "dispose": "unsupported"
+            },
+            "permissions": [
+              "filesystem:read",
+              "filesystem:write"
+            ],
+            "evidence": {
+              "install": null,
+              "failureIsolation": null,
+              "hotReload": null,
+              "remove": null
+            }
+          }
+        }
+      },
+      "classification": {
+        "management": "guided"
+      },
+      "baseline": {
+        "package": "@deepseek-ai/dsh",
+        "version": "0.1.0-rc.6",
+        "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+      },
+      "review": {
+        "state": "pending-review"
+      },
+      "verification": {
+        "state": "source-evidence-passed",
+        "verifiedAt": "2026-08-14T12:49:23.022Z",
+        "evidence": "intake/evidence/bug-tamer@0.1.0-rc.2.json"
+      },
+      "tests": {
+        "static": {
+          "required": true,
+          "status": "passed",
+          "evidence": "package.json#dshWorkshop passed the public manifest contract | artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/toybox/plugins/bug-tamer/.dsh-plugin/skills/bug-tamer/SKILL.md | Skill matches the RC.6 one-level filesystem provider contract | adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6 | reviewed 2 declared permission scope(s)"
+        },
+        "supplyChain": {
+          "required": true,
+          "status": "passed",
+          "evidence": "no package lifecycle scripts; installation is forced to ignore scripts"
+        },
+        "officialBaseline": {
+          "required": false,
+          "status": "not-applicable",
+          "evidence": "guided entries expose no executable install intent"
+        },
+        "lifecycle": {
+          "required": false,
+          "status": "not-applicable",
+          "evidence": "guided entries have no Workshop-owned lifecycle"
+        }
+      },
+      "registry": {
+        "state": "ineligible",
+        "reason": "guided-catalog-only"
+      }
+    },
+    {
+      "schema": "omdsh-workshop-intake/v1",
+      "id": "chinese-colors-mcp@0.1.0-rc.2",
+      "submission": {
+        "repository": "https://github.com/omdsh-dev/toybox",
+        "ref": "86e98729b92db0b9fe901c39e32bca74cf8c0f54",
+        "path": "/plugins/chinese-colors-mcp/.dsh-plugin",
+        "manifest": {
+          "schema": "omdsh-workshop-submission/v2",
+          "operation": "add-release",
+          "project": {
+            "id": "chinese-colors-mcp",
+            "displayName": "中国传统色 MCP",
+            "summary": "搜索中国传统色、按日期取今日色，并生成带文化典故的和谐色板。",
+            "kind": "mcp",
+            "category": "fun",
+            "tags": [
+              "颜色",
+              "设计",
+              "文化"
+            ],
+            "repository": "https://github.com/omdsh-dev/toybox",
+            "path": "/plugins/chinese-colors-mcp/.dsh-plugin",
+            "author": {
+              "name": "mattheliu",
+              "url": "https://github.com/mattheliu"
+            },
+            "license": "MIT"
+          },
+          "release": {
+            "version": "0.1.0-rc.2",
+            "ref": "86e98729b92db0b9fe901c39e32bca74cf8c0f54",
+            "updatedAt": "2026-08-13T13:18:30Z",
+            "channel": "beta",
+            "compatibility": "Exact @deepseek-ai/dsh@0.1.0-rc.6 Harness evaluation.",
+            "changelog": "Migrated to the current typed Workshop contract and fixed public source.",
+            "capabilities": {
+              "requiresFabric": false,
+              "deepHook": false,
+              "restartRequired": true
+            },
+            "profileBundle": null,
+            "updateFrom": null
+          },
+          "management": {
+            "method": "guided",
+            "protocol": "mcp",
+            "label": "Isolated MCP review",
+            "instructions": "Review the fixed MCP server in an isolated process after explicit trust approval.",
+            "source": null
+          },
+          "declarations": {
+            "permissions": "none",
+            "testing": "Run the typed adapter against this exact source and preserve the complete report.",
+            "trustedPublisherRequested": false,
+            "installScriptsMustRemainDisabled": true
+          },
+          "packageManifest": {
+            "schema": "omdsh-workshop-package/v1",
+            "type": "plugin",
+            "integration": {
+              "protocol": "mcp",
+              "artifact": "server.json",
+              "mcp": {
+                "protocolVersions": [
+                  "2026-07-28"
+                ],
+                "serverManifest": "server.json",
+                "registrySchema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json"
+              }
+            },
+            "install": {
+              "mode": "isolated-trial",
+              "adapter": "mcp-server",
+              "failurePolicy": "discard-process",
+              "touchesCurrentBeforeActivation": false
+            },
+            "lifecycle": {
+              "activation": "restart-plugin",
+              "dispose": "supported"
+            },
+            "permissions": [],
+            "capability": {
+              "id": "color_search",
+              "kind": "tool",
+              "invocation": "color_search({keyword: '黛'})",
+              "expected": "🔍 找到 3 个与 \"黛\" 相关的传统色：\n\n**黛紫** #574266 · RGB(87,66,102) · 紫系\n  📜 青黛染紫，温润含蓄\n**黛蓝** #425066 · RGB(66,80,102) · 青系\n  📜 青黛沉蓝，远山含黛\n**秋香** #D9B611 · RGB(217,182,17) · 黄系\n  📜 秋天的稻香之色，黛玉穿的\"秋香色\""
+            },
+            "evidence": {
+              "install": null,
+              "failureIsolation": null,
+              "hotReload": null,
+              "remove": null
+            }
+          }
+        }
+      },
+      "classification": {
+        "management": "guided"
+      },
+      "baseline": {
+        "package": "@deepseek-ai/dsh",
+        "version": "0.1.0-rc.6",
+        "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+      },
+      "review": {
+        "state": "pending-review"
+      },
+      "verification": {
+        "state": "source-evidence-passed",
+        "verifiedAt": "2026-08-14T12:49:27.951Z",
+        "evidence": "intake/evidence/chinese-colors-mcp@0.1.0-rc.2.json"
+      },
+      "tests": {
+        "static": {
+          "required": true,
+          "status": "passed",
+          "evidence": "package.json#dshWorkshop passed the public manifest contract | artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/toybox/plugins/chinese-colors-mcp/.dsh-plugin/server.json | server.json and package ownership conform to the official MCP Registry contract | adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6 | reviewed 0 declared permission scope(s)"
+        },
+        "supplyChain": {
+          "required": true,
+          "status": "passed",
+          "evidence": "no package lifecycle scripts; installation is forced to ignore scripts"
+        },
+        "officialBaseline": {
+          "required": false,
+          "status": "not-applicable",
+          "evidence": "guided entries expose no executable install intent"
+        },
+        "lifecycle": {
+          "required": false,
+          "status": "not-applicable",
+          "evidence": "guided entries have no Workshop-owned lifecycle"
+        }
+      },
+      "registry": {
+        "state": "ineligible",
+        "reason": "guided-catalog-only"
+      }
+    },
+    {
+      "schema": "omdsh-workshop-intake/v1",
+      "id": "code-archaeologist@0.1.0-rc.2",
+      "submission": {
+        "repository": "https://github.com/omdsh-dev/toybox",
+        "ref": "86e98729b92db0b9fe901c39e32bca74cf8c0f54",
+        "path": "/plugins/code-archaeologist/.dsh-plugin",
+        "manifest": {
+          "schema": "omdsh-workshop-submission/v2",
+          "operation": "add-release",
+          "project": {
+            "id": "code-archaeologist",
+            "displayName": "代码考古学家",
+            "summary": "用地层、文物和证据链方法解剖遗留代码，给出保护性迁移建议。",
+            "kind": "skill",
+            "category": "fun",
+            "tags": [
+              "legacy-code",
+              "架构",
+              "证据链"
+            ],
+            "repository": "https://github.com/omdsh-dev/toybox",
+            "path": "/plugins/code-archaeologist/.dsh-plugin",
+            "author": {
+              "name": "mattheliu",
+              "url": "https://github.com/mattheliu"
+            },
+            "license": "MIT"
+          },
+          "release": {
+            "version": "0.1.0-rc.2",
+            "ref": "86e98729b92db0b9fe901c39e32bca74cf8c0f54",
+            "updatedAt": "2026-08-13T13:18:30Z",
+            "channel": "beta",
+            "compatibility": "Exact @deepseek-ai/dsh@0.1.0-rc.6 Harness evaluation.",
+            "changelog": "Migrated to the current typed Workshop contract and fixed public source.",
+            "capabilities": {
+              "requiresFabric": false,
+              "deepHook": false,
+              "restartRequired": false
+            },
+            "profileBundle": null,
+            "updateFrom": null
+          },
+          "management": {
+            "method": "guided",
+            "protocol": "skill",
+            "label": "Static Skill review",
+            "instructions": "Inspect the fixed Skill bundle statically without executing its instructions.",
+            "source": null
+          },
+          "declarations": {
+            "permissions": "filesystem:read",
+            "testing": "Run the typed adapter against this exact source and preserve the complete report.",
+            "trustedPublisherRequested": false,
+            "installScriptsMustRemainDisabled": true
+          },
+          "packageManifest": {
+            "schema": "omdsh-workshop-package/v1",
+            "type": "plugin",
+            "integration": {
+              "protocol": "skill",
+              "artifact": "skills/code-archaeologist/SKILL.md"
+            },
+            "install": {
+              "mode": "guided",
+              "adapter": "skill",
+              "failurePolicy": "manual",
+              "touchesCurrentBeforeActivation": false
+            },
+            "lifecycle": {
+              "activation": "immediate",
+              "dispose": "unsupported"
+            },
+            "permissions": [
+              "filesystem:read"
+            ],
+            "evidence": {
+              "install": null,
+              "failureIsolation": null,
+              "hotReload": null,
+              "remove": null
+            }
+          }
+        }
+      },
+      "classification": {
+        "management": "guided"
+      },
+      "baseline": {
+        "package": "@deepseek-ai/dsh",
+        "version": "0.1.0-rc.6",
+        "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+      },
+      "review": {
+        "state": "pending-review"
+      },
+      "verification": {
+        "state": "source-evidence-passed",
+        "verifiedAt": "2026-08-14T12:49:23.102Z",
+        "evidence": "intake/evidence/code-archaeologist@0.1.0-rc.2.json"
+      },
+      "tests": {
+        "static": {
+          "required": true,
+          "status": "passed",
+          "evidence": "package.json#dshWorkshop passed the public manifest contract | artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/toybox/plugins/code-archaeologist/.dsh-plugin/skills/code-archaeologist/SKILL.md | Skill matches the RC.6 one-level filesystem provider contract | adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6 | reviewed 1 declared permission scope(s)"
+        },
+        "supplyChain": {
+          "required": true,
+          "status": "passed",
+          "evidence": "no package lifecycle scripts; installation is forced to ignore scripts"
+        },
+        "officialBaseline": {
+          "required": false,
+          "status": "not-applicable",
+          "evidence": "guided entries expose no executable install intent"
+        },
+        "lifecycle": {
+          "required": false,
+          "status": "not-applicable",
+          "evidence": "guided entries have no Workshop-owned lifecycle"
+        }
+      },
+      "registry": {
+        "state": "ineligible",
+        "reason": "guided-catalog-only"
+      }
+    },
+    {
+      "schema": "omdsh-workshop-intake/v1",
+      "id": "code-talent-scout@0.1.0-rc.2",
+      "submission": {
+        "repository": "https://github.com/omdsh-dev/toybox",
+        "ref": "86e98729b92db0b9fe901c39e32bca74cf8c0f54",
+        "path": "/plugins/code-talent-scout/.dsh-plugin",
+        "manifest": {
+          "schema": "omdsh-workshop-submission/v2",
+          "operation": "add-release",
+          "project": {
+            "id": "code-talent-scout",
+            "displayName": "代码星探",
+            "summary": "用四维评分卡给函数做 S/A/B/C 评级，找出最值得重写的候选。",
+            "kind": "skill",
+            "category": "fun",
+            "tags": [
+              "code-review",
+              "评分",
+              "重构"
+            ],
+            "repository": "https://github.com/omdsh-dev/toybox",
+            "path": "/plugins/code-talent-scout/.dsh-plugin",
+            "author": {
+              "name": "mattheliu",
+              "url": "https://github.com/mattheliu"
+            },
+            "license": "MIT"
+          },
+          "release": {
+            "version": "0.1.0-rc.2",
+            "ref": "86e98729b92db0b9fe901c39e32bca74cf8c0f54",
+            "updatedAt": "2026-08-13T13:18:30Z",
+            "channel": "beta",
+            "compatibility": "Exact @deepseek-ai/dsh@0.1.0-rc.6 Harness evaluation.",
+            "changelog": "Migrated to the current typed Workshop contract and fixed public source.",
+            "capabilities": {
+              "requiresFabric": false,
+              "deepHook": false,
+              "restartRequired": false
+            },
+            "profileBundle": null,
+            "updateFrom": null
+          },
+          "management": {
+            "method": "guided",
+            "protocol": "skill",
+            "label": "Static Skill review",
+            "instructions": "Inspect the fixed Skill bundle statically without executing its instructions.",
+            "source": null
+          },
+          "declarations": {
+            "permissions": "filesystem:read",
+            "testing": "Run the typed adapter against this exact source and preserve the complete report.",
+            "trustedPublisherRequested": false,
+            "installScriptsMustRemainDisabled": true
+          },
+          "packageManifest": {
+            "schema": "omdsh-workshop-package/v1",
+            "type": "plugin",
+            "integration": {
+              "protocol": "skill",
+              "artifact": "skills/code-talent-scout/SKILL.md"
+            },
+            "install": {
+              "mode": "guided",
+              "adapter": "skill",
+              "failurePolicy": "manual",
+              "touchesCurrentBeforeActivation": false
+            },
+            "lifecycle": {
+              "activation": "immediate",
+              "dispose": "unsupported"
+            },
+            "permissions": [
+              "filesystem:read"
+            ],
+            "evidence": {
+              "install": null,
+              "failureIsolation": null,
+              "hotReload": null,
+              "remove": null
+            }
+          }
+        }
+      },
+      "classification": {
+        "management": "guided"
+      },
+      "baseline": {
+        "package": "@deepseek-ai/dsh",
+        "version": "0.1.0-rc.6",
+        "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+      },
+      "review": {
+        "state": "pending-review"
+      },
+      "verification": {
+        "state": "source-evidence-passed",
+        "verifiedAt": "2026-08-14T12:49:23.164Z",
+        "evidence": "intake/evidence/code-talent-scout@0.1.0-rc.2.json"
+      },
+      "tests": {
+        "static": {
+          "required": true,
+          "status": "passed",
+          "evidence": "package.json#dshWorkshop passed the public manifest contract | artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/toybox/plugins/code-talent-scout/.dsh-plugin/skills/code-talent-scout/SKILL.md | Skill matches the RC.6 one-level filesystem provider contract | adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6 | reviewed 1 declared permission scope(s)"
+        },
+        "supplyChain": {
+          "required": true,
+          "status": "passed",
+          "evidence": "no package lifecycle scripts; installation is forced to ignore scripts"
+        },
+        "officialBaseline": {
+          "required": false,
+          "status": "not-applicable",
+          "evidence": "guided entries expose no executable install intent"
+        },
+        "lifecycle": {
+          "required": false,
+          "status": "not-applicable",
+          "evidence": "guided entries have no Workshop-owned lifecycle"
+        }
+      },
+      "registry": {
+        "state": "ineligible",
+        "reason": "guided-catalog-only"
+      }
+    },
+    {
+      "schema": "omdsh-workshop-intake/v1",
+      "id": "decision-dice-mcp@0.1.0-rc.2",
+      "submission": {
+        "repository": "https://github.com/omdsh-dev/toybox",
+        "ref": "86e98729b92db0b9fe901c39e32bca74cf8c0f54",
+        "path": "/plugins/decision-dice-mcp/.dsh-plugin",
+        "manifest": {
+          "schema": "omdsh-workshop-submission/v2",
+          "operation": "add-release",
+          "project": {
+            "id": "decision-dice-mcp",
+            "displayName": "决策骰子 MCP",
+            "summary": "提供抛硬币、掷骰和命运抉择工具，为选择困难保留可复现结果。",
+            "kind": "mcp",
+            "category": "fun",
+            "tags": [
+              "决策",
+              "随机",
+              "seed"
+            ],
+            "repository": "https://github.com/omdsh-dev/toybox",
+            "path": "/plugins/decision-dice-mcp/.dsh-plugin",
+            "author": {
+              "name": "mattheliu",
+              "url": "https://github.com/mattheliu"
+            },
+            "license": "MIT"
+          },
+          "release": {
+            "version": "0.1.0-rc.2",
+            "ref": "86e98729b92db0b9fe901c39e32bca74cf8c0f54",
+            "updatedAt": "2026-08-13T13:18:30Z",
+            "channel": "beta",
+            "compatibility": "Exact @deepseek-ai/dsh@0.1.0-rc.6 Harness evaluation.",
+            "changelog": "Migrated to the current typed Workshop contract and fixed public source.",
+            "capabilities": {
+              "requiresFabric": false,
+              "deepHook": false,
+              "restartRequired": true
+            },
+            "profileBundle": null,
+            "updateFrom": null
+          },
+          "management": {
+            "method": "guided",
+            "protocol": "mcp",
+            "label": "Isolated MCP review",
+            "instructions": "Review the fixed MCP server in an isolated process after explicit trust approval.",
+            "source": null
+          },
+          "declarations": {
+            "permissions": "none",
+            "testing": "Run the typed adapter against this exact source and preserve the complete report.",
+            "trustedPublisherRequested": false,
+            "installScriptsMustRemainDisabled": true
+          },
+          "packageManifest": {
+            "schema": "omdsh-workshop-package/v1",
+            "type": "plugin",
+            "integration": {
+              "protocol": "mcp",
+              "artifact": "server.json",
+              "mcp": {
+                "protocolVersions": [
+                  "2026-07-28"
+                ],
+                "serverManifest": "server.json",
+                "registrySchema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json"
+              }
+            },
+            "install": {
+              "mode": "isolated-trial",
+              "adapter": "mcp-server",
+              "failurePolicy": "discard-process",
+              "touchesCurrentBeforeActivation": false
+            },
+            "lifecycle": {
+              "activation": "restart-plugin",
+              "dispose": "supported"
+            },
+            "permissions": [],
+            "capability": {
+              "id": "flip",
+              "kind": "tool",
+              "invocation": "flip({seed: 'verify'})",
+              "expected": "🪙 硬币腾空而起……\n🎯 结果：**反面**\n（seed=\"verify\"，可复现）"
+            },
+            "evidence": {
+              "install": null,
+              "failureIsolation": null,
+              "hotReload": null,
+              "remove": null
+            }
+          }
+        }
+      },
+      "classification": {
+        "management": "guided"
+      },
+      "baseline": {
+        "package": "@deepseek-ai/dsh",
+        "version": "0.1.0-rc.6",
+        "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+      },
+      "review": {
+        "state": "pending-review"
+      },
+      "verification": {
+        "state": "source-evidence-passed",
+        "verifiedAt": "2026-08-14T12:49:28.784Z",
+        "evidence": "intake/evidence/decision-dice-mcp@0.1.0-rc.2.json"
+      },
+      "tests": {
+        "static": {
+          "required": true,
+          "status": "passed",
+          "evidence": "package.json#dshWorkshop passed the public manifest contract | artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/toybox/plugins/decision-dice-mcp/.dsh-plugin/server.json | server.json and package ownership conform to the official MCP Registry contract | adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6 | reviewed 0 declared permission scope(s)"
+        },
+        "supplyChain": {
+          "required": true,
+          "status": "passed",
+          "evidence": "no package lifecycle scripts; installation is forced to ignore scripts"
+        },
+        "officialBaseline": {
+          "required": false,
+          "status": "not-applicable",
+          "evidence": "guided entries expose no executable install intent"
+        },
+        "lifecycle": {
+          "required": false,
+          "status": "not-applicable",
+          "evidence": "guided entries have no Workshop-owned lifecycle"
+        }
+      },
+      "registry": {
+        "state": "ineligible",
+        "reason": "guided-catalog-only"
+      }
+    },
     {
       "schema": "omdsh-workshop-intake/v1",
       "id": "dsh-session-hotkeys@1.5.1",
@@ -146,6 +1098,562 @@
         "supplyChain": {
           "required": true,
           "status": "pending"
+        },
+        "officialBaseline": {
+          "required": false,
+          "status": "not-applicable",
+          "evidence": "guided entries expose no executable install intent"
+        },
+        "lifecycle": {
+          "required": false,
+          "status": "not-applicable",
+          "evidence": "guided entries have no Workshop-owned lifecycle"
+        }
+      },
+      "registry": {
+        "state": "ineligible",
+        "reason": "guided-catalog-only"
+      }
+    },
+    {
+      "schema": "omdsh-workshop-intake/v1",
+      "id": "github-integration@0.1.0-rc.2",
+      "submission": {
+        "repository": "https://github.com/omdsh-dev/dsh-github-integration",
+        "ref": "a190f89c71a179e5b8748db5bba21465e47de2c9",
+        "path": "/plugins/github-integration/.dsh-plugin",
+        "manifest": {
+          "schema": "omdsh-workshop-submission/v2",
+          "operation": "add-release",
+          "project": {
+            "id": "github-integration",
+            "displayName": "GitHub Integration",
+            "summary": "用于规范化 GitHub Issue 与 Pull Request 协作流程的静态工作流技能，不包含 API 客户端、工具提供方或凭据。",
+            "kind": "skill",
+            "category": "developer-tools",
+            "tags": [
+              "github",
+              "issue",
+              "pull-request"
+            ],
+            "repository": "https://github.com/omdsh-dev/dsh-github-integration",
+            "path": "/plugins/github-integration/.dsh-plugin",
+            "author": {
+              "name": "mattheliu",
+              "url": "https://github.com/mattheliu"
+            },
+            "license": "MIT"
+          },
+          "release": {
+            "version": "0.1.0-rc.2",
+            "ref": "a190f89c71a179e5b8748db5bba21465e47de2c9",
+            "updatedAt": "2026-08-13T13:18:33Z",
+            "channel": "beta",
+            "compatibility": "Exact @deepseek-ai/dsh@0.1.0-rc.6 Harness evaluation.",
+            "changelog": "Migrated to the current typed Workshop contract and fixed public source.",
+            "capabilities": {
+              "requiresFabric": false,
+              "deepHook": false,
+              "restartRequired": false
+            },
+            "profileBundle": null,
+            "updateFrom": null
+          },
+          "management": {
+            "method": "guided",
+            "protocol": "skill",
+            "label": "Static Skill review",
+            "instructions": "Inspect the fixed Skill bundle statically without executing its instructions.",
+            "source": null
+          },
+          "declarations": {
+            "permissions": "github:read, github:write",
+            "testing": "Run the typed adapter against this exact source and preserve the complete report.",
+            "trustedPublisherRequested": false,
+            "installScriptsMustRemainDisabled": true
+          },
+          "packageManifest": {
+            "schema": "omdsh-workshop-package/v1",
+            "type": "plugin",
+            "integration": {
+              "protocol": "skill",
+              "artifact": "skills/github-issue-pr/SKILL.md"
+            },
+            "install": {
+              "mode": "guided",
+              "adapter": "skill",
+              "failurePolicy": "manual",
+              "touchesCurrentBeforeActivation": false
+            },
+            "lifecycle": {
+              "activation": "immediate",
+              "dispose": "unsupported"
+            },
+            "permissions": [
+              "github:read",
+              "github:write"
+            ],
+            "evidence": {
+              "install": null,
+              "failureIsolation": null,
+              "hotReload": null,
+              "remove": null
+            }
+          }
+        }
+      },
+      "classification": {
+        "management": "guided"
+      },
+      "baseline": {
+        "package": "@deepseek-ai/dsh",
+        "version": "0.1.0-rc.6",
+        "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+      },
+      "review": {
+        "state": "pending-review"
+      },
+      "verification": {
+        "state": "source-evidence-passed",
+        "verifiedAt": "2026-08-14T12:49:23.226Z",
+        "evidence": "intake/evidence/github-integration@0.1.0-rc.2.json"
+      },
+      "tests": {
+        "static": {
+          "required": true,
+          "status": "passed",
+          "evidence": "package.json#dshWorkshop passed the public manifest contract | artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/dsh-github-integration/plugins/github-integration/.dsh-plugin/skills/github-issue-pr/SKILL.md | Skill matches the RC.6 one-level filesystem provider contract | adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6 | reviewed 2 declared permission scope(s)"
+        },
+        "supplyChain": {
+          "required": true,
+          "status": "passed",
+          "evidence": "no package lifecycle scripts; installation is forced to ignore scripts"
+        },
+        "officialBaseline": {
+          "required": false,
+          "status": "not-applicable",
+          "evidence": "guided entries expose no executable install intent"
+        },
+        "lifecycle": {
+          "required": false,
+          "status": "not-applicable",
+          "evidence": "guided entries have no Workshop-owned lifecycle"
+        }
+      },
+      "registry": {
+        "state": "ineligible",
+        "reason": "guided-catalog-only"
+      }
+    },
+    {
+      "schema": "omdsh-workshop-intake/v1",
+      "id": "naming-master-mcp@0.1.0-rc.2",
+      "submission": {
+        "repository": "https://github.com/omdsh-dev/toybox",
+        "ref": "86e98729b92db0b9fe901c39e32bca74cf8c0f54",
+        "path": "/plugins/naming-master-mcp/.dsh-plugin",
+        "manifest": {
+          "schema": "omdsh-workshop-submission/v2",
+          "operation": "add-release",
+          "project": {
+            "id": "naming-master-mcp",
+            "displayName": "取名大师 MCP",
+            "summary": "用古风、赛博、极简与程序员梗四种风格给变量、函数或项目取名。",
+            "kind": "mcp",
+            "category": "fun",
+            "tags": [
+              "命名",
+              "创意",
+              "开发体验"
+            ],
+            "repository": "https://github.com/omdsh-dev/toybox",
+            "path": "/plugins/naming-master-mcp/.dsh-plugin",
+            "author": {
+              "name": "mattheliu",
+              "url": "https://github.com/mattheliu"
+            },
+            "license": "MIT"
+          },
+          "release": {
+            "version": "0.1.0-rc.2",
+            "ref": "86e98729b92db0b9fe901c39e32bca74cf8c0f54",
+            "updatedAt": "2026-08-13T13:18:30Z",
+            "channel": "beta",
+            "compatibility": "Exact @deepseek-ai/dsh@0.1.0-rc.6 Harness evaluation.",
+            "changelog": "Migrated to the current typed Workshop contract and fixed public source.",
+            "capabilities": {
+              "requiresFabric": false,
+              "deepHook": false,
+              "restartRequired": true
+            },
+            "profileBundle": null,
+            "updateFrom": null
+          },
+          "management": {
+            "method": "guided",
+            "protocol": "mcp",
+            "label": "Isolated MCP review",
+            "instructions": "Review the fixed MCP server in an isolated process after explicit trust approval.",
+            "source": null
+          },
+          "declarations": {
+            "permissions": "none",
+            "testing": "Run the typed adapter against this exact source and preserve the complete report.",
+            "trustedPublisherRequested": false,
+            "installScriptsMustRemainDisabled": true
+          },
+          "packageManifest": {
+            "schema": "omdsh-workshop-package/v1",
+            "type": "plugin",
+            "integration": {
+              "protocol": "mcp",
+              "artifact": "server.json",
+              "mcp": {
+                "protocolVersions": [
+                  "2026-07-28"
+                ],
+                "serverManifest": "server.json",
+                "registrySchema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json"
+              }
+            },
+            "install": {
+              "mode": "isolated-trial",
+              "adapter": "mcp-server",
+              "failurePolicy": "discard-process",
+              "touchesCurrentBeforeActivation": false
+            },
+            "lifecycle": {
+              "activation": "restart-plugin",
+              "dispose": "supported"
+            },
+            "permissions": [],
+            "capability": {
+              "id": "name_styles",
+              "kind": "tool",
+              "invocation": "name_styles({})",
+              "expected": "🎨 取名大师支持以下风格：\n\n- `gu_feng` 古风：云鹤青墨，适合追求气质的项目/模块/宠物\n- `cyber` 赛博：neo/quantum 前缀，适合新潮工具、AI 项目、命令行\n- `minimal` 极简：短小精悍，适合工具函数、hook、单测变量\n- `geek` 程序员梗：懂的都懂，适合彩蛋、demo、内部工具"
+            },
+            "evidence": {
+              "install": null,
+              "failureIsolation": null,
+              "hotReload": null,
+              "remove": null
+            }
+          }
+        }
+      },
+      "classification": {
+        "management": "guided"
+      },
+      "baseline": {
+        "package": "@deepseek-ai/dsh",
+        "version": "0.1.0-rc.6",
+        "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+      },
+      "review": {
+        "state": "pending-review"
+      },
+      "verification": {
+        "state": "source-evidence-passed",
+        "verifiedAt": "2026-08-14T12:49:29.644Z",
+        "evidence": "intake/evidence/naming-master-mcp@0.1.0-rc.2.json"
+      },
+      "tests": {
+        "static": {
+          "required": true,
+          "status": "passed",
+          "evidence": "package.json#dshWorkshop passed the public manifest contract | artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/toybox/plugins/naming-master-mcp/.dsh-plugin/server.json | server.json and package ownership conform to the official MCP Registry contract | adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6 | reviewed 0 declared permission scope(s)"
+        },
+        "supplyChain": {
+          "required": true,
+          "status": "passed",
+          "evidence": "no package lifecycle scripts; installation is forced to ignore scripts"
+        },
+        "officialBaseline": {
+          "required": false,
+          "status": "not-applicable",
+          "evidence": "guided entries expose no executable install intent"
+        },
+        "lifecycle": {
+          "required": false,
+          "status": "not-applicable",
+          "evidence": "guided entries have no Workshop-owned lifecycle"
+        }
+      },
+      "registry": {
+        "state": "ineligible",
+        "reason": "guided-catalog-only"
+      }
+    },
+    {
+      "schema": "omdsh-workshop-intake/v1",
+      "id": "session-teleport@0.6.0-rc.2",
+      "submission": {
+        "repository": "https://github.com/omdsh-dev/session-teleport",
+        "ref": "0640ca9ccd1b9ac12709b74aecf2a0e75c8bb4b1",
+        "path": null,
+        "manifest": {
+          "schema": "omdsh-workshop-submission/v2",
+          "operation": "add-release",
+          "project": {
+            "id": "session-teleport",
+            "displayName": "Session Teleport",
+            "summary": "基于 PostgreSQL 的多设备 Session 接力插件，提供单写者 fencing、接管、恢复与审计边界。",
+            "kind": "extension",
+            "category": "memory",
+            "tags": [
+              "session",
+              "postgresql",
+              "handoff"
+            ],
+            "repository": "https://github.com/omdsh-dev/session-teleport",
+            "path": null,
+            "author": {
+              "name": "mattheliu",
+              "url": "https://github.com/mattheliu"
+            },
+            "license": "BSD-3-Clause"
+          },
+          "release": {
+            "version": "0.6.0-rc.2",
+            "ref": "0640ca9ccd1b9ac12709b74aecf2a0e75c8bb4b1",
+            "updatedAt": "2026-08-13T20:55:45+08:00",
+            "channel": "beta",
+            "compatibility": "Exact @deepseek-ai/dsh@0.1.0-rc.6 Harness evaluation.",
+            "changelog": "Migrated to the current typed Workshop contract and fixed public source.",
+            "capabilities": {
+              "requiresFabric": false,
+              "deepHook": false,
+              "restartRequired": true
+            },
+            "profileBundle": {
+              "packageName": "@mattheliu/session-teleport",
+              "spec": "github:omdsh-dev/session-teleport#0640ca9ccd1b9ac12709b74aecf2a0e75c8bb4b1"
+            },
+            "updateFrom": {
+              "version": "0.6.0-rc.1",
+              "ref": "d76e0d98b09ad1d08f2592ffd47161acb907bfc4"
+            }
+          },
+          "management": {
+            "method": "profile-bundle",
+            "protocol": "harness-profile",
+            "label": "Transactional candidate Profile review",
+            "instructions": "Evaluate the fixed Profile Bundle in an ephemeral candidate generation.",
+            "source": null
+          },
+          "declarations": {
+            "permissions": "database:read, database:write, filesystem:write, network:outbound",
+            "testing": "Run the typed adapter against this exact source and preserve the complete report.",
+            "trustedPublisherRequested": false,
+            "installScriptsMustRemainDisabled": true
+          },
+          "packageManifest": {
+            "schema": "omdsh-workshop-package/v1",
+            "type": "plugin",
+            "integration": {
+              "protocol": "harness-profile",
+              "artifact": "cordis.patch.yml"
+            },
+            "install": {
+              "mode": "transactional",
+              "adapter": "profile-bundle",
+              "failurePolicy": "generation-rollback",
+              "touchesCurrentBeforeActivation": false
+            },
+            "lifecycle": {
+              "activation": "restart-profile",
+              "dispose": "supported"
+            },
+            "permissions": [
+              "database:read",
+              "database:write",
+              "filesystem:write",
+              "network:outbound"
+            ],
+            "capability": {
+              "id": "session-persistence-teleport",
+              "kind": "provider",
+              "invocation": "boot an RC.6 candidate Profile with DSH_TELEPORT_ENABLE=1 and run the Session persistence lifecycle",
+              "expected": "the Teleport persistence provider becomes ready only after its PostgreSQL-backed health check passes"
+            },
+            "evidence": {
+              "install": "docs/PLUGIN_LIFECYCLE.md",
+              "failureIsolation": "docs/PLUGIN_LIFECYCLE.md",
+              "hotReload": null,
+              "remove": "docs/PLUGIN_LIFECYCLE.md"
+            }
+          }
+        }
+      },
+      "classification": {
+        "management": "transactional"
+      },
+      "baseline": {
+        "package": "@deepseek-ai/dsh",
+        "version": "0.1.0-rc.6",
+        "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+      },
+      "review": {
+        "state": "pending-review"
+      },
+      "verification": {
+        "state": "blocked",
+        "verifiedAt": "2026-08-14T12:38:08.141Z",
+        "evidence": "intake/reports/session-teleport@0.6.0-rc.2.profile.json"
+      },
+      "tests": {
+        "static": {
+          "required": true,
+          "status": "passed",
+          "evidence": "submission manifest validation"
+        },
+        "supplyChain": {
+          "required": true,
+          "status": "passed",
+          "evidence": "no package lifecycle scripts; installation is forced to ignore scripts"
+        },
+        "officialBaseline": {
+          "required": true,
+          "status": "blocked",
+          "evidence": "PostgreSQL runtime validation blocked: POSTGRES_TEST_URL is unset; no local postgres or psql binaries are installed; the Docker daemon is unavailable. The database-backed /health check is required before DSH_TELEPORT_ENABLE=1."
+        },
+        "lifecycle": {
+          "required": true,
+          "status": "blocked",
+          "evidence": "lifecycle steps did not run after the blocking required step"
+        }
+      },
+      "registry": {
+        "state": "ineligible",
+        "reason": "current-baseline-verification-blocked"
+      }
+    },
+    {
+      "schema": "omdsh-workshop-intake/v1",
+      "id": "time-capsule-mcp@0.1.0-rc.2",
+      "submission": {
+        "repository": "https://github.com/omdsh-dev/toybox",
+        "ref": "86e98729b92db0b9fe901c39e32bca74cf8c0f54",
+        "path": "/plugins/time-capsule-mcp/.dsh-plugin",
+        "manifest": {
+          "schema": "omdsh-workshop-submission/v2",
+          "operation": "add-release",
+          "project": {
+            "id": "time-capsule-mcp",
+            "displayName": "时间胶囊 MCP",
+            "summary": "封存想法并在指定天数后开启，未到期时由服务端拒绝泄露内容。",
+            "kind": "mcp",
+            "category": "fun",
+            "tags": [
+              "时间胶囊",
+              "写作",
+              "存储"
+            ],
+            "repository": "https://github.com/omdsh-dev/toybox",
+            "path": "/plugins/time-capsule-mcp/.dsh-plugin",
+            "author": {
+              "name": "mattheliu",
+              "url": "https://github.com/mattheliu"
+            },
+            "license": "MIT"
+          },
+          "release": {
+            "version": "0.1.0-rc.2",
+            "ref": "86e98729b92db0b9fe901c39e32bca74cf8c0f54",
+            "updatedAt": "2026-08-13T13:18:30Z",
+            "channel": "beta",
+            "compatibility": "Exact @deepseek-ai/dsh@0.1.0-rc.6 Harness evaluation.",
+            "changelog": "Migrated to the current typed Workshop contract and fixed public source.",
+            "capabilities": {
+              "requiresFabric": false,
+              "deepHook": false,
+              "restartRequired": true
+            },
+            "profileBundle": null,
+            "updateFrom": null
+          },
+          "management": {
+            "method": "guided",
+            "protocol": "mcp",
+            "label": "Isolated MCP review",
+            "instructions": "Review the fixed MCP server in an isolated process after explicit trust approval.",
+            "source": null
+          },
+          "declarations": {
+            "permissions": "filesystem:write",
+            "testing": "Run the typed adapter against this exact source and preserve the complete report.",
+            "trustedPublisherRequested": false,
+            "installScriptsMustRemainDisabled": true
+          },
+          "packageManifest": {
+            "schema": "omdsh-workshop-package/v1",
+            "type": "plugin",
+            "integration": {
+              "protocol": "mcp",
+              "artifact": "server.json",
+              "mcp": {
+                "protocolVersions": [
+                  "2026-07-28"
+                ],
+                "serverManifest": "server.json",
+                "registrySchema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json"
+              }
+            },
+            "install": {
+              "mode": "isolated-trial",
+              "adapter": "mcp-server",
+              "failurePolicy": "discard-process",
+              "touchesCurrentBeforeActivation": false
+            },
+            "lifecycle": {
+              "activation": "restart-plugin",
+              "dispose": "supported"
+            },
+            "permissions": [
+              "filesystem:write"
+            ],
+            "capability": {
+              "id": "list",
+              "kind": "tool",
+              "invocation": "list({})",
+              "expected": "🗄️ 还没有任何时间胶囊。用 seal 封存一条消息吧。"
+            },
+            "evidence": {
+              "install": null,
+              "failureIsolation": null,
+              "hotReload": null,
+              "remove": null
+            }
+          }
+        }
+      },
+      "classification": {
+        "management": "guided"
+      },
+      "baseline": {
+        "package": "@deepseek-ai/dsh",
+        "version": "0.1.0-rc.6",
+        "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+      },
+      "review": {
+        "state": "pending-review"
+      },
+      "verification": {
+        "state": "source-evidence-passed",
+        "verifiedAt": "2026-08-14T12:49:30.488Z",
+        "evidence": "intake/evidence/time-capsule-mcp@0.1.0-rc.2.json"
+      },
+      "tests": {
+        "static": {
+          "required": true,
+          "status": "passed",
+          "evidence": "package.json#dshWorkshop passed the public manifest contract | artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/toybox/plugins/time-capsule-mcp/.dsh-plugin/server.json | server.json and package ownership conform to the official MCP Registry contract | adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6 | reviewed 1 declared permission scope(s)"
+        },
+        "supplyChain": {
+          "required": true,
+          "status": "passed",
+          "evidence": "no package lifecycle scripts; installation is forced to ignore scripts"
         },
         "officialBaseline": {
           "required": false,

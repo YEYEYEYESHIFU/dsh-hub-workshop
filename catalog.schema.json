@@ -285,7 +285,7 @@
           "additionalProperties": false,
           "properties": {
             "route": { "enum": ["package-json-manifest", "legacy-compatibility-map"] },
-            "state": { "enum": ["manifest-ready-for-tests", "registry-admitted", "needs-package-manifest"] }
+            "state": { "enum": ["manifest-ready-for-tests", "verification-passed-review-pending", "guided-evidence-passed", "verification-blocked", "registry-admitted", "needs-package-manifest"] }
           }
         }
       }

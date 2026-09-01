@@ -2,11 +2,12 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import test from 'node:test'
 
-import { buildAutomationPlan, buildVerificationJobs, declaredDshVersions, validateAutomationPolicy } from '../scripts/automation-policy-lib.mjs'
+import { automationPlanExitCode, buildAutomationPlan, buildVerificationJobs, declaredDshVersions, validateAutomationPolicy } from '../scripts/automation-policy-lib.mjs'
 
 const policy = JSON.parse(await readFile(new URL('../automation-policy.json', import.meta.url), 'utf8'))
 const baseline = JSON.parse(await readFile(new URL('../official-baseline.json', import.meta.url), 'utf8'))
 const loaderRegistry = JSON.parse(await readFile(new URL('../loader-adapters.json', import.meta.url), 'utf8'))
+const verificationWorkflow = await readFile(new URL('../.github/workflows/verify.yml', import.meta.url), 'utf8')
 
 function record(adapter, protocol, compatibility = 'Exact @deepseek-ai/dsh@0.1.0-rc.2 support.') {
   return {
@@ -29,6 +30,12 @@ test('automation policy retains the two trust boundaries', () => {
   assert.deepEqual(validateAutomationPolicy(policy), [])
   assert.equal(policy.discovery.autoAdmission, false)
   assert.equal(policy.release.productionApproval, true)
+})
+
+test('verification finalization preserves independent evidence without implicit Admission', () => {
+  assert.match(verificationWorkflow, /merge-multiple: true\n\s+path: intake/)
+  assert.match(verificationWorkflow, /runnable_release_ids/)
+  assert.match(verificationWorkflow, /inputs\.risk_level != 'unknown'/)
 })
 
 test('Profile verification follows the declared exact version and current baseline', () => {
@@ -61,6 +68,17 @@ test('automation plan never turns a blocked release into a runnable job', () => 
   assert.equal(plan.jobs.length, 1)
   assert.equal(plan.blocked.length, 1)
   assert.equal(plan.summary.admissionEligible, false)
+  assert.equal(automationPlanExitCode(plan), 0)
+  assert.equal(automationPlanExitCode(plan, { explicitSingleRelease: true }), 2)
+})
+
+test('automation plan fails closed only when every selected release is blocked', () => {
+  const plan = buildAutomationPlan([
+    record('repository-plugin', 'harness-repository')
+  ], baseline, policy, loaderRegistry)
+  assert.equal(plan.jobs.length, 0)
+  assert.equal(plan.blocked.length, 1)
+  assert.equal(automationPlanExitCode(plan), 2)
 })
 
 test('automation plan accepts a deterministic multi-release selection', () => {

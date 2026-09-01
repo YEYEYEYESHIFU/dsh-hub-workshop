@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hub.omdsh.dev/real-project-review.schema.json",
+  "title": "OMDSH Workshop real-project review case",
+  "description": "Fail-closed evidence for one public project at one immutable commit. This document is not RC.6 verification or Registry admission.",
+  "type": "object",
+  "required": ["schema", "id", "releaseId", "source", "catalog", "package", "sequence", "typePlan", "trustReview", "adapter", "humanReview", "admission", "claims", "reviewedAt", "reviewer"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "omdsh-workshop-real-project-review/v1" },
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "releaseId": { "type": "string", "minLength": 3 },
+    "source": {
+      "type": "object",
+      "required": ["repository", "ref", "path", "packagePath", "publiclyReachable", "observedDefaultHead", "tree"],
+      "additionalProperties": false,
+      "properties": {
+        "repository": { "type": "string", "pattern": "^https://github\\.com/" },
+        "ref": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "path": { "type": ["string", "null"] },
+        "packagePath": { "type": "string", "minLength": 1 },
+        "publiclyReachable": { "const": true },
+        "observedDefaultHead": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "tree": { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+      }
+    },
+    "catalog": {
+      "type": "object",
+      "required": ["version", "license", "kind", "legacyManagement"],
+      "additionalProperties": false,
+      "properties": {
+        "version": { "type": "string" },
+        "license": { "type": "string" },
+        "kind": { "type": "string" },
+        "legacyManagement": { "enum": ["profile-bundle", "repository-plugin", "guided"] }
+      }
+    },
+    "package": {
+      "type": "object",
+      "required": ["name", "version", "license", "private", "workshopManifest", "legacySignals", "lifecycleScripts"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "version": { "type": "string" },
+        "license": { "type": ["string", "null"] },
+        "private": { "type": "boolean" },
+        "workshopManifest": { "enum": ["absent", "invalid", "valid"] },
+        "legacySignals": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "lifecycleScripts": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+      }
+    },
+    "sequence": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "items": {
+        "type": "object",
+        "required": ["stage", "state", "reason"],
+        "additionalProperties": false,
+        "properties": {
+          "stage": { "enum": ["fixed-source", "type-plan", "trust-review", "adapter", "evidence", "human-review", "admission"] },
+          "state": { "enum": ["passed", "completed", "blocked", "saved", "pending", "not-created"] },
+          "reason": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "typePlan": {
+      "type": "object",
+      "required": ["state", "declaredProtocol", "declaredAdapter", "observedLegacyProtocol", "observedLegacyAdapter", "migrationOptions", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "state": { "enum": ["ready", "blocked"] },
+        "declaredProtocol": { "type": ["string", "null"] },
+        "declaredAdapter": { "type": ["string", "null"] },
+        "observedLegacyProtocol": { "type": ["string", "null"] },
+        "observedLegacyAdapter": { "type": ["string", "null"] },
+        "migrationOptions": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "trustReview": {
+      "type": "object",
+      "required": ["state", "method", "sourceExecutionAuthorized", "checks", "findings"],
+      "additionalProperties": false,
+      "properties": {
+        "state": { "enum": ["pending-human", "needs-fix", "rejected", "approved"] },
+        "method": { "const": "assisted-static-public-source-review" },
+        "sourceExecutionAuthorized": { "const": false },
+        "checks": {
+          "type": "object",
+          "additionalProperties": { "enum": ["passed", "failed", "blocked", "review-required", "not-applicable"] }
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["severity", "code", "evidence"],
+            "additionalProperties": false,
+            "properties": {
+              "severity": { "enum": ["blocker", "review", "info"] },
+              "code": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+              "evidence": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    "adapter": {
+      "type": "object",
+      "required": ["state", "name", "reason", "report"],
+      "additionalProperties": false,
+      "properties": {
+        "state": { "enum": ["not-run", "blocked", "passed", "failed"] },
+        "name": { "type": ["string", "null"] },
+        "reason": { "type": "string", "minLength": 1 },
+        "report": { "type": ["string", "null"] }
+      }
+    },
+    "humanReview": {
+      "type": "object",
+      "required": ["state", "reviewer", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "state": { "enum": ["pending", "needs-fix", "approved", "rejected"] },
+        "reviewer": { "type": ["string", "null"] },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "admission": {
+      "type": "object",
+      "required": ["state", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "state": { "enum": ["not-created", "ineligible", "admitted"] },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "claims": {
+      "type": "object",
+      "required": ["rc6Verified", "seamlessInstall", "failureIsolation", "hotReload"],
+      "additionalProperties": false,
+      "properties": {
+        "rc6Verified": { "const": false },
+        "seamlessInstall": { "const": "unknown" },
+        "failureIsolation": { "const": "unknown" },
+        "hotReload": { "const": "unknown" }
+      }
+    },
+    "reviewedAt": { "type": "string", "format": "date-time" },
+    "reviewer": { "const": "codex-assisted-pre-admission-review" }
+  }
+}

@@ -53,8 +53,10 @@ const globalInputs = new Set([
   'automation-policy.json',
   'scripts/typed-harness-lib.mjs',
   'scripts/automation-policy-lib.mjs',
+  'scripts/harness-adapters.mjs',
+  'scripts/loader-adapter-lib.mjs',
 ])
-const globalChanged = newHistory || changedPaths.some((path) => globalInputs.has(path))
+const globalChanged = newHistory || changedPaths.some((path) => globalInputs.has(path) || path.startsWith('scripts/loader-adapters/'))
 let currentRecords = await readCurrentRecords()
 let previousRecords = []
 if (!globalChanged) {

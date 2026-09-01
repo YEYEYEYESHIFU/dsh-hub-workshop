@@ -101,3 +101,10 @@ export function buildAutomationPlan(records, baseline, policy, loaderRegistry, r
     }
   }
 }
+
+export function automationPlanExitCode(plan, { explicitSingleRelease = false } = {}) {
+  if (!plan || !Array.isArray(plan.jobs) || !Array.isArray(plan.blocked)) return 2
+  if (plan.blocked.length === 0) return 0
+  if (explicitSingleRelease || plan.jobs.length === 0) return 2
+  return 0
+}

@@ -2,6 +2,11 @@
 
 import { readFile, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
+import {
+  COMMUNITY_PLUGIN_CREATED_AT_CUTOFF,
+  OFFICIAL_REPOSITORY_OWNERS,
+} from './topic-admission-policy.mjs'
+import { buildCatalogPresentation } from './catalog-presentation-lib.mjs'
 
 const ROOT = resolve(import.meta.dirname, '..')
 const oldCatalogPath = process.argv[2]
@@ -100,6 +105,7 @@ function topicEntry(repository) {
       source: 'github-topic',
       topic: 'dsh-plugin',
       stars: repository.stargazers_count,
+      createdAt: repository.created_at,
       commitUpdatedAt: repository.pushed_at || repository.updated_at,
       metadataUpdatedAt: repository.updated_at,
       archived: repository.archived,
@@ -119,6 +125,7 @@ function migratedOldEntry(oldEntry, repository) {
         source: 'github-topic-reviewed',
         topic: 'dsh-plugin',
         stars: repository.stargazers_count,
+        createdAt: repository.created_at,
         commitUpdatedAt: repository.pushed_at || repository.updated_at,
         metadataUpdatedAt: repository.updated_at,
         archived: repository.archived,
@@ -158,6 +165,7 @@ function migratedOldEntry(oldEntry, repository) {
       topic: 'dsh-plugin',
       archivedCatalogId: oldEntry.id,
       stars: repository.stargazers_count,
+      createdAt: repository.created_at,
       commitUpdatedAt: repository.pushed_at || repository.updated_at,
       metadataUpdatedAt: repository.updated_at,
       archived: repository.archived,
@@ -194,18 +202,22 @@ for (const entry of reviewedPackages) {
 
 const countBy = (field) => Object.fromEntries([...new Set(packages.map((entry) => entry[field]))].sort().map((value) => [value, packages.filter((entry) => entry[field] === value).length]))
 const installMethods = Object.fromEntries([...new Set(packages.map((entry) => entry.install.type))].sort().map((value) => [value, packages.filter((entry) => entry.install.type === value).length]))
+const presentationGroups = existingCatalog.presentationGroups || []
+const presentation = buildCatalogPresentation({ packages, presentationGroups })
 const catalog = {
   schema: 'dsh-hub-index/v0.4',
   hub: 'github:omdsh-dev/dsh-hub-workshop',
   updated: new Date().toISOString(),
   policy: {
     discovery: 'The dsh-plugin Topic is only a candidate source. Catalog inclusion requires file-level evidence of a DSH plugin contract or a manually verified plugin subproject.',
+    creation: `Community plugin repositories must be created at or after ${COMMUNITY_PLUGIN_CREATED_AT_CUTOFF}; official owner exemptions are explicit and identity-based.`,
     exclusions: 'Core products, ecosystem infrastructure, distributions, awesome lists, documentation, templates, standalone applications, placeholders, unavailable private sources, and Topic-only repositories are excluded.',
     archive: 'Detailed legacy records are restored only when they map to a currently qualified plugin repository.',
     authority: 'Plugin qualification and archive mapping do not grant Registry installation authority.',
   },
   stats: {
     packages: packages.length,
+    listings: presentation.listings.length,
     repositories: representedRepositories.size,
     observedTopicRepositories: topicCount,
     qualifiedRepositories: topicAudit.stats.decisions.include,
@@ -217,6 +229,7 @@ const catalog = {
     kinds: countBy('kind'),
     installMethods,
   },
+  presentationGroups,
   packages,
   plugins: [],
   distros: [],
@@ -229,6 +242,13 @@ const topicSnapshot = {
   source: 'https://github.com/search?q=topic%3Adsh-plugin&type=repositories',
   observedRepositoryCount: topicCount,
   status: 'discovery-only',
+  collection: {
+    method: 'captured-github-search-pages',
+    pluginCreationPolicy: {
+      communityCreatedAtCutoff: COMMUNITY_PLUGIN_CREATED_AT_CUTOFF,
+      officialOwnerExemptions: OFFICIAL_REPOSITORY_OWNERS,
+    },
+  },
   repositories: topicRepositories.map((repository) => ({
     owner: repository.owner.login,
     name: repository.name,
@@ -236,6 +256,7 @@ const topicSnapshot = {
     description: sanitizePublicText(repository.description || ''),
     language: repository.language,
     topics: publicTopics(repository),
+    createdAt: repository.created_at,
     commitUpdatedAt: repository.pushed_at || repository.updated_at,
     metadataUpdatedAt: repository.updated_at,
     stars: repository.stargazers_count,

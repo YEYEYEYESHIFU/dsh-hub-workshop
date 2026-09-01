@@ -212,6 +212,12 @@ description: 当用户要求整理会话时，生成带结论、证据和后续�
     },
     &quot;lifecycle&quot;: { &quot;activation&quot;: &quot;restart-profile&quot;, &quot;dispose&quot;: &quot;supported&quot; },
     &quot;permissions&quot;: [&quot;filesystem:read&quot;],
+    &quot;capability&quot;: {
+      &quot;id&quot;: &quot;project-route-ready&quot;,
+      &quot;kind&quot;: &quot;service&quot;,
+      &quot;invocation&quot;: &quot;启动 candidate Profile 并请求项目路由&quot;,
+      &quot;expected&quot;: &quot;路由返回可重复判断的成功响应&quot;
+    },
     &quot;evidence&quot;: {
       &quot;install&quot;: &quot;docs/verification/install.md&quot;,
       &quot;failureIsolation&quot;: &quot;docs/verification/failure-isolation.md&quot;,
@@ -220,7 +226,12 @@ description: 当用户要求整理会话时，生成带结论、证据和后续�
     }
   }
 }</code></pre>
-<p><code>transactional</code> 表示候选安装、确认应用和代际恢复；<code>isolated-trial</code> 表示失败时只丢弃 candidate 或独立进程，不触碰线上 current；<code>guided</code> 只提供接入说明。<code>hot-reload</code> 必须同时声明 <code>dispose=supported</code>，但声明仍须经过 dispose、重新激活和真实能力调用测试。</p>
+<p><code>transactional</code> 表示候选安装、确认应用和代际恢复；<code>isolated-trial</code> 表示失败时只丢弃 candidate 或独立进程，不触碰线上 current；<code>guided</code> 只提供接入说明。Profile、Repository Plugin、Cordis 与 MCP 必须声明一个具体 <code>capability</code> 测试目标；Skill 和纯第三方说明不得声明运行时能力。<code>hot-reload</code> 必须同时声明 <code>dispose=supported</code>，但声明仍须经过 dispose、重新激活和真实能力调用测试。</p>
+<h2>生成分类型测试计划</h2>
+<p>维护者对 v2 submission 运行 <code>npm run harness:plan -- submission.json</code>，生成符合 <a href="harness-plan.schema.json"><code>omdsh-workshop-harness-plan/v1</code></a> 的只读计划。计划按 Profile Bundle、Repository Plugin、MCP、Cordis、Skill 或第三方协议选择不同步骤；生成计划不会执行投稿代码。</p>
+<p>实际执行只能由显式受信任的 adapter 在临时工作区中完成，默认禁网、禁用 install scripts，并在受控激活前把 current Profile 视为只读。计划会固定 <code>capability</code> 断言；adapter 报告的 ID、类型、调用方式和预期必须逐项一致，并另外提供实际观察值。执行报告遵循 <a href="harness-report.schema.json"><code>omdsh-workshop-harness-report/v1</code></a>；只有固定来源、预期事实、能力绑定、故障隔离和清理全部通过，才能转换为 <code>omdsh-workshop-intake-evidence/v2</code>。Repository Plugin 在当前公共契约不可用时会在执行前阻断；MCP 协议测试仍保持 Catalog-only，不会获得 DSH Registry 权限。</p>
+<p>维护者可分别运行 <code>npm run harness:skill</code>、<code>npm run harness:mcp</code> 和 <code>npm run harness:profile</code>，或用 <code>npm run harness:verify</code> 按顺序回归仓库内夹具。这些夹具报告不能替代真实投稿证据；真实模式会自行核对 Git <code>origin</code>、HEAD、投稿子路径和干净工作树。Profile adapter 使用真实 RC.6 CLI 验证 candidate、能力调用、故障丢弃、代际切换、同 PID 热重载、升级、禁用、移除和 previous 恢复；MCP adapter 使用 <code>server/discover → tools/list → tools/call</code> 并注入子进程崩溃；Skill adapter 永不执行 Skill，只做 frontmatter、引用、路径与危险命令静态检查。</p>
+<p>当前隔离执行器要求 macOS <code>sandbox-exec</code>，并在运行前证明工作区外写入与网络 socket 均被拒绝。没有等价强制隔离器的平台必须失败关闭，不能退化为无沙箱执行。</p>
 <h2>编写 MCP</h2>
 <p>MCP 继续遵循 MCP 自己的协议和进程边界，DSH Hub Workshop 不发明另一套 MCP SDK。当前对齐协议为 <code>2026-07-28</code>；该版本按请求携带协议版本，<code>2025-11-25</code> 及更早属于 <code>initialize</code> 会话式旧协议。投稿必须复用官方 <code>server.json</code>（当前 Registry schema <code>2025-12-11</code>），npm 包的 <code>package.json#mcpName</code> 必须与 <code>server.json#name</code> 一致。</p>
 <ul>
@@ -269,9 +280,10 @@ description: 当用户要求整理会话时，生成带结论、证据和后续�
 <p><a data-localized-anchor="community-distributions"></a></p>
 <h2>发布社区整合包</h2>
 <p>整合包类似 Minecraft Modpack：它不是新 Loader，而是一个有版本、用途、文档、兼容范围和更新通道的长期组合。Oh My DSH 是社区维护的旗舰整合包；DSH Hub 是允许不同维护者发布许多整合包的中立平台。</p>
-<p>在 <a href="publish.html?type=distribution">Author Studio</a> 选择“整合包 / 发行版”，只需填写双语名称和用途，并从已通过收录门禁的事务型 Profile Bundle Release 中选择组件。Studio 会生成严格的 <code>omdsh-distribution/v1</code> 纯数据 manifest；作者把它提交到自己的 GitHub 仓库，再用 40 位固定 commit 和相对 JSON 路径发起<a href="https://github.com/omdsh-dev/dsh-hub-workshop/issues/new?template=distribution-submission.yml">整合包收录申请</a>。</p>
+<p>在 <a href="publish.html?type=distribution">Author Studio</a> 选择“整合包 / 发行版”后，默认只需名称、ID、版本和官方预设。可以从 Registry 选择固定 Release，也可以填入自己插件的 npm 包名、SPDX 许可证、公开 GitHub 仓库和 40 位完整 commit。Studio 会逐项列出许可证、声明来源和人工核对提醒，并生成可立即交给 OMDSH CLI 锁定和试跑的 <code>omdsh-pack-source/v1</code> 本地实验清单。</p>
+<p>需要公开发行时再切换到“可信公开发行”并补齐双语名称、用途、兼容范围和维护仓库。公开 <code>omdsh-distribution/v1</code> 只能引用已通过准入的事务型 Profile Bundle Release；自有源码插件必须先单独完成 Registry 准入，不能借整合包绕过。作者把纯数据 manifest 提交到自己的 GitHub 仓库，再用 40 位固定 commit 和相对 JSON 路径发起<a href="https://github.com/omdsh-dev/dsh-hub-workshop/issues/new?template=distribution-submission.yml">整合包收录申请</a>。</p>
 <p>现有收录流水线只读取该固定 commit 下的一份、最大 64 KiB 的 JSON，并检查所有 Project/Release 是否真实存在、处于 active 且已经 auto-listed 或 reviewed，并支持单 candidate 事务应用；<code>review-required</code> 与 <code>blocked</code> 仍会失败关闭。它不扫描或执行投稿仓库代码。验证通过后只生成一个草稿 Recipe 候选 PR，由维护者审阅，不自动合并。</p>
-<p>整合包本身不会获得新的 Registry 权限，也不能携带安装命令、包 spec、脚本、Token、本机路径或任意配置。每个组件保留自身 Release 的审核、风险和安装能力。当前 Recipe v1 只投影该发行版的当前版本，历史版本继续由维护仓库保存；应用仍走“用户审阅差异 → OMDSH candidate → 官方 Profile/Bundle 校验 → 用户确认切换”。</p>
+<p>整合包本身不会获得新的 Registry 权限，也不能携带浮动分支、脚本、Token、本机路径或任意配置。本地实验包仅允许固定源码 spec，且应用前必须显式信任；每个组件仍保留自身 Release 的审核、风险、许可证和安装能力。许可证清单是可追溯事实，不替作者作法律兼容性结论。当前 Recipe v1 只投影该发行版的当前版本，历史版本继续由维护仓库保存；应用仍走“用户审阅差异 → OMDSH candidate → 官方 Profile/Bundle 校验 → 用户确认切换”。</p>
 <p>如果只是分享一个固定列表而不准备长期维护品牌、兼容性和升级，请使用合集；如果要分享一个独立能力，请发布项目。</p>
 <h2>市场准入标准</h2>
 <h3>最低准入：允许被发现</h3>
@@ -600,6 +612,12 @@ description: Produce a structured summary with conclusions, evidence, and next a
     },
     &quot;lifecycle&quot;: { &quot;activation&quot;: &quot;restart-profile&quot;, &quot;dispose&quot;: &quot;supported&quot; },
     &quot;permissions&quot;: [&quot;filesystem:read&quot;],
+    &quot;capability&quot;: {
+      &quot;id&quot;: &quot;project-route-ready&quot;,
+      &quot;kind&quot;: &quot;service&quot;,
+      &quot;invocation&quot;: &quot;boot the candidate Profile and request the project route&quot;,
+      &quot;expected&quot;: &quot;the route returns a deterministic success response&quot;
+    },
     &quot;evidence&quot;: {
       &quot;install&quot;: &quot;docs/verification/install.md&quot;,
       &quot;failureIsolation&quot;: &quot;docs/verification/failure-isolation.md&quot;,
@@ -608,7 +626,12 @@ description: Produce a structured summary with conclusions, evidence, and next a
     }
   }
 }</code></pre>
-<p><code>transactional</code> means candidate install, confirmed activation, and generation recovery. <code>isolated-trial</code> discards only the candidate or isolated process on failure without touching current. <code>guided</code> exposes instructions only. <code>hot-reload</code> requires <code>dispose=supported</code> and still needs dispose, reactivation, and real-capability tests.</p>
+<p><code>transactional</code> means candidate install, confirmed activation, and generation recovery. <code>isolated-trial</code> discards only the candidate or isolated process on failure without touching current. <code>guided</code> exposes instructions only. Profile, Repository Plugin, Cordis, and MCP declarations name one concrete <code>capability</code> target; Skill and static third-party guidance cannot claim a runtime target. <code>hot-reload</code> requires <code>dispose=supported</code> and still needs dispose, reactivation, and real-capability tests.</p>
+<h2>Generate a typed test plan</h2>
+<p>Maintainers run <code>npm run harness:plan -- submission.json</code> for a v2 submission to generate a read-only <a href="harness-plan.schema.json"><code>omdsh-workshop-harness-plan/v1</code></a>. The plan selects distinct Profile Bundle, Repository Plugin, MCP, Cordis, Skill, or third-party steps and never executes submitted code while planning.</p>
+<p>Execution requires an explicitly trusted adapter in an ephemeral workspace, with network denied by default, install scripts disabled, and current treated as read-only until controlled activation. The plan fixes the <code>capability</code> assertion; the adapter must return the same ID, kind, invocation, and expected observation plus the actual observed value. Results follow <a href="harness-report.schema.json"><code>omdsh-workshop-harness-report/v1</code></a>. Only a fixed source, all expected facts, capability binding, failure isolation, and mandatory cleanup can produce <code>omdsh-workshop-intake-evidence/v2</code>. An unavailable public Repository Plugin contract blocks before execution; independent MCP protocol evidence remains Catalog-only and grants no DSH Registry authority.</p>
+<p>Maintainers can run <code>npm run harness:skill</code>, <code>npm run harness:mcp</code>, and <code>npm run harness:profile</code> separately, or use <code>npm run harness:verify</code> for the repository-owned fixtures in order. Fixture reports never replace evidence for a real submission; real mode independently checks Git <code>origin</code>, HEAD, the submitted subpath, and a clean worktree. The Profile adapter drives the real RC.6 CLI through candidate creation, capability invocation, failure discard, generation switch, same-process hot reload, update, disable, remove, and previous-generation recovery. MCP uses <code>server/discover → tools/list → tools/call</code> and injects a child-process crash. Skill inspection never executes instructions; it statically checks frontmatter, references, paths, and dangerous command text.</p>
+<p>The current isolated executor requires macOS <code>sandbox-exec</code> and proves before execution that outside-workspace writes and network sockets are denied. A platform without an equivalent enforced executor must fail closed rather than run submitted source without a sandbox.</p>
 <h2>Writing an MCP server</h2>
 <p>MCP keeps its own protocol and process boundary; Workshop does not introduce another MCP SDK. The current protocol baseline is <code>2026-07-28</code>, which carries the version per request; <code>2025-11-25</code> and earlier use the legacy <code>initialize</code> session. Submissions reuse the official <code>server.json</code> (current Registry schema <code>2025-12-11</code>), and npm <code>package.json#mcpName</code> must match <code>server.json#name</code>.</p>
 <p>Workshop trial-runs MCP in an isolated process. A disposable process failure is not proof of protocol compatibility. Protocol negotiation, discovery, one real tool/resource call, failure exit, and removal must pass before the corresponding facts become Verified.</p>
@@ -649,9 +672,10 @@ description: Produce a structured summary with conclusions, evidence, and next a
 <p><a data-localized-anchor="community-distributions"></a></p>
 <h2>Publishing a community modpack</h2>
 <p>A modpack works like a Minecraft modpack: it is not a new Loader, but a maintained composition with a version, purpose, documentation, compatibility range, and update channel. Oh My DSH is the community&#39;s flagship distribution; DSH Hub is the neutral platform where many maintainers can publish different modpacks.</p>
-<p>Choose “Modpack / Distribution” in <a href="publish.html?type=distribution">Author Studio</a>, enter bilingual identity and use cases, and select components from transactional Profile Bundle Releases that have passed admission. Studio generates a strict, data-only <code>omdsh-distribution/v1</code> manifest. Commit it to your own GitHub repository, then open a <a href="https://github.com/omdsh-dev/dsh-hub-workshop/issues/new?template=distribution-submission.yml">modpack submission</a> with the full 40-character commit and relative JSON path.</p>
+<p>Choose “Modpack / Distribution” in <a href="publish.html?type=distribution">Author Studio</a>. The default path needs only a name, ID, version, and official preset. Pick pinned Registry Releases or add your own plugin with its npm package name, SPDX license, public GitHub repository, and full 40-character commit. Studio lists every license, declaration source, and review notice, then generates an <code>omdsh-pack-source/v1</code> Local Experimental manifest that the OMDSH CLI can lock and test immediately.</p>
+<p>Switch to “Trusted public release” only when publishing, then add bilingual identity, use cases, compatibility, and maintainer repository. A public <code>omdsh-distribution/v1</code> may reference admitted transactional Profile Bundle Releases only. An author-owned source must pass plugin Registry admission first and cannot use a modpack to bypass that boundary. Commit the data-only manifest to your own GitHub repository, then open a <a href="https://github.com/omdsh-dev/dsh-hub-workshop/issues/new?template=distribution-submission.yml">modpack submission</a> with the full 40-character commit and relative JSON path.</p>
 <p>The existing intake workflow reads only that one JSON file, bounded to 64 KiB, and verifies that every exact Project/Release exists, is active, is either auto-listed or reviewed, and supports single-candidate transactional application. <code>review-required</code> and <code>blocked</code> fail closed. It neither scans nor executes repository code. A valid submission creates one draft Recipe candidate PR for maintainer review and is never auto-merged.</p>
-<p>A modpack gains no new Registry authority and cannot carry install commands, package specs, scripts, tokens, local paths, or arbitrary configuration. Each component keeps the review, risk, and installation capability of its Release. Recipe v1 projects only the current distribution version; history stays in the maintainer repository. Applying still follows “user reviews the diff → OMDSH candidate → official Profile/Bundle validation → user confirms the switch.”</p>
+<p>A modpack gains no new Registry authority and cannot carry floating branches, scripts, tokens, local paths, or arbitrary configuration. A Local Experimental Pack accepts only a fixed source spec and requires explicit trust before apply. Every component keeps its own Release review, risk, license, and installation capability. The license inventory is a traceable fact set, not an automatic legal compatibility verdict. Recipe v1 projects only the current distribution version; history stays in the maintainer repository. Applying still follows “user reviews the diff → OMDSH candidate → official Profile/Bundle validation → user confirms the switch.”</p>
 <p>Use a Collection for a lightweight pinned list without a long-term branding, compatibility, and upgrade commitment. Publish a Project for one independent capability.</p>
 <h2>Marketplace admission</h2>
 <h3>Minimum admission: discovery</h3>
@@ -783,13 +807,9 @@ description: Produce a structured summary with conclusions, evidence, and next a
 
     </main>
     <footer class="site-footer doc-footer">
-      <a class="footer-brand" href="./">DSH Hub Workshop</a>
-      <p data-i18n="footer.notice">DSH Hub Workshop 只做索引，不对插件内容做安全担保。是否信任与安装，请自行核验。</p>
-      <div class="footer-links">
-        <a href="./" data-i18n="nav.catalog">插件</a>
-        <a href="catalog.json">JSON API</a>
-        <a href="https://github.com/omdsh-dev/dsh-hub-workshop">GitHub</a>
-      </div>
+      <div class="footer-summary"><a class="footer-brand" href="./">DSH Hub Workshop</a><p data-i18n="footer.notice">DSH Hub Workshop 只做索引，不对插件内容做安全担保。是否信任与安装，请自行核验。</p></div>
+      <nav class="footer-group" aria-label="站点资源"><strong class="footer-heading">站点资源</strong><div class="footer-links"><a href="./" data-i18n="nav.catalog">插件</a><a href="catalog.json">JSON API</a><a href="https://github.com/omdsh-dev/dsh-hub-workshop">GitHub</a></div></nav>
+      <nav class="footer-group footer-ecosystem" aria-label="生态外链"><strong class="footer-heading">生态外链</strong><a class="footer-external-link" href="https://dshfind.com/" target="_blank" rel="noopener noreferrer"><span><b>dshfind</b><small>DSH 学习与分享社区</small></span><span aria-hidden="true">↗</span></a></nav>
     </footer>
   </body>
 </html>

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { readFile, writeFile } from 'node:fs/promises'
+import { readFile, rename, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 
 import { githubRepository, validateExternalEvidence } from './external-evidence-lib.mjs'
@@ -139,5 +139,8 @@ const output = {
   projects,
 }
 
-await writeFile(resolve(ROOT, 'verification-inventory.json'), `${JSON.stringify(output, null, 2)}\n`)
+const target = resolve(ROOT, 'verification-inventory.json')
+const temporary = `${target}.tmp-${process.pid}`
+await writeFile(temporary, `${JSON.stringify(output, null, 2)}\n`)
+await rename(temporary, target)
 console.log(`built verification inventory: ${projects.length} projects, ${output.summary.verification['current-baseline-passed'] ?? 0} current-baseline verified`)

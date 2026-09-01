@@ -1,0 +1,120 @@
+{
+  "schema": "omdsh-workshop-real-project-review/v1",
+  "id": "code-archaeologist",
+  "releaseId": "code-archaeologist@0.1.0-rc.2",
+  "source": {
+    "repository": "https://github.com/omdsh-dev/toybox",
+    "ref": "86e98729b92db0b9fe901c39e32bca74cf8c0f54",
+    "path": "/plugins/code-archaeologist/.dsh-plugin",
+    "packagePath": "plugins/code-archaeologist/.dsh-plugin/package.json",
+    "publiclyReachable": true,
+    "observedDefaultHead": "86e98729b92db0b9fe901c39e32bca74cf8c0f54",
+    "tree": "36bd74cbc8331e47ce29651f6a3ac4fa1ccc4086"
+  },
+  "catalog": {
+    "version": "0.1.0-rc.2",
+    "license": "MIT",
+    "kind": "skill",
+    "legacyManagement": "guided"
+  },
+  "package": {
+    "name": "code-archaeologist",
+    "version": "0.1.0-rc.2",
+    "license": "MIT",
+    "private": true,
+    "workshopManifest": "valid",
+    "legacySignals": [],
+    "lifecycleScripts": []
+  },
+  "sequence": [
+    {
+      "stage": "fixed-source",
+      "state": "passed",
+      "reason": "Anonymous public Git fetch resolved the exact commit and tree 36bd74cbc8331e47ce29651f6a3ac4fa1ccc4086."
+    },
+    {
+      "stage": "type-plan",
+      "state": "passed",
+      "reason": "A valid author declaration is available for Harness planning."
+    },
+    {
+      "stage": "trust-review",
+      "state": "completed",
+      "reason": "Assisted static review recorded 0 finding(s) without executing source code."
+    },
+    {
+      "stage": "adapter",
+      "state": "blocked",
+      "reason": "Source execution requires a separate explicit human trust decision after a valid type plan."
+    },
+    {
+      "stage": "evidence",
+      "state": "saved",
+      "reason": "Pre-admission review evidence is stored at intake/reviews/code-archaeologist@0.1.0-rc.2.json."
+    },
+    {
+      "stage": "human-review",
+      "state": "pending",
+      "reason": "Independent maintainer review has not been recorded."
+    },
+    {
+      "stage": "admission",
+      "state": "not-created",
+      "reason": "Admission is a separate explicit change after approved review and passing Harness evidence."
+    }
+  ],
+  "typePlan": {
+    "state": "ready",
+    "declaredProtocol": "skill",
+    "declaredAdapter": "skill",
+    "observedLegacyProtocol": null,
+    "observedLegacyAdapter": null,
+    "migrationOptions": [
+      "Declare an integration protocol and adapter in package.json#dshWorkshop."
+    ],
+    "reason": "Author declaration and fixed release facts are sufficient to generate a typed Harness plan."
+  },
+  "trustReview": {
+    "state": "pending-human",
+    "method": "assisted-static-public-source-review",
+    "sourceExecutionAuthorized": false,
+    "checks": {
+      "publicCommit": "passed",
+      "packageJson": "passed",
+      "workshopManifest": "passed",
+      "catalogVersion": "passed",
+      "license": "passed",
+      "artifact": "passed",
+      "credentials": "passed",
+      "symlinkContainment": "passed",
+      "nativeCode": "passed",
+      "lifecycleScripts": "passed",
+      "processExecutionIntent": "passed",
+      "rc6Baseline": "not-applicable"
+    },
+    "findings": []
+  },
+  "adapter": {
+    "state": "blocked",
+    "name": "skill",
+    "reason": "Awaiting a separate explicit human trust decision.",
+    "report": null
+  },
+  "humanReview": {
+    "state": "pending",
+    "reviewer": null,
+    "reason": "The generated assisted review cannot approve its own independent human gate."
+  },
+  "admission": {
+    "state": "not-created",
+    "reason": "No approved human review or passing RC.6 Harness report exists for this fixed release."
+  },
+  "claims": {
+    "rc6Verified": false,
+    "seamlessInstall": "unknown",
+    "failureIsolation": "unknown",
+    "hotReload": "unknown"
+  },
+  "reviewedAt": "2026-08-14T14:59:51.325Z",
+  "reviewer": "codex-assisted-pre-admission-review"
+}

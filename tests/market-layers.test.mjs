@@ -31,9 +31,10 @@ test('dsh-mygo is visible as infrastructure but excluded from plugin installatio
   }
 })
 
-test('genuine ecosystem applications are visible while directories and core repositories stay out of plugin authority', async () => {
-  const layers = await json('market-layers.json')
-  assert.equal(layers.projects.find((entry) => entry.id === 'bruc3van/dsh-desktop')?.layer, 'infrastructure')
-  assert.equal(layers.projects.find((entry) => entry.id === 'jesse-njx/dsh-plugin-manager')?.layer, 'infrastructure')
+test('unverified ecosystem claims stay out of public market layers', async () => {
+  const [layers, audit] = await Promise.all([json('market-layers.json'), json('topic-plugin-audit.json')])
+  assert.equal(layers.projects.some((entry) => entry.id === 'bruc3van/dsh-desktop'), false)
+  assert.equal(layers.projects.some((entry) => entry.id === 'jesse-njx/dsh-plugin-manager'), false)
+  assert.equal(audit.repositories.find((entry) => entry.owner === 'bruc3van' && entry.name === 'dsh-desktop')?.reasonCode, 'infrastructure-needs-source-evidence')
   assert.ok(layers.projects.every((entry) => entry.registry.state === 'ineligible'))
 })

@@ -1,5 +1,6 @@
 const state = {
   packages: [],
+  catalogComponents: new Map(),
   candidates: [],
   projects: new Map(),
   runRecords: [],
@@ -14,7 +15,7 @@ const state = {
   view: 'grid',
   featuredMode: 'stars',
   authorsExpanded: false,
-  marketLayer: 'all',
+  marketLayer: 'plugin',
   scope: 'all',
   snapshot: '',
   visible: 24,
@@ -44,6 +45,10 @@ const elements = {
   scope: document.querySelector('#catalog-scope'),
   marketLayers: document.querySelector('#market-layer-options'),
   marketLayerDescription: document.querySelector('#market-layer-description'),
+  advancedFilter: document.querySelector('#advanced-filter'),
+  activeFilterCount: document.querySelector('#active-filter-count'),
+  filterPanel: document.querySelector('.filter-panel'),
+  ecosystemCount: document.querySelector('[data-ecosystem-count]'),
   featuredTabs: document.querySelector('#featured-tabs'),
   catalogShell: document.querySelector('.catalog-shell'),
   results: document.querySelector('.results-panel'),
@@ -271,11 +276,30 @@ function integrationLabel(pkg) {
     : t('install.guidedCompatibility')
 }
 
+function packageAccessState(pkg) {
+  const state = pkg.workshop?.admission?.state
+  if (state === 'registry-admitted') return 'registry'
+  if (state === 'verification-passed-review-pending') return 'verified-pending'
+  if (state === 'guided-evidence-passed') return 'guided-verified'
+  if (state === 'verification-blocked') return 'blocked'
+  return 'source-only'
+}
+
+function installFilterGroup(pkg) {
+  const access = packageAccessState(pkg)
+  if (['verified-pending', 'blocked'].includes(access)) return 'pending'
+  if (['guided-verified', 'source-only'].includes(access)) return 'guided'
+  return installGroup(pkg.install.type)
+}
+
 function catalogAccessLabel(pkg) {
   if (projectMarketLayer(pkg) !== 'plugin') return marketLayerLabel(projectMarketLayer(pkg))
-  return installGroup(pkg.install.type) === 'guided'
-    ? integrationLabel(pkg)
-    : managementLabel(pkg.install.type)
+  const access = packageAccessState(pkg)
+  if (access === 'registry') return t('access.registry')
+  if (access === 'verified-pending') return t('access.verifiedPending')
+  if (access === 'guided-verified') return t('access.guidedVerified')
+  if (access === 'blocked') return t('access.blocked')
+  return t('access.sourceOnly')
 }
 
 function omdshCommand(pkg) {
@@ -434,6 +458,82 @@ function marketProject(project) {
   }
 }
 
+function catalogPresentation(index) {
+  const components = index.packages || []
+  const groups = index.presentationGroups || []
+  const componentsById = new Map(components.map((component) => [component.id, component]))
+  const membership = new Map()
+  const resolvedGroups = new Map()
+
+  for (const group of groups) {
+    const members = group.componentIds.map((id) => {
+      const component = componentsById.get(id)
+      if (!component) throw new Error(`${group.id}: missing presentation component ${id}`)
+      if (membership.has(id)) throw new Error(`${id}: duplicate presentation group membership`)
+      membership.set(id, group.id)
+      return component
+    })
+    const repositories = new Set(members.map((component) => component.repository))
+    const refs = new Set(members.map((component) => component.ref))
+    if (members.length < 2 || repositories.size !== 1 || refs.size !== 1) {
+      throw new Error(`${group.id}: invalid presentation group`)
+    }
+    const base = members[0]
+    const componentCounts = Object.fromEntries([...new Set(members.map((component) => component.kind))]
+      .sort()
+      .map((kind) => [kind, members.filter((component) => component.kind === kind).length]))
+    resolvedGroups.set(group.id, {
+      ...base,
+      ...group,
+      repositoryPath: group.repositoryPath || '',
+      version: group.version || (members.every((component) => component.version === base.version) ? base.version : undefined),
+      license: group.license || (members.every((component) => component.license === base.license) ? base.license : t('factValue.unknown')),
+      status: group.status || (members.every((component) => component.status === base.status) ? base.status : 'prototype'),
+      featured: group.featured ?? members.some((component) => component.featured),
+      install: {
+        ...base.install,
+        label: group.installLabel || t('market.viewSource'),
+        source: base.repository,
+        command: base.repository,
+        note: group.installNote,
+      },
+      workshop: {
+        manifest: {
+          status: members.every((component) => component.workshop?.manifest?.status === 'valid') ? 'valid' : 'legacy-evidence',
+          source: `${members.length} component manifests`,
+          schema: 'omdsh-workshop-package/v1',
+        },
+        install: {
+          mode: 'guided',
+          adapter: 'third-party',
+          seamless: { state: 'unsupported', reason: 'presentation-group-is-not-an-install-unit' },
+          failureIsolation: { state: 'unknown', policy: 'manual', reason: 'verified-per-component' },
+        },
+        lifecycle: { hotReload: { state: 'unknown', activation: 'unknown', reason: 'verified-per-component' } },
+        integration: { protocol: 'third-party', artifact: `${members.length} independently reviewed components`, mcp: null },
+        admission: { route: 'package-json-manifest', state: 'manifest-ready-for-tests' },
+      },
+      presentationGroup: {
+        componentIds: members.map((component) => component.id),
+        componentCounts,
+        components: members,
+      },
+    })
+  }
+
+  const emitted = new Set()
+  const listings = []
+  for (const component of components) {
+    const groupId = membership.get(component.id)
+    if (!groupId) listings.push(component)
+    else if (!emitted.has(groupId)) {
+      listings.push(resolvedGroups.get(groupId))
+      emitted.add(groupId)
+    }
+  }
+  return { components, listings }
+}
+
 function factValue(value) {
   const key = `factValue.${String(value)}`
   const translated = t(key)
@@ -472,6 +572,28 @@ function capabilityMatrix(pkg) {
       <article class="state-${escapeHtml(hotReload.state)}"><span>${escapeHtml(t('project.hotReload'))}</span><strong>${escapeHtml(factValue(hotReload.state))}</strong><small>${escapeHtml(factValue(hotReload.activation))}</small></article>
       <article><span>${escapeHtml(t('project.integrationProtocol'))}</span><strong>${escapeHtml(factValue(capabilities.integration.protocol))}</strong><small>${escapeHtml(mcpVersion ? `MCP ${mcpVersion}` : capabilities.integration.artifact)}</small></article>
       <article class="state-${escapeHtml(capabilities.manifest.status === 'valid' ? 'declared' : 'unknown')}"><span>${escapeHtml(t('project.communityAdmission'))}</span><strong>${escapeHtml(factValue(capabilities.admission.state))}</strong><small>${escapeHtml(factValue(capabilities.admission.route))}</small></article>
+    </div>
+  </section>`
+}
+
+function presentationGroupSection(pkg) {
+  const group = pkg.presentationGroup
+  if (!group) return ''
+  const counts = Object.entries(group.componentCounts)
+    .map(([kind, count]) => formatText('project.componentKindCount', { count, kind: kindLabel(kind) }))
+    .join(' · ')
+  return `<section class="suite-components">
+    <div class="suite-components-heading">
+      <div><span>${escapeHtml(t('project.components'))}</span><strong>${escapeHtml(formatText('project.componentCount', { count: group.components.length }))}</strong></div>
+      <p>${escapeHtml(t('project.componentsBoundary'))}</p>
+    </div>
+    <div class="suite-component-counts">${escapeHtml(counts)}</div>
+    <div class="suite-component-grid">
+      ${group.components.map((component) => `<button type="button" class="suite-component" data-open-package="${escapeHtml(component.id)}">
+        <span class="suite-component-symbol" aria-hidden="true">${escapeHtml(projectKindSymbols[component.kind] || '◇')}</span>
+        <span><strong>${escapeHtml(packageText(component).name)}</strong><small>${escapeHtml(kindLabel(component.kind))} · ${escapeHtml(component.repositoryPath)}</small></span>
+        <span class="suite-component-state">${escapeHtml(factValue(component.workshop?.admission?.state || 'needs-package-manifest'))}</span>
+      </button>`).join('')}
     </div>
   </section>`
 }
@@ -571,6 +693,8 @@ function searchTokens(value) {
 
 function searchableText(pkg) {
   const translated = window.DSHHub.i18n?.packages?.[pkg.id] || {}
+  const componentText = (pkg.presentationGroup?.components || [])
+    .flatMap((component) => [component.id, component.name, component.description, component.kind, ...(component.tags || [])])
   return normalizeSearch([
     pkg.id,
     pkg.name,
@@ -585,6 +709,7 @@ function searchableText(pkg) {
     kindLabel(pkg.kind),
     pkg.category ? categoryLabel(pkg.category) : '',
     ...pkg.tags,
+    ...componentText,
   ].filter(Boolean).join(' '))
 }
 
@@ -608,8 +733,10 @@ function filteredPackages() {
       if (!query.every((token) => text.includes(token))) return false
     }
     if (state.category !== 'all' && pkg.category !== state.category) return false
-    if (state.kind !== 'all' && pkg.kind !== state.kind) return false
-    if (state.install !== 'all' && installGroup(pkg.install.type) !== state.install) return false
+    if (state.kind !== 'all'
+      && pkg.kind !== state.kind
+      && !(pkg.presentationGroup?.components || []).some((component) => component.kind === state.kind)) return false
+    if (state.install !== 'all' && installFilterGroup(pkg) !== state.install) return false
     if (state.channel !== 'all' && releaseChannel(pkg) !== state.channel) return false
     return true
   })
@@ -630,9 +757,12 @@ function packageCard(pkg) {
   const visual = projectVisual(pkg, visualFormat)
   const version = pkg.version ? `v${pkg.version}` : pkg.ref.slice(0, 7)
   const { release } = projectRelease(pkg)
-  const guided = installGroup(pkg.install.type) === 'guided'
+  const access = packageAccessState(pkg)
+  const guided = access === 'guided-verified'
+  const verifiedPending = access === 'verified-pending'
+  const sourceOnly = access === 'source-only'
   const informational = projectMarketLayer(pkg) !== 'plugin'
-  const installBlocked = !guided && ['blocked', 'review-required'].includes(release?.listing?.state)
+  const installBlocked = access === 'blocked'
   return `
     <article class="package-card market-layer-${escapeHtml(projectMarketLayer(pkg))}">
       <button class="package-thumb project-visual mark-${escapeHtml(pkg.category || 'uncategorized')}" type="button" data-media-state="${visual.state}" data-visual-format="${visualFormat}" data-open-package="${escapeHtml(pkg.id)}" aria-label="${escapeHtml(formatText('row.open', { name: copy.name }))}">
@@ -663,7 +793,9 @@ function packageCard(pkg) {
           <span>${escapeHtml(t('row.compatibility'))}</span>
           <strong title="${escapeHtml(copy.compatibility)}">${escapeHtml(copy.compatibility)}</strong>
         </div>
-        ${projectMarketLayer(pkg) === 'plugin' ? `<div class="package-capability-strip">
+        ${projectMarketLayer(pkg) === 'plugin' ? pkg.presentationGroup ? `<div class="package-component-summary">
+          ${Object.entries(pkg.presentationGroup.componentCounts).map(([kind, count]) => `<span><strong>${escapeHtml(count)}</strong><small>${escapeHtml(kindLabel(kind))}</small></span>`).join('')}
+        </div>` : `<div class="package-capability-strip">
           ${capabilityChip(t('project.seamlessInstall'), workshopCapabilities(pkg).install.seamless)}
           ${capabilityChip(t('project.failureIsolation'), workshopCapabilities(pkg).install.failureIsolation)}
           ${capabilityChip(t('project.hotReload'), workshopCapabilities(pkg).lifecycle.hotReload)}
@@ -676,9 +808,15 @@ function packageCard(pkg) {
             <code>${escapeHtml(t('market.informationalOnly'))}</code>
           </span>
           <span class="copy-label">↗</span>
-        </a>` : installBlocked ? `<div class="install-preview install-preview-blocked"><span><strong>${escapeHtml(t('project.installUnavailable'))}</strong><code>${escapeHtml(factValue(release?.listing?.state || 'blocked'))}</code></span></div>` : guided ? `<a class="install-preview" href="${escapeHtml(detailUrl(pkg))}">
+        </a>` : installBlocked ? `<div class="install-preview install-preview-blocked"><span><strong>${escapeHtml(t('project.installUnavailable'))}</strong><code>${escapeHtml(t('access.blocked'))}</code></span></div>` : verifiedPending ? `<div class="install-preview install-preview-blocked"><span><strong>${escapeHtml(t('install.awaitingApproval'))}</strong><code>${escapeHtml(t('access.verifiedPending'))}</code></span></div>` : guided ? `<a class="install-preview" href="${escapeHtml(detailUrl(pkg))}">
           <span>
-            <strong>${escapeHtml(omdshActionLabel(pkg))}</strong>
+            <strong>${escapeHtml(t('install.viewVerifiedGuide'))}</strong>
+            <code>${escapeHtml(pkg.repository.replace('https://github.com/', ''))}</code>
+          </span>
+          <span class="copy-label">↗</span>
+        </a>` : sourceOnly ? `<a class="install-preview" href="${escapeHtml(detailUrl(pkg))}">
+          <span>
+            <strong>${escapeHtml(t('install.viewSourceOnly'))}</strong>
             <code>${escapeHtml(pkg.repository.replace('https://github.com/', ''))}</code>
           </span>
           <span class="copy-label">↗</span>
@@ -887,6 +1025,18 @@ function renderMarketLayers() {
   if (elements.scope) {
     elements.scope.hidden = !['all', 'plugin'].includes(state.marketLayer)
   }
+  if (elements.ecosystemCount) {
+    elements.ecosystemCount.textContent = String(counts.infrastructure + counts.distribution)
+  }
+}
+
+function renderAdvancedFilterState() {
+  if (!elements.activeFilterCount) return
+  const count = [state.install, state.channel, state.category]
+    .filter((value) => value !== 'all').length
+  elements.activeFilterCount.textContent = String(count)
+  elements.activeFilterCount.hidden = count === 0
+  elements.advancedFilter?.classList.toggle('has-active-filters', count > 0)
 }
 
 function render() {
@@ -904,6 +1054,7 @@ function render() {
   elements.pagination.hidden = packages.length === 0
   elements.loadMore.hidden = visiblePackages.length >= packages.length
   renderMarketLayers()
+  renderAdvancedFilterState()
   refreshMasonryLayout()
 
   document.querySelectorAll('.category-filter').forEach((button) => {
@@ -1045,7 +1196,7 @@ function renderWorkshopModes() {
   const modes = ['transactional', 'managed', 'guided']
   const counts = Object.fromEntries(modes.map((mode) => [
     mode,
-    state.packages.filter((pkg) => installGroup(pkg.install.type) === mode).length,
+    state.packages.filter((pkg) => installFilterGroup(pkg) === mode).length,
   ]))
   elements.workshopModes.innerHTML = modes.map((mode) => `
     <button class="workshop-mode mode-${escapeHtml(mode)}" type="button" data-install-view="${escapeHtml(mode)}" aria-pressed="${state.install === mode}">
@@ -1358,7 +1509,7 @@ function openMarketProject(pkg, updateHash = true, requestedTab = 'overview') {
 }
 
 function openPackage(id, updateHash = true, requestedTab = 'overview') {
-  const pkg = state.packages.find((candidate) => candidate.id === id)
+  const pkg = state.packages.find((candidate) => candidate.id === id) || state.catalogComponents.get(id)
   if (!pkg) return
   if (projectMarketLayer(pkg) !== 'plugin') {
     openMarketProject(pkg, updateHash, requestedTab)
@@ -1368,13 +1519,19 @@ function openPackage(id, updateHash = true, requestedTab = 'overview') {
   const { project, release } = projectRelease(pkg)
   const version = release?.version ? `v${release.version}` : pkg.ref.slice(0, 7)
   const boundary = managementBoundary(pkg.install.type)
-  const guided = installGroup(pkg.install.type) === 'guided'
-  const installBlocked = !guided && ['blocked', 'review-required'].includes(release?.listing?.state)
+  const access = packageAccessState(pkg)
+  const guided = access === 'guided-verified'
+  const verifiedPending = access === 'verified-pending'
+  const sourceOnly = access === 'source-only'
+  const installBlocked = access === 'blocked'
   const detailVisual = projectVisual(pkg, 'cover', { decorative: false })
   const media = projectMedia(pkg)
-  const runRecords = state.runRecords.filter((record) => record.projectId === pkg.id && record.releaseId === release?.id)
+  const evidenceProjectIds = new Set(pkg.presentationGroup?.componentIds || [pkg.id])
+  const runRecords = state.runRecords.filter((record) => evidenceProjectIds.has(record.projectId)
+    && (pkg.presentationGroup || record.releaseId === release?.id))
   const hasReproduction = runRecords.some((record) => record.reproduces !== null)
-  const releaseCollections = state.collections.filter((collection) => collection.items.some((item) => item.projectId === pkg.id && item.releaseId === release?.id))
+  const releaseCollections = state.collections.filter((collection) => collection.items.some((item) => evidenceProjectIds.has(item.projectId)
+    && (pkg.presentationGroup || item.releaseId === release?.id)))
   const insight = ecosystemInsight(release, runRecords, releaseCollections)
   const returnAuthorUrl = elements.dialog.dataset.authorUrl || elements.dialog.dataset.returnAuthorUrl || ''
   elements.dialog.dataset.packageId = id
@@ -1402,15 +1559,17 @@ function openPackage(id, updateHash = true, requestedTab = 'overview') {
       </nav>
       <section class="project-panel" role="tabpanel" data-project-panel="overview">
         <p class="dialog-description">${escapeHtml(copy.description)}</p>
+        ${presentationGroupSection(pkg)}
         ${media?.screenshots?.length > 0 ? `<div class="project-gallery">${media.screenshots.map((asset, index) => `<img src="${escapeHtml(asset.url)}" alt="${escapeHtml(`${copy.name} ${t('project.screenshot')} ${index + 1}`)}" loading="lazy" decoding="async" data-project-media>`).join('')}</div>` : ''}
         ${project?.lifecycle?.state && project.lifecycle.state !== 'active' ? `<section class="project-lifecycle"><strong>${escapeHtml(factValue(project.lifecycle.state))}</strong><p>${escapeHtml(project.lifecycle.notice || t('project.lifecycleNotice'))}</p>${project.lifecycle.successor ? `<button type="button" data-open-package="${escapeHtml(project.lifecycle.successor)}">${escapeHtml(t('project.openSuccessor'))}</button>` : ''}</section>` : ''}
         <dl class="dialog-facts">
           <div><dt>${escapeHtml(t('dialog.author'))}</dt><dd>${authorLink(pkg.author)}</dd></div>
           <div><dt>${escapeHtml(t('dialog.version'))}</dt><dd>${escapeHtml(version)}</dd></div>
           <div><dt>${escapeHtml(t('dialog.license'))}</dt><dd>${escapeHtml(release?.license || pkg.license)}</dd></div>
+          ${pkg.discovery?.createdAt ? `<div><dt>${escapeHtml(t('project.created'))}</dt><dd>${escapeHtml(formatDate(pkg.discovery.createdAt, 'long'))}</dd></div>` : ''}
           <div><dt>${escapeHtml(t('project.updated'))}</dt><dd>${escapeHtml(formatDate(release?.updatedAt || pkg.updatedAt, 'long'))}</dd></div>
         </dl>
-        ${capabilityMatrix(pkg)}
+        ${pkg.presentationGroup ? '' : capabilityMatrix(pkg)}
         <section class="management-boundary boundary-${escapeHtml(boundary.group)}">
           <span class="management-boundary-label">${escapeHtml(managementLabel(pkg.install.type))}</span>
           <div>
@@ -1418,13 +1577,21 @@ function openPackage(id, updateHash = true, requestedTab = 'overview') {
             <p>${escapeHtml(boundary.description)}</p>
           </div>
         </section>
-        ${installBlocked ? `<section class="install-panel install-unavailable"><div class="install-heading"><h3>${escapeHtml(t('project.installUnavailable'))}</h3><span>${escapeHtml(factValue(release?.listing?.state || 'blocked'))}</span></div><p>${escapeHtml(release?.notice || t('project.installUnavailableDescription'))}</p></section>` : guided ? `<section class="install-panel">
+        ${installBlocked ? `<section class="install-panel install-unavailable"><div class="install-heading"><h3>${escapeHtml(t('project.installUnavailable'))}</h3><span>${escapeHtml(t('access.blocked'))}</span></div><p>${escapeHtml(pkg.install.note || release?.notice || t('project.installUnavailableDescription'))}</p></section>` : verifiedPending ? `<section class="install-panel install-unavailable">
+          <div class="install-heading"><h3>${escapeHtml(t('install.awaitingApproval'))}</h3><span>${escapeHtml(t('access.verifiedPending'))}</span></div>
+          <p>${escapeHtml(pkg.install.note || t('install.awaitingApprovalNote'))}</p>
+          <a class="secondary-action" href="${escapeHtml(detailUrl(pkg))}">${escapeHtml(t('dialog.viewSource'))} ↗</a>
+        </section>` : guided ? `<section class="install-panel">
           <div class="install-heading">
-            <h3>${escapeHtml(omdshActionLabel(pkg))}</h3>
+            <h3>${escapeHtml(t('install.viewVerifiedGuide'))}</h3>
             <span>${escapeHtml(integrationRequirement(pkg))}</span>
           </div>
           <p class="install-note">${escapeHtml(pkg.install.note || omdshInstallNote(pkg))}</p>
           <a class="primary-action" href="${escapeHtml(detailUrl(pkg))}">${escapeHtml(t('row.source'))} ↗</a>
+        </section>` : sourceOnly ? `<section class="install-panel">
+          <div class="install-heading"><h3>${escapeHtml(t('install.viewSourceOnly'))}</h3><span>${escapeHtml(t('access.sourceOnly'))}</span></div>
+          <p class="install-note">${escapeHtml(pkg.install.note || t('install.note.guided'))}</p>
+          <a class="primary-action" href="${escapeHtml(detailUrl(pkg))}">${escapeHtml(t('dialog.viewSource'))} ↗</a>
         </section>` : `<section class="install-panel">
           <div class="install-heading">
             <h3>${escapeHtml(omdshActionLabel(pkg))}</h3>
@@ -1534,11 +1701,11 @@ function openPackage(id, updateHash = true, requestedTab = 'overview') {
 
       <section class="project-panel" role="tabpanel" data-project-panel="discussions" hidden>
         <div class="project-panel-heading">
-          <div><span>${escapeHtml(t('project.discussions'))}</span><strong>${escapeHtml((state.community.discussions || []).filter((item) => item.projectId === pkg.id).length)}</strong></div>
+          <div><span>${escapeHtml(t('project.discussions'))}</span><strong>${escapeHtml((state.community.discussions || []).filter((item) => evidenceProjectIds.has(item.projectId)).length)}</strong></div>
           <p>${escapeHtml(t('project.discussionsBoundary'))}</p>
         </div>
         <div class="project-discussions">
-          ${(state.community.discussions || []).filter((item) => item.projectId === pkg.id).map(discussionRow).join('') || `<div class="community-empty"><strong>${escapeHtml(t('project.noDiscussionsTitle'))}</strong><p>${escapeHtml(t('project.noDiscussionsDescription'))}</p></div>`}
+          ${(state.community.discussions || []).filter((item) => evidenceProjectIds.has(item.projectId)).map(discussionRow).join('') || `<div class="community-empty"><strong>${escapeHtml(t('project.noDiscussionsTitle'))}</strong><p>${escapeHtml(t('project.noDiscussionsDescription'))}</p></div>`}
         </div>
         <a class="secondary-action discussion-external" href="${escapeHtml(project?.links?.discussions || `${pkg.repository}/discussions`)}">${escapeHtml(t('project.openDiscussions'))} ↗</a>
       </section>
@@ -1630,6 +1797,7 @@ function resetFilters() {
   state.sort = 'featured'
   state.visible = 24
   elements.search.value = ''
+  if (elements.advancedFilter) elements.advancedFilter.open = false
   renderFilters()
   render()
   alignResultsToTop()
@@ -1668,6 +1836,15 @@ function bindEvents() {
     renderAuthors()
   })
   window.addEventListener('resize', updateFeaturedRail)
+  elements.filterPanel?.addEventListener('pointermove', (event) => {
+    const bounds = elements.filterPanel.getBoundingClientRect()
+    elements.filterPanel.style.setProperty('--glass-x', `${event.clientX - bounds.left}px`)
+    elements.filterPanel.style.setProperty('--glass-y', `${event.clientY - bounds.top}px`)
+  })
+  elements.filterPanel?.addEventListener('pointerleave', () => {
+    elements.filterPanel.style.removeProperty('--glass-x')
+    elements.filterPanel.style.removeProperty('--glass-y')
+  })
   elements.kind.addEventListener('change', (event) => {
     state.kind = event.target.value
     state.visible = 24
@@ -1729,6 +1906,9 @@ function bindEvents() {
     }
   })
   document.addEventListener('click', (event) => {
+    if (elements.advancedFilter?.open && !elements.advancedFilter.contains(event.target)) {
+      elements.advancedFilter.open = false
+    }
     const projectTab = event.target.closest('[data-project-tab]')
     if (projectTab && elements.dialog.contains(projectTab)) {
       activateProjectTab(projectTab.dataset.projectTab)
@@ -1860,8 +2040,10 @@ async function init() {
     const workshop = await workshopResponse.json()
     const candidateFeed = await candidateResponse.json()
     const marketFeed = await marketResponse.json()
+    const presentation = catalogPresentation(index)
+    state.catalogComponents = new Map(presentation.components.map((pkg) => [pkg.id, { ...pkg, marketLayer: 'plugin' }]))
     state.packages = [
-      ...(index.packages || []).map((pkg) => ({ ...pkg, marketLayer: 'plugin' })),
+      ...presentation.listings.map((pkg) => ({ ...pkg, marketLayer: 'plugin' })),
       ...(marketFeed.projects || []).map(marketProject),
     ]
     state.candidates = (candidateFeed.projects || []).map(candidatePackage)

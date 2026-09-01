@@ -6,6 +6,7 @@ import { resolve } from 'node:path'
 import { registryTrustPublicKey } from './registry-signing-lib.mjs'
 import { validateExternalEvidence } from './external-evidence-lib.mjs'
 import { validateVerificationPriority } from './verification-priority-lib.mjs'
+import { buildCatalogPresentation } from './catalog-presentation-lib.mjs'
 
 const ROOT = resolve(import.meta.dirname, '..')
 const BUILD = resolve(ROOT, '.public-site')
@@ -55,6 +56,7 @@ const [catalog, registry, trustRoots, trustRootsSchema, recipes, ecosystem, work
 ])
 
 if (catalog.schema !== 'dsh-hub-index/v0.4') throw new Error('catalog schema mismatch')
+const presentation = buildCatalogPresentation(catalog)
 if (registry.schema !== 'omdsh-registry/v1') throw new Error('Registry schema mismatch')
 if (trustRoots.schema !== 'omdsh-registry-trust-roots/v1'
   || trustRootsSchema.properties?.schema?.const !== 'omdsh-registry-trust-roots/v1'
@@ -112,18 +114,25 @@ if (intake.schema !== 'omdsh-workshop-intake-queue/v1'
   || intake.records.some((record) => record.registry?.state === 'admitted')) {
   throw new Error('public intake queue must match the official baseline and current empty Registry')
 }
+const intakeVerification = Object.fromEntries(['current-baseline-passed', 'source-evidence-passed', 'blocked'].map((state) => [
+  state,
+  intake.records.filter((record) => record.verification?.state === state).length,
+]))
 if (inventory.schema !== 'omdsh-workshop-verification-inventory/v1'
   || inventory.summary?.catalogProjects !== catalog.packages.length
   || inventory.projects?.length !== catalog.packages.length
-  || inventory.summary?.verification?.['current-baseline-passed'] !== undefined
+  || (inventory.summary?.verification?.['current-baseline-passed'] ?? 0) !== intakeVerification['current-baseline-passed']
+  || (inventory.summary?.verification?.['source-evidence-passed'] ?? 0) !== intakeVerification['source-evidence-passed']
+  || (inventory.summary?.verification?.blocked ?? 0) !== intakeVerification.blocked
+  || (inventory.summary?.verification?.untested ?? 0) !== catalog.packages.length - intake.records.length
   || inventory.summary?.registry?.admitted !== undefined
   || inventory.summary?.management?.transactional !== 2
-  || inventory.summary?.management?.managed !== 9
-  || inventory.summary?.management?.guided !== catalog.packages.length - 11
+  || inventory.summary?.management?.managed !== undefined
+  || inventory.summary?.management?.guided !== catalog.packages.length - 2
   || inventory.projects.some((project) => !project.identity?.fullName || !Array.isArray(project.externalEvidence))
   || inventory.projects.some((project) => project.externalEvidence.some((evidence) => evidence.authority !== 'supplemental-only'))
   || inventory.projects.some((project) => !project.capabilities?.manifest || !project.capabilities?.install?.seamless || !project.capabilities?.install?.failureIsolation || !project.capabilities?.lifecycle?.hotReload || !project.capabilities?.integration || !project.capabilities?.admission)) {
-  throw new Error('verification inventory must cover every Catalog project without claiming current-baseline verification or Registry admission')
+  throw new Error('verification inventory must cover every Catalog project, match exact Intake evidence, and grant no Registry admission')
 }
 if (externalEvidenceSchema.properties?.schema?.const !== 'omdsh-supplemental-evidence/v1'
   || validateExternalEvidence(externalEvidence).length > 0
@@ -141,11 +150,12 @@ if (topicAudit.schema !== 'omdsh-topic-plugin-audit/v3'
 }
 const qualifiedRepositories = new Set(topicAudit.repositories
   .filter((entry) => entry.decision === 'include'
-    && entry.qualification === 'static-evidence-passed'
+    && ['verified', 'static-evidence-passed'].includes(entry.qualification)
     && (entry.evidence?.strongSignals || []).length > 0)
   .map((entry) => `${entry.owner}/${entry.name}`.toLocaleLowerCase('en-US')))
 const catalogRepositories = new Set(catalog.packages.map((entry) => new URL(entry.repository).pathname.split('/').filter(Boolean).slice(0, 2).join('/').toLocaleLowerCase('en-US')))
 if (catalog.packages.length !== catalog.stats?.packages
+  || presentation.listings.length !== catalog.stats?.listings
   || catalog.stats?.repositories !== catalogRepositories.size
   || catalog.stats?.observedTopicRepositories !== topicRepositories.observedRepositoryCount
   || catalog.stats?.qualifiedRepositories !== topicAudit.stats.decisions.include
@@ -162,16 +172,18 @@ if (catalog.packages.length !== catalog.stats?.packages
 }
 const [pluginApi, pluginTypes, marketApi] = await Promise.all([json('api/v1/plugins.json'), json('api/v1/plugin-types.json'), json('api/v1/market.json')])
 if (pluginApi.schema !== 'omdsh-ai-plugins/v1'
-  || pluginApi.count !== catalog.packages.length
-  || pluginApi.projects.length !== catalog.packages.length
+  || pluginApi.count !== presentation.listings.length
+  || pluginApi.componentCount !== catalog.packages.length
+  || pluginApi.projects.length !== presentation.listings.length
   || pluginApi.projects.some((project) => project.registry?.state !== 'ineligible')
   || pluginApi.projects.some((project) => !project.identity?.fullName || !Array.isArray(project.externalEvidence))
   || pluginApi.projects.some((project) => !project.capabilities?.install?.seamless)
   || pluginTypes.schema !== 'omdsh-ai-plugin-types/v1'
-  || pluginTypes.totals?.catalogProjects !== catalog.packages.length
+  || pluginTypes.totals?.catalogProjects !== presentation.listings.length
+  || pluginTypes.totals?.catalogComponents !== catalog.packages.length
   || pluginTypes.management.find((entry) => entry.id === 'transactional')?.count !== 2
-  || pluginTypes.management.find((entry) => entry.id === 'managed')?.count !== 9
-  || pluginTypes.management.find((entry) => entry.id === 'guided')?.count !== catalog.packages.length - 11) {
+  || (pluginTypes.management.find((entry) => entry.id === 'managed')?.count ?? 0) !== 0
+  || pluginTypes.management.find((entry) => entry.id === 'guided')?.count !== catalog.packages.length - 2) {
   throw new Error('plugin API must project the full Catalog and verification inventory without install authority')
 }
 const nonPluginIds = new Set(marketLayers.projects.map((project) => project.id))
@@ -188,8 +200,8 @@ if (marketLayers.schema !== 'omdsh-market-layers/v2'
   throw new Error('non-plugin market layers must preserve review facts, stay disjoint from the plugin Catalog, and remain ineligible for installation')
 }
 if (marketApi.schema !== 'omdsh-ai-market/v1'
-  || marketApi.totals?.projects !== catalog.packages.length + marketLayers.projects.length
-  || marketApi.totals?.plugin !== catalog.packages.length
+  || marketApi.totals?.projects !== presentation.listings.length + marketLayers.projects.length
+  || marketApi.totals?.plugin !== presentation.listings.length
   || marketApi.totals?.infrastructure !== marketLayers.totals.infrastructure
   || marketApi.totals?.distribution !== marketLayers.totals.distribution
   || marketApi.totals?.installable !== 0
@@ -264,10 +276,12 @@ if (forbiddenPublicContent.test(contents)) {
   throw new Error('public site contains private-source, login, credential, or key material')
 }
 
-const [home, app, styles, configurations, developers, publish, contributing, agentPromptZh, agentPromptEn] = await Promise.all([
+const [home, app, styles, projectsPage, discoveryApp, configurations, developers, publish, contributing, agentPromptZh, agentPromptEn] = await Promise.all([
   readFile(resolve(ROOT, 'index.html'), 'utf8'),
   readFile(resolve(ROOT, 'assets/app.js'), 'utf8'),
   readFile(resolve(ROOT, 'assets/styles.css'), 'utf8'),
+  readFile(resolve(ROOT, 'projects.html'), 'utf8'),
+  readFile(resolve(ROOT, 'assets/discovery.js'), 'utf8'),
   readFile(resolve(ROOT, 'configurations.html'), 'utf8'),
   readFile(resolve(ROOT, 'developer-guide.html'), 'utf8'),
   readFile(resolve(ROOT, 'publish.html'), 'utf8'),
@@ -275,8 +289,14 @@ const [home, app, styles, configurations, developers, publish, contributing, age
   readFile(resolve(ROOT, 'agent-submission-prompt.zh.md'), 'utf8'),
   readFile(resolve(ROOT, 'agent-submission-prompt.en.md'), 'utf8'),
 ])
-for (const required of ['discover-stage', 'featured-tabs', 'market-layer-options', 'data-market-layer="infrastructure"', 'data-market-layer="distribution"', 'data-catalog-view="grid"', 'data-catalog-view="list"', 'catalog-pagination']) {
+for (const required of ['discover-stage', 'featured-tabs', 'advanced-filter', 'active-filter-count', 'data-ecosystem-count', 'data-catalog-view="grid"', 'data-catalog-view="list"', 'catalog-pagination']) {
   if (!home.includes(required)) throw new Error(`restored Workshop layout is missing ${required}`)
+}
+for (const required of ['ecosystem-project-list', 'data-ecosystem-layer="infrastructure"', 'data-ecosystem-layer="distribution"']) {
+  if (!projectsPage.includes(required)) throw new Error(`project directory is missing ${required}`)
+}
+if (!discoveryApp.includes("fetch('market-layers.json')") || !discoveryApp.includes('renderEcosystem')) {
+  throw new Error('ecosystem infrastructure and distributions must render on the project subpage')
 }
 if (!home.includes('class="github-star"') || !home.includes('https://github.com/omdsh-dev/dsh-hub-workshop')) {
   throw new Error('the primary navigation must expose the public Workshop GitHub Star link')
@@ -286,7 +306,8 @@ if (!app.includes('featured.empty.recoverable') || !app.includes('visiblePackage
 }
 if (!home.includes('data-featured-mode="stars"')
   || !app.includes('projectStars')
-  || !app.includes('commitUpdatedAt')) {
+  || !app.includes('commitUpdatedAt')
+  || !app.includes("t('project.created')")) {
   throw new Error('featured lanes must use GitHub stars and repository commit activity')
 }
 if (!app.includes('selectSpotlightPackages')
@@ -296,7 +317,9 @@ if (!app.includes('selectSpotlightPackages')
 }
 if (!publish.includes('copy-agent-submission-prompt')
   || !publish.includes('agent-submission-prompt.zh.md')
-  || !developers.includes('agent-submission-prompt.en.md')) {
+  || !developers.includes('agent-submission-prompt.en.md')
+  || !publish.includes('copy-distribution-cli')
+  || !publish.includes('omdsh pack build')) {
   throw new Error('Author Studio and developer guide must expose Agent submission instructions')
 }
 for (const prompt of [agentPromptZh, agentPromptEn]) {

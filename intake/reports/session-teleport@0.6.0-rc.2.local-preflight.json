@@ -1,0 +1,68 @@
+{
+  "schema": "omdsh-workshop-local-preflight/v1",
+  "projectId": "session-teleport",
+  "releaseId": "session-teleport@0.6.0-rc.2",
+  "source": {
+    "repository": "https://github.com/omdsh-dev/session-teleport",
+    "ref": "0640ca9ccd1b9ac12709b74aecf2a0e75c8bb4b1",
+    "tree": "acd7a07eaa5d5a9071ab76f3564aaceb200a3290",
+    "clean": true
+  },
+  "runtime": {
+    "package": "@deepseek-ai/dsh",
+    "version": "0.1.0-rc.6",
+    "profileBase": "@deepseek-ai/dsh-base@0.1.0-rc.6",
+    "sourceRuntimeDependency": "pg@8.23.0",
+    "databaseFixture": "@electric-sql/pglite@0.5.4 + @electric-sql/pglite-socket@0.2.7"
+  },
+  "status": "blocked",
+  "checks": [
+    {
+      "id": "package.check",
+      "status": "passed",
+      "evidence": "pnpm check passed typecheck:core, typecheck:adapter, build, release-artifact verification, and Vitest; 45 tests passed and 7 environment-gated tests were skipped."
+    },
+    {
+      "id": "package.tarball",
+      "status": "passed",
+      "evidence": "pnpm pack:check verified 90 package files and confirmed the local npm configuration was excluded."
+    },
+    {
+      "id": "profile.install-safe-default",
+      "status": "passed",
+      "evidence": "The project-owned local lifecycle script passed on exact DSH RC.6: package install, JSONL-safe default and explicit cutover composition, packaged binaries and adapter loading, and uninstall restoration."
+    },
+    {
+      "id": "typed-profile-preflight",
+      "status": "passed",
+      "evidence": "The typed Harness passed 13 source, supply-chain, sandbox, exact-runtime, candidate-creation, and installation steps before the database readiness boundary; see session-teleport@0.6.0-rc.2.profile.json."
+    },
+    {
+      "id": "postgresql.health",
+      "status": "passed-fixture",
+      "evidence": "A loopback PostgreSQL-wire fixture accepted pg@8.23.0 connections and supported the fixed release's schema, concurrent recovery, generic RC.6 Profile migration, import and rollback tests. This is not native PostgreSQL production certification."
+    },
+    {
+      "id": "rc6.jsonl-migration-fixed-source",
+      "status": "failed",
+      "evidence": "The exact fixed-source suite passed 51/52 tests. Its physical JSONL fixture writes plugin/session-teleport-test events without RC.6 ignorable=true, so RC.6 correctly rejects source inspection."
+    },
+    {
+      "id": "rc6.jsonl-migration-candidate-fix",
+      "status": "passed-non-admission",
+      "evidence": "An isolated test-only candidate adding ignorable=true to the two custom event envelopes passed 52/52 tests. The candidate copy is diagnostic evidence, not fixed-source admission evidence."
+    },
+    {
+      "id": "postgresql.lifecycle-and-recovery",
+      "status": "blocked",
+      "evidence": "A new fixed plugin release is required for the RC.6 JSONL fixture correction. Native PostgreSQL and enabled-provider Profile invocation, restart, update, disable, remove, and generation recovery remain unverified."
+    }
+  ],
+  "claims": {
+    "currentBaselineVerified": false,
+    "registryEligible": false,
+    "reason": "The fixed release has one reproducible RC.6 fixture incompatibility; native PostgreSQL and live enabled-provider Profile lifecycle evidence are also incomplete."
+  },
+  "verifiedAt": "2026-08-14T16:02:06.000Z",
+  "verifier": "local-fixed-checkout-session-teleport-preflight"
+}

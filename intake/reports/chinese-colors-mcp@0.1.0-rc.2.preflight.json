@@ -1,0 +1,235 @@
+{
+  "schema": "omdsh-workshop-harness-report/v1",
+  "planId": "chinese-colors-mcp@0.1.0-rc.2:0.1.0-rc.6:mcp",
+  "projectId": "chinese-colors-mcp",
+  "releaseId": "chinese-colors-mcp@0.1.0-rc.2",
+  "source": {
+    "repository": "https://github.com/omdsh-dev/toybox",
+    "ref": "86e98729b92db0b9fe901c39e32bca74cf8c0f54",
+    "path": "/plugins/chinese-colors-mcp/.dsh-plugin"
+  },
+  "updateFrom": null,
+  "baseline": {
+    "package": "@deepseek-ai/dsh",
+    "version": "0.1.0-rc.6",
+    "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+  },
+  "profileBase": null,
+  "classification": {
+    "management": "guided",
+    "installMode": "isolated-trial",
+    "adapter": "mcp-server",
+    "protocol": "mcp",
+    "failurePolicy": "discard-process",
+    "activation": "restart-plugin"
+  },
+  "status": "passed",
+  "execution": {
+    "adapter": "mcp-2026-stdio-isolated-process-adapter",
+    "trustedSourceExecution": true,
+    "workspace": "ephemeral"
+  },
+  "steps": [
+    {
+      "id": "source.immutable",
+      "status": "passed",
+      "evidence": "clean Git origin, HEAD, and source path match 86e98729b92db0b9fe901c39e32bca74cf8c0f54; Git tree 71598fcbf77c04841c57325de22a53a8d6c88089",
+      "facts": {
+        "sourceImmutable": true
+      }
+    },
+    {
+      "id": "manifest.validate",
+      "status": "passed",
+      "evidence": "package.json#dshWorkshop passed the public manifest contract",
+      "facts": {
+        "manifestValid": true
+      }
+    },
+    {
+      "id": "artifact.present",
+      "status": "passed",
+      "evidence": "artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/toybox/plugins/chinese-colors-mcp/.dsh-plugin/server.json",
+      "facts": {
+        "artifactPresent": true
+      }
+    },
+    {
+      "id": "protocol.contract",
+      "status": "passed",
+      "evidence": "server.json and package ownership conform to the official MCP Registry contract",
+      "facts": {
+        "protocolContractValid": true
+      }
+    },
+    {
+      "id": "compatibility.baseline",
+      "status": "passed",
+      "evidence": "adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6",
+      "facts": {
+        "compatibilityPassed": true
+      }
+    },
+    {
+      "id": "permissions.review",
+      "status": "passed",
+      "evidence": "reviewed 0 declared permission scope(s)",
+      "facts": {
+        "permissionsReviewed": true
+      }
+    },
+    {
+      "id": "supply-chain.review",
+      "status": "passed",
+      "evidence": "no package lifecycle scripts; installation is forced to ignore scripts",
+      "facts": {
+        "supplyChainPassed": true,
+        "installScriptsDisabled": true
+      }
+    },
+    {
+      "id": "mcp.server-manifest",
+      "status": "passed",
+      "evidence": "official server.json contract passed at the fixed source",
+      "facts": {
+        "registrySchema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+        "serverManifestValid": true
+      }
+    },
+    {
+      "id": "mcp.ownership",
+      "status": "passed",
+      "evidence": "package.json#mcpName matches io.github.omdsh-dev/chinese-colors-mcp",
+      "facts": {
+        "packageOwnershipBound": true
+      }
+    },
+    {
+      "id": "sandbox.policy",
+      "status": "passed",
+      "evidence": "MCP server will run with deny-network sandboxing, an explicit environment, and workspace-only writes",
+      "facts": {
+        "workspaceEphemeral": true,
+        "networkDeniedByDefault": true,
+        "installScriptsDisabled": true,
+        "currentProtected": true
+      }
+    },
+    {
+      "id": "mcp.process-create",
+      "status": "passed",
+      "evidence": "spawned sandboxed MCP stdio pid 33803",
+      "facts": {
+        "processIsolated": true,
+        "currentUntouched": true
+      }
+    },
+    {
+      "id": "mcp.discover",
+      "status": "passed",
+      "evidence": "server/discover selected the stateless 2026-07-28 protocol era",
+      "facts": {
+        "protocolVersion": "2026-07-28",
+        "discovered": true,
+        "stateless": true
+      }
+    },
+    {
+      "id": "mcp.tools-list",
+      "status": "passed",
+      "evidence": "tools/list returned 4 tool(s), including color_search",
+      "facts": {
+        "toolsListed": true
+      }
+    },
+    {
+      "id": "capability.invoke",
+      "status": "passed",
+      "evidence": "tools/call returned the expected isolated fixture result",
+      "facts": {
+        "capabilityObserved": true
+      },
+      "capability": {
+        "id": "color_search",
+        "kind": "tool",
+        "invocation": "color_search({keyword: '黛'})",
+        "expected": "🔍 找到 3 个与 \"黛\" 相关的传统色：\n\n**黛紫** #574266 · RGB(87,66,102) · 紫系\n  📜 青黛染紫，温润含蓄\n**黛蓝** #425066 · RGB(66,80,102) · 青系\n  📜 青黛沉蓝，远山含黛\n**秋香** #D9B611 · RGB(217,182,17) · 黄系\n  📜 秋天的稻香之色，黛玉穿的\"秋香色\"",
+        "observed": "🔍 找到 3 个与 \"黛\" 相关的传统色：\n\n**黛紫** #574266 · RGB(87,66,102) · 紫系\n  📜 青黛染紫，温润含蓄\n**黛蓝** #425066 · RGB(66,80,102) · 青系\n  📜 青黛沉蓝，远山含黛\n**秋香** #D9B611 · RGB(217,182,17) · 黄系\n  📜 秋天的稻香之色，黛玉穿的\"秋香色\""
+      }
+    },
+    {
+      "id": "failure.inject-process",
+      "status": "passed",
+      "evidence": "failure tool terminated only the isolated MCP child and the client observed a closed transport",
+      "facts": {
+        "failureInjected": true
+      }
+    },
+    {
+      "id": "failure.current-unchanged",
+      "status": "passed",
+      "evidence": "MCP process failure left the protected current Profile sentinel unchanged",
+      "facts": {
+        "currentUnchanged": true
+      }
+    },
+    {
+      "id": "failure.discard-process",
+      "status": "passed",
+      "evidence": "failed MCP process was fully reaped",
+      "facts": {
+        "processDiscarded": true
+      }
+    },
+    {
+      "id": "lifecycle.restart",
+      "status": "passed",
+      "evidence": "fresh isolated pid 33805 restarted the plugin process and invoked color_search",
+      "facts": {
+        "restarted": true,
+        "restartScope": "plugin",
+        "capabilityObserved": true
+      }
+    },
+    {
+      "id": "remove.apply",
+      "status": "passed",
+      "evidence": "MCP client closed transport and reaped the isolated process",
+      "facts": {
+        "removePassed": true,
+        "processRemoved": true
+      }
+    }
+  ],
+  "cleanup": {
+    "status": "passed",
+    "evidence": "MCP workspace and child process were removed",
+    "facts": {
+      "workspaceRemoved": true
+    }
+  },
+  "claims": {
+    "seamlessInstall": {
+      "state": "not-claimed",
+      "reason": "only transactional Profile Bundle installation can claim seamless installation"
+    },
+    "failureIsolation": {
+      "state": "verified",
+      "reason": "all required typed Harness steps passed"
+    },
+    "hotReload": {
+      "state": "not-declared",
+      "reason": "declared activation is restart-plugin"
+    },
+    "protocolCompatibility": {
+      "state": "verified",
+      "reason": "all required typed Harness steps passed"
+    },
+    "registryReadiness": {
+      "state": "catalog-only",
+      "reason": "this protocol has no current Workshop Registry install authority"
+    }
+  },
+  "verifiedAt": "2026-08-14T12:49:27.951Z",
+  "verifier": "local-fixed-checkout-mcp-preflight"
+}

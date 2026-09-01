@@ -1,0 +1,235 @@
+{
+  "schema": "omdsh-workshop-harness-report/v1",
+  "planId": "decision-dice-mcp@0.1.0-rc.2:0.1.0-rc.6:mcp",
+  "projectId": "decision-dice-mcp",
+  "releaseId": "decision-dice-mcp@0.1.0-rc.2",
+  "source": {
+    "repository": "https://github.com/omdsh-dev/toybox",
+    "ref": "86e98729b92db0b9fe901c39e32bca74cf8c0f54",
+    "path": "/plugins/decision-dice-mcp/.dsh-plugin"
+  },
+  "updateFrom": null,
+  "baseline": {
+    "package": "@deepseek-ai/dsh",
+    "version": "0.1.0-rc.6",
+    "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg=="
+  },
+  "profileBase": null,
+  "classification": {
+    "management": "guided",
+    "installMode": "isolated-trial",
+    "adapter": "mcp-server",
+    "protocol": "mcp",
+    "failurePolicy": "discard-process",
+    "activation": "restart-plugin"
+  },
+  "status": "passed",
+  "execution": {
+    "adapter": "mcp-2026-stdio-isolated-process-adapter",
+    "trustedSourceExecution": true,
+    "workspace": "ephemeral"
+  },
+  "steps": [
+    {
+      "id": "source.immutable",
+      "status": "passed",
+      "evidence": "clean Git origin, HEAD, and source path match 86e98729b92db0b9fe901c39e32bca74cf8c0f54; Git tree a787ac3fd476b4e4244161f4e2ecd44fec785b59",
+      "facts": {
+        "sourceImmutable": true
+      }
+    },
+    {
+      "id": "manifest.validate",
+      "status": "passed",
+      "evidence": "package.json#dshWorkshop passed the public manifest contract",
+      "facts": {
+        "manifestValid": true
+      }
+    },
+    {
+      "id": "artifact.present",
+      "status": "passed",
+      "evidence": "artifact present at /Users/liuzhuoxin/Documents/Codex/2026-08-13/atlas-ompsh-dev-dsh-hub-atlas/work/release-repos/toybox/plugins/decision-dice-mcp/.dsh-plugin/server.json",
+      "facts": {
+        "artifactPresent": true
+      }
+    },
+    {
+      "id": "protocol.contract",
+      "status": "passed",
+      "evidence": "server.json and package ownership conform to the official MCP Registry contract",
+      "facts": {
+        "protocolContractValid": true
+      }
+    },
+    {
+      "id": "compatibility.baseline",
+      "status": "passed",
+      "evidence": "adapter is pinned to @deepseek-ai/dsh@0.1.0-rc.6",
+      "facts": {
+        "compatibilityPassed": true
+      }
+    },
+    {
+      "id": "permissions.review",
+      "status": "passed",
+      "evidence": "reviewed 0 declared permission scope(s)",
+      "facts": {
+        "permissionsReviewed": true
+      }
+    },
+    {
+      "id": "supply-chain.review",
+      "status": "passed",
+      "evidence": "no package lifecycle scripts; installation is forced to ignore scripts",
+      "facts": {
+        "supplyChainPassed": true,
+        "installScriptsDisabled": true
+      }
+    },
+    {
+      "id": "mcp.server-manifest",
+      "status": "passed",
+      "evidence": "official server.json contract passed at the fixed source",
+      "facts": {
+        "registrySchema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+        "serverManifestValid": true
+      }
+    },
+    {
+      "id": "mcp.ownership",
+      "status": "passed",
+      "evidence": "package.json#mcpName matches io.github.omdsh-dev/decision-dice-mcp",
+      "facts": {
+        "packageOwnershipBound": true
+      }
+    },
+    {
+      "id": "sandbox.policy",
+      "status": "passed",
+      "evidence": "MCP server will run with deny-network sandboxing, an explicit environment, and workspace-only writes",
+      "facts": {
+        "workspaceEphemeral": true,
+        "networkDeniedByDefault": true,
+        "installScriptsDisabled": true,
+        "currentProtected": true
+      }
+    },
+    {
+      "id": "mcp.process-create",
+      "status": "passed",
+      "evidence": "spawned sandboxed MCP stdio pid 33837",
+      "facts": {
+        "processIsolated": true,
+        "currentUntouched": true
+      }
+    },
+    {
+      "id": "mcp.discover",
+      "status": "passed",
+      "evidence": "server/discover selected the stateless 2026-07-28 protocol era",
+      "facts": {
+        "protocolVersion": "2026-07-28",
+        "discovered": true,
+        "stateless": true
+      }
+    },
+    {
+      "id": "mcp.tools-list",
+      "status": "passed",
+      "evidence": "tools/list returned 4 tool(s), including flip",
+      "facts": {
+        "toolsListed": true
+      }
+    },
+    {
+      "id": "capability.invoke",
+      "status": "passed",
+      "evidence": "tools/call returned the expected isolated fixture result",
+      "facts": {
+        "capabilityObserved": true
+      },
+      "capability": {
+        "id": "flip",
+        "kind": "tool",
+        "invocation": "flip({seed: 'verify'})",
+        "expected": "🪙 硬币腾空而起……\n🎯 结果：**反面**\n（seed=\"verify\"，可复现）",
+        "observed": "🪙 硬币腾空而起……\n🎯 结果：**反面**\n（seed=\"verify\"，可复现）"
+      }
+    },
+    {
+      "id": "failure.inject-process",
+      "status": "passed",
+      "evidence": "failure tool terminated only the isolated MCP child and the client observed a closed transport",
+      "facts": {
+        "failureInjected": true
+      }
+    },
+    {
+      "id": "failure.current-unchanged",
+      "status": "passed",
+      "evidence": "MCP process failure left the protected current Profile sentinel unchanged",
+      "facts": {
+        "currentUnchanged": true
+      }
+    },
+    {
+      "id": "failure.discard-process",
+      "status": "passed",
+      "evidence": "failed MCP process was fully reaped",
+      "facts": {
+        "processDiscarded": true
+      }
+    },
+    {
+      "id": "lifecycle.restart",
+      "status": "passed",
+      "evidence": "fresh isolated pid 33839 restarted the plugin process and invoked flip",
+      "facts": {
+        "restarted": true,
+        "restartScope": "plugin",
+        "capabilityObserved": true
+      }
+    },
+    {
+      "id": "remove.apply",
+      "status": "passed",
+      "evidence": "MCP client closed transport and reaped the isolated process",
+      "facts": {
+        "removePassed": true,
+        "processRemoved": true
+      }
+    }
+  ],
+  "cleanup": {
+    "status": "passed",
+    "evidence": "MCP workspace and child process were removed",
+    "facts": {
+      "workspaceRemoved": true
+    }
+  },
+  "claims": {
+    "seamlessInstall": {
+      "state": "not-claimed",
+      "reason": "only transactional Profile Bundle installation can claim seamless installation"
+    },
+    "failureIsolation": {
+      "state": "verified",
+      "reason": "all required typed Harness steps passed"
+    },
+    "hotReload": {
+      "state": "not-declared",
+      "reason": "declared activation is restart-plugin"
+    },
+    "protocolCompatibility": {
+      "state": "verified",
+      "reason": "all required typed Harness steps passed"
+    },
+    "registryReadiness": {
+      "state": "catalog-only",
+      "reason": "this protocol has no current Workshop Registry install authority"
+    }
+  },
+  "verifiedAt": "2026-08-14T12:49:28.784Z",
+  "verifier": "local-fixed-checkout-mcp-preflight"
+}

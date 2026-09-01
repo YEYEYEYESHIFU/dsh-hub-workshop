@@ -1,0 +1,79 @@
+{
+  "schema": "omdsh-workshop-rc6-alignment-evidence/v1",
+  "generatedAt": "2026-08-14T16:02:06Z",
+  "projectId": "session-teleport",
+  "releaseId": "session-teleport@0.6.0-rc.2",
+  "source": {
+    "repository": "https://github.com/omdsh-dev/session-teleport",
+    "ref": "0640ca9ccd1b9ac12709b74aecf2a0e75c8bb4b1",
+    "testFile": "tests/jsonl-migration.postgres.integration.spec.ts",
+    "testFileSha256": "ec9c23f6ed5a2747f91cb9b65e1be9633486cb0c5e4dc139b14a305655011859"
+  },
+  "baseline": {
+    "package": "@deepseek-ai/dsh",
+    "version": "0.1.0-rc.6",
+    "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg==",
+    "onlineCoordinateVerified": true
+  },
+  "databaseFixture": {
+    "engine": {
+      "package": "@electric-sql/pglite",
+      "version": "0.5.4",
+      "integrity": "sha512-yYZUyyXrHU7tPlCjwZQJ6hIG9DscdCCn7Uk0mYKwC1FeHX286AbcmFveMiRBEak8e9iPupjsoVImN3yJZVed2g=="
+    },
+    "wireServer": {
+      "package": "@electric-sql/pglite-socket",
+      "version": "0.2.7",
+      "integrity": "sha512-lhYx1OOVueiWJRa2Uj1QiIjCWmpRnYLNs5rRH/g47EqrYXP/Qt3VvcXGGum4uIouKKMVlPlkXb6E5Uw0aHRymw=="
+    },
+    "transport": "PostgreSQL wire protocol over loopback",
+    "scope": "WASM PostgreSQL compatibility fixture; not native PostgreSQL production certification"
+  },
+  "fixedSourceRun": {
+    "commandClass": "full plugin test suite with exact RC.6 runtime and pgwire fixture",
+    "testFilesPassed": 10,
+    "testFilesFailed": 1,
+    "testsPassed": 51,
+    "testsFailed": 1,
+    "status": "failed",
+    "failedTest": "physical JSONL prefix capture/import/rollback",
+    "rootCause": {
+      "code": "rc6-unknown-event-not-ignorable",
+      "classification": "source-test-fixture-incompatible",
+      "detail": "The fixed RC.2 test fixture writes a custom Session event type without the RC.6 ignorable=true envelope marker. RC.6 correctly refuses to interpret that JSONL log."
+    }
+  },
+  "passedSubsets": [
+    {
+      "name": "concurrent PostgreSQL writer recovery and rollback",
+      "testsPassed": 4,
+      "testsFailed": 0
+    },
+    {
+      "name": "real RC.6 DSH Profile capture, PostgreSQL import and rollback",
+      "testsPassed": 1,
+      "testsFailed": 0
+    }
+  ],
+  "candidateFixValidation": {
+    "sourceCommitUnchanged": true,
+    "admissionEvidence": false,
+    "change": "Add ignorable=true to the two custom plugin/session-teleport-test event envelopes in the isolated test fixture copy.",
+    "candidateTestFileSha256": "2b8ee484639ba63b095174a26df3d226a9bc04bca82913155d394002978884da",
+    "testFilesPassed": 11,
+    "testFilesFailed": 0,
+    "testsPassed": 52,
+    "testsFailed": 0,
+    "status": "passed"
+  },
+  "decision": {
+    "state": "blocked-source-fix-required",
+    "rc6Verified": false,
+    "registryEligible": false,
+    "blockers": [
+      "A new fixed plugin release must carry the RC.6-compatible JSONL migration test fixture.",
+      "Native PostgreSQL and live RC.6 Profile provider lifecycle acceptance are still required.",
+      "Independent human trust review and admission remain pending."
+    ]
+  }
+}

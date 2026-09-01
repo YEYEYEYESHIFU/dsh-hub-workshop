@@ -3,6 +3,7 @@
 import { readFile, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { capabilityProfile } from './workshop-manifest-lib.mjs'
+import { buildCatalogPresentation } from './catalog-presentation-lib.mjs'
 
 const ROOT = resolve(import.meta.dirname, '..')
 const json = (path) => readFile(resolve(ROOT, path), 'utf8').then(JSON.parse)
@@ -43,14 +44,26 @@ function inferCategory(entry) {
   return 'developer-tools'
 }
 
-function discoveryFacts(snapshot, qualification) {
+function discoveryFacts(snapshot, classification) {
+  const creation = classification?.evidence?.creation || {}
+  const dependencies = classification?.evidence?.dependencyCheck || {}
   return {
     source: 'github-topic', topic: 'dsh-plugin',
     stars: snapshot?.stars || 0,
+    createdAt: creation.createdAt || snapshot?.createdAt || null,
     commitUpdatedAt: snapshot?.commitUpdatedAt || audit.sourceSnapshotGeneratedAt,
     metadataUpdatedAt: snapshot?.metadataUpdatedAt || audit.sourceSnapshotGeneratedAt,
     archived: snapshot?.archived || false,
-    qualification,
+    qualification: classification?.reasonCode,
+    creationEligibility: creation.reason || 'repository-created-at-unavailable',
+    officialExempt: creation.officialExempt === true,
+    dependencyEvidence: {
+      productionHarness: Object.keys(dependencies.production || {}),
+      versionedProductionHarness: Object.keys(dependencies.versionedProduction || {}),
+      unboundedProductionHarness: Object.keys(dependencies.unboundedProduction || {}),
+      referencedProductionHarness: dependencies.referencedProduction || [],
+      developmentOnlyHarness: Object.keys(dependencies.developmentOnly || {}),
+    },
   }
 }
 
@@ -75,16 +88,31 @@ function workshopFacts(classification, project = null) {
   return profile
 }
 
-const reviewedEntries = catalog.packages.filter((entry) => entry.status !== 'discovery' && entry.id !== 'dsh-tool-browser')
+function hasStaticQualification(classification) {
+  return classification?.decision === 'include'
+    && ['verified', 'static-evidence-passed'].includes(classification.qualification)
+}
+
+const reviewedEntries = catalog.packages.filter((entry) => {
+  if (entry.status === 'discovery' || entry.id === 'dsh-tool-browser') return false
+  const classification = auditByRepository.get(repositoryKey(entry.repository))
+  return hasStaticQualification(classification)
+    && classification.evidence?.creation?.eligible === true
+})
   .map((entry) => {
-    const classification = auditByRepository.get(repositoryKey(entry.repository))
-    return { ...entry, workshop: workshopFacts(classification, entry) }
+    const key = repositoryKey(entry.repository)
+    const classification = auditByRepository.get(key)
+    const snapshot = topicByRepository.get(key)
+    return {
+      ...entry,
+      discovery: { ...(entry.discovery || {}), ...discoveryFacts(snapshot, classification) },
+      workshop: workshopFacts(classification, entry),
+    }
   })
 const retainedDiscoveryEntries = catalog.packages.filter((entry) => {
   if (entry.status !== 'discovery') return false
   const classification = auditByRepository.get(repositoryKey(entry.repository))
-  return classification?.decision === 'include'
-    && classification.qualification === 'static-evidence-passed'
+  return hasStaticQualification(classification)
     && (classification.evidence?.strongSignals || []).length > 0
 })
   .map((entry) => {
@@ -101,15 +129,14 @@ const retainedDiscoveryEntries = catalog.packages.filter((entry) => {
         type: 'manual', label: '查看公开来源', source: entry.repository, command: entry.repository,
         note: '展示与待审核状态不授予安装权限。请先核验固定版本、许可、权限、供应链与当前官方基线。',
       },
-      discovery: discoveryFacts(snapshot, classification.reasonCode),
+      discovery: discoveryFacts(snapshot, classification),
       workshop: workshopFacts(classification, entry),
     }
   })
 
 const representedRepositories = new Set([...retainedDiscoveryEntries, ...reviewedEntries].map((entry) => repositoryKey(entry.repository)))
 const generatedEntries = audit.repositories
-  .filter((entry) => entry.decision === 'include'
-    && entry.qualification === 'static-evidence-passed'
+  .filter((entry) => hasStaticQualification(entry)
     && (entry.evidence?.strongSignals || []).length > 0
     && !representedRepositories.has(`${entry.owner}/${entry.name}`.toLocaleLowerCase('en-US')))
   .map((entry) => {
@@ -135,7 +162,7 @@ const generatedEntries = audit.repositories
         note: '展示与待审核状态不授予安装权限。请先核验固定版本、许可、权限、供应链与当前官方基线。',
       },
       featured: false,
-      discovery: discoveryFacts(snapshot, entry.reasonCode),
+      discovery: discoveryFacts(snapshot, entry),
       workshop: workshopFacts(entry),
     }
   })
@@ -144,6 +171,8 @@ const packages = [...retainedDiscoveryEntries, ...generatedEntries, ...reviewedE
   .sort((left, right) => Number(right.status !== 'discovery') - Number(left.status !== 'discovery')
     || Number(right.discovery?.stars || 0) - Number(left.discovery?.stars || 0)
     || left.id.localeCompare(right.id))
+const presentationGroups = catalog.presentationGroups || []
+const presentation = buildCatalogPresentation({ packages, presentationGroups })
 const catalogRepositories = new Set(packages.map((entry) => repositoryKey(entry.repository)))
 const countBy = (field) => Object.fromEntries([...new Set(packages.map((entry) => entry[field]))]
   .sort().map((value) => [value, packages.filter((entry) => entry[field] === value).length]))
@@ -156,12 +185,15 @@ const catalogOutput = {
   updated: audit.sourceSnapshotGeneratedAt,
   policy: {
     discovery: 'Topic is discovery-only. Plugin Catalog entries require a valid package.json#dshWorkshop manifest or preserved legacy file-level artifacts. Legacy entries are compatibility-mapped and still need the manifest plus current-baseline tests.',
+    creation: audit.policy.creation,
+    dependencies: audit.policy.dependencies,
     exclusions: 'Name, description, README claims, unavailable scans, unexpanded collections, Topic-only traffic, core products, Awesome/documentation, and templates remain outside the plugin Catalog. Genuine ecosystem infrastructure and distributions are displayed separately.',
     archive: 'Archived genuine works remain visible with their archived source fact.',
     authority: 'Catalog visibility and review state never grant Registry installation authority.',
   },
   stats: {
     packages: packages.length,
+    listings: presentation.listings.length,
     repositories: catalogRepositories.size,
     observedTopicRepositories: audit.stats.repositories,
     qualifiedRepositories: audit.stats.decisions.include || 0,
@@ -174,6 +206,7 @@ const catalogOutput = {
     kinds: countBy('kind'),
     installMethods,
   },
+  presentationGroups,
   packages,
 }
 
@@ -210,6 +243,7 @@ const discoveredMarket = audit.repositories
       featured: false,
       discovery: {
         stars: snapshot?.stars || 0,
+        createdAt: snapshot?.createdAt || null,
         commitUpdatedAt: snapshot?.commitUpdatedAt || audit.sourceSnapshotGeneratedAt,
         metadataUpdatedAt: snapshot?.metadataUpdatedAt || audit.sourceSnapshotGeneratedAt,
         archived: snapshot?.archived || false,

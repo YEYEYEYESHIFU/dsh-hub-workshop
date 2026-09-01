@@ -1,0 +1,136 @@
+{
+  "schema": "omdsh-workshop-real-project-review/v1",
+  "id": "7d7d",
+  "releaseId": "7d7d@0.4.0-rc.1",
+  "source": {
+    "repository": "https://github.com/omdsh-dev/7d7d",
+    "ref": "80b6ddb779a009d378a1c30c85dfef598f527997",
+    "path": null,
+    "packagePath": "package.json",
+    "publiclyReachable": true,
+    "observedDefaultHead": "80b6ddb779a009d378a1c30c85dfef598f527997",
+    "tree": "844a8af6a4ea6d29a0c65e120bbe1431faac92a5"
+  },
+  "catalog": {
+    "version": "0.4.0-rc.1",
+    "license": "MIT",
+    "kind": "ui",
+    "legacyManagement": "profile-bundle"
+  },
+  "package": {
+    "name": "@mattheliu/7d7d",
+    "version": "0.4.0-rc.1",
+    "license": "MIT",
+    "private": true,
+    "workshopManifest": "absent",
+    "legacySignals": [
+      "dsh.bundle.patch:./cordis.patch.yml"
+    ],
+    "lifecycleScripts": []
+  },
+  "sequence": [
+    {
+      "stage": "fixed-source",
+      "state": "passed",
+      "reason": "Anonymous public Git fetch resolved the exact commit and tree 844a8af6a4ea6d29a0c65e120bbe1431faac92a5."
+    },
+    {
+      "stage": "type-plan",
+      "state": "blocked",
+      "reason": "A valid author-declared package.json#dshWorkshop and matching release facts are required."
+    },
+    {
+      "stage": "trust-review",
+      "state": "completed",
+      "reason": "Assisted static review recorded 3 finding(s) without executing source code."
+    },
+    {
+      "stage": "adapter",
+      "state": "blocked",
+      "reason": "Source execution requires a separate explicit human trust decision after a valid type plan."
+    },
+    {
+      "stage": "evidence",
+      "state": "saved",
+      "reason": "Pre-admission review evidence is stored at intake/reviews/7d7d@0.4.0-rc.1.json."
+    },
+    {
+      "stage": "human-review",
+      "state": "pending",
+      "reason": "Independent maintainer review has not been recorded."
+    },
+    {
+      "stage": "admission",
+      "state": "not-created",
+      "reason": "Admission is a separate explicit change after approved review and passing Harness evidence."
+    }
+  ],
+  "typePlan": {
+    "state": "blocked",
+    "declaredProtocol": null,
+    "declaredAdapter": null,
+    "observedLegacyProtocol": "harness-profile",
+    "observedLegacyAdapter": "profile-bundle",
+    "migrationOptions": [],
+    "reason": "package.json#dshWorkshop is absent"
+  },
+  "trustReview": {
+    "state": "needs-fix",
+    "method": "assisted-static-public-source-review",
+    "sourceExecutionAuthorized": false,
+    "checks": {
+      "publicCommit": "passed",
+      "packageJson": "passed",
+      "workshopManifest": "failed",
+      "catalogVersion": "passed",
+      "license": "passed",
+      "artifact": "passed",
+      "credentials": "passed",
+      "symlinkContainment": "passed",
+      "nativeCode": "passed",
+      "lifecycleScripts": "passed",
+      "processExecutionIntent": "review-required",
+      "rc6Baseline": "failed"
+    },
+    "findings": [
+      {
+        "severity": "blocker",
+        "code": "workshop-manifest-absent",
+        "evidence": "package.json#dshWorkshop is absent"
+      },
+      {
+        "severity": "blocker",
+        "code": "legacy-runtime-pins",
+        "evidence": "Fixed package still declares @deepseek-ai/cordis@4.0.1-rc.4, @deepseek-ai/dsh-client-runtime@0.0.1-rc.5, @deepseek-ai/dsh-client-ui-conversation@0.0.1-rc.5, @deepseek-ai/dsh-client-ui-slots@0.0.1-rc.5, @deepseek-ai/dsh-host-webserver@0.0.1-rc.5; this is not RC.6 evidence."
+      },
+      {
+        "severity": "review",
+        "code": "process-execution-intent",
+        "evidence": "1 tracked file(s) contain process-execution intent and require manual inspection."
+      }
+    ]
+  },
+  "adapter": {
+    "state": "blocked",
+    "name": "profile-bundle",
+    "reason": "Typed Harness plan is blocked; project code was not executed.",
+    "report": null
+  },
+  "humanReview": {
+    "state": "pending",
+    "reviewer": null,
+    "reason": "The generated assisted review cannot approve its own independent human gate."
+  },
+  "admission": {
+    "state": "not-created",
+    "reason": "No approved human review or passing RC.6 Harness report exists for this fixed release."
+  },
+  "claims": {
+    "rc6Verified": false,
+    "seamlessInstall": "unknown",
+    "failureIsolation": "unknown",
+    "hotReload": "unknown"
+  },
+  "reviewedAt": "2026-08-14T07:27:57.043Z",
+  "reviewer": "codex-assisted-pre-admission-review"
+}
